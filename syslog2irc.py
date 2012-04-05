@@ -17,7 +17,7 @@ For more information, see `RFC 3164`, "The BSD syslog Protocol".
 
 :Copyright: 2007 Jochen Kupperschmidt
 :Date: 12-Apr-2007
-:License: GNU General Public License, Version 2
+:License: MIT, see LICENSE for details.
 
 .. _python-irclib:  http://python-irclib.sourceforge.net/
 .. _RFC 3164:       http://tools.ietf.org/html/rfc3164
