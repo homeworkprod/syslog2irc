@@ -23,6 +23,7 @@ For more information, see `RFC 3164`, "The BSD syslog Protocol".
 .. _RFC 3164:       http://tools.ietf.org/html/rfc3164
 """
 
+import argparse
 from Queue import Queue
 from SocketServer import BaseRequestHandler, ThreadingUDPServer
 from threading import Thread
@@ -125,8 +126,10 @@ class SyslogRequestHandler(BaseRequestHandler):
 class SyslogReceiveServer(ThreadingUDPServer):
     """UDP server that waits for syslog messages."""
 
-    def __init__(self):
-        ThreadingUDPServer.__init__(self, ('', 514), SyslogRequestHandler)
+    DEFAULT_PORT = 514
+
+    def __init__(self, port):
+        ThreadingUDPServer.__init__(self, ('', port), SyslogRequestHandler)
         self.queue = Queue()
 
 
@@ -189,13 +192,35 @@ def process_queue(announce_callback, queue, delay=2):
             continue
         announce_callback('%s:%d ' % addr + str(msg))
 
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(usage='%(prog)s [options]')
+
+    parser.add_argument('--syslog-port',
+        dest='syslog_port',
+        type=int,
+        default=SyslogReceiveServer.DEFAULT_PORT,
+        metavar='PORT',
+        help='the port to listen on for syslog messages [default: %d]'
+            % SyslogReceiveServer.DEFAULT_PORT)
+
+    parser.add_argument('--no-irc',
+        dest='irc_enabled',
+        action='store_false',
+        default=False,
+        help='display messages locally instead of forwarding them to IRC')
+
+    return parser.parse_args()
+
 if __name__ == '__main__':
+    args = parse_args()
+
     # Set IRC connection parameters.
-    irc_active = True
+    print 'IRC enabled:', args.irc_enabled
     irc_servers = [('irc.example.com', 6667)]
     irc_channels = [('#examplechannel', 'secret')]
 
-    if irc_active:
+    if args.irc_enabled:
         # Prepare and start IRC bot.
         bot = SyslogBot(irc_servers, irc_channels)
         Thread(target=bot.start).start()
@@ -206,7 +231,7 @@ if __name__ == '__main__':
             print s
 
     # Prepare and start syslog message receiver.
-    receiver = SyslogReceiveServer()
+    receiver = SyslogReceiveServer(args.syslog_port)
     Thread(target=receiver.serve_forever).start()
 
     process_queue(announce, receiver.queue)
