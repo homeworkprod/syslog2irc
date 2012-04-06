@@ -24,6 +24,7 @@ For more information, see `RFC 3164`, "The BSD syslog Protocol".
 """
 
 import argparse
+from collections import namedtuple
 from Queue import Queue
 from SocketServer import BaseRequestHandler, ThreadingUDPServer
 from threading import Thread
@@ -31,6 +32,10 @@ from time import sleep, strftime, strptime
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
+
+
+DEFAULT_IRC_PORT = 6667
+DEFAULT_SYSLOG_PORT = 514
 
 
 # ---------------------------------------------------------------- #
@@ -126,8 +131,6 @@ class SyslogRequestHandler(BaseRequestHandler):
 class SyslogReceiveServer(ThreadingUDPServer):
     """UDP server that waits for syslog messages."""
 
-    DEFAULT_PORT = 514
-
     def __init__(self, port):
         ThreadingUDPServer.__init__(self, ('', port), SyslogRequestHandler)
         self.queue = Queue()
@@ -138,9 +141,10 @@ class SyslogReceiveServer(ThreadingUDPServer):
 
 class SyslogBot(SingleServerIRCBot):
 
-    def __init__(self, server_list, channel_list, nickname='Syslog',
+    def __init__(self, hostAndPort, channel_list, nickname='Syslog',
             realname='syslog'):
-        SingleServerIRCBot.__init__(self, server_list, nickname, realname)
+        print 'Connecting to IRC server %s:%d ...' % hostAndPort
+        SingleServerIRCBot.__init__(self, [hostAndPort], nickname, realname)
         self.channel_list = channel_list
 
     def on_welcome(self, conn, event):
@@ -194,21 +198,39 @@ def process_queue(announce_callback, queue, delay=2):
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(usage='%(prog)s [options]')
+
+    HostAndPort = namedtuple('HostAndPort', ['host', 'port'])
+
+    def host_and_port(port_default):
+        def parse_host_and_port(value):
+            """Parse a hostname with optional port."""
+            host, port_str = value.partition(':')[::2]
+            port = int(port_str) if port_str else port_default
+            return HostAndPort(host, port)
+        return parse_host_and_port
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--irc-disabled',
+        dest='irc_enabled',
+        action='store_false',
+        default=True,
+        help='display messages on STDOUT instead of forwarding them to IRC')
 
     parser.add_argument('--syslog-port',
         dest='syslog_port',
         type=int,
-        default=SyslogReceiveServer.DEFAULT_PORT,
+        default=DEFAULT_SYSLOG_PORT,
         metavar='PORT',
         help='the port to listen on for syslog messages [default: %d]'
-            % SyslogReceiveServer.DEFAULT_PORT)
+            % DEFAULT_SYSLOG_PORT)
 
-    parser.add_argument('--no-irc',
-        dest='irc_enabled',
-        action='store_false',
-        default=False,
-        help='display messages locally instead of forwarding them to IRC')
+    parser.add_argument('irc_server',
+        type=host_and_port(DEFAULT_IRC_PORT),
+        help='IRC server (host and, optionally, port) to connect to'
+            + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
+            + ' default port: %d]' % DEFAULT_IRC_PORT,
+        metavar='<IRC server>')
 
     return parser.parse_args()
 
@@ -216,17 +238,16 @@ if __name__ == '__main__':
     args = parse_args()
 
     # Set IRC connection parameters.
-    print 'IRC enabled:', args.irc_enabled
-    irc_servers = [('irc.example.com', 6667)]
     irc_channels = [('#examplechannel', 'secret')]
 
     if args.irc_enabled:
         # Prepare and start IRC bot.
-        bot = SyslogBot(irc_servers, irc_channels)
+        bot = SyslogBot(args.irc_server, irc_channels)
         Thread(target=bot.start).start()
         announce = bot.say
     else:
-        # Just display messages locally.
+        # Just display messages on STDOUT.
+        print 'IRC output is disabled.'
         def announce(s):
             print s
 
