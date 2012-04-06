@@ -15,8 +15,8 @@ Setup your ``syslog.conf``::
 
 For more information, see `RFC 3164`, "The BSD syslog Protocol".
 
-:Copyright: 2007 Jochen Kupperschmidt
-:Date: 12-Apr-2007
+:Copyright: 2007-2012 Jochen Kupperschmidt
+:Date: 06-Apr-2012 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
 
 .. _python-irclib:  http://python-irclib.sourceforge.net/
