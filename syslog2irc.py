@@ -141,8 +141,7 @@ class SyslogReceiveServer(ThreadingUDPServer):
 
 class SyslogBot(SingleServerIRCBot):
 
-    def __init__(self, hostAndPort, channel_list, nickname='Syslog',
-            realname='syslog'):
+    def __init__(self, hostAndPort, channel_list, nickname, realname):
         print 'Connecting to IRC server %s:%d ...' % hostAndPort
         SingleServerIRCBot.__init__(self, [hostAndPort], nickname, realname)
         self.channel_list = channel_list
@@ -163,7 +162,7 @@ class SyslogBot(SingleServerIRCBot):
         whonick = nm_to_n(event.source())
         message = event.arguments()[0].lower()
         if message == 'version':
-            conn.notice(whonick, 'Syslog2IRC')
+            conn.notice(whonick, 'syslog2IRC')
         elif message == 'ping':
             conn.pong(whonick)
 
@@ -217,6 +216,16 @@ def parse_args():
         default=True,
         help='display messages on STDOUT instead of forwarding them to IRC')
 
+    parser.add_argument('--irc-nickname',
+        dest='irc_nickname',
+        default='syslog',
+        help='the IRC nickname the bot should use')
+
+    parser.add_argument('--irc-realname',
+        dest='irc_realname',
+        default='syslog2IRC',
+        help='the IRC realname the bot should use')
+
     parser.add_argument('--syslog-port',
         dest='syslog_port',
         type=int,
@@ -242,7 +251,8 @@ if __name__ == '__main__':
 
     if args.irc_enabled:
         # Prepare and start IRC bot.
-        bot = SyslogBot(args.irc_server, irc_channels)
+        bot = SyslogBot(args.irc_server, irc_channels, args.irc_nickname,
+            args.irc_realname)
         Thread(target=bot.start).start()
         announce = bot.say
     else:
