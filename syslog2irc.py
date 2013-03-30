@@ -14,9 +14,13 @@ installed via pip_:
 
     $ pip install irc
 
-Setup your ``syslog.conf``::
+Setup your ``syslog.conf`` or ``rsyslog.conf``::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on
+
+Or, to listen on a non-default port (here: 11514)::
+
+    *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
 
 For more information, see `RFC 3164`, "The BSD syslog Protocol".
 
