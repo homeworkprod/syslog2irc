@@ -7,7 +7,11 @@ syslog2IRC
 
 Receive syslog messages via UDP and show them on IRC.
 
-Requires the `python-irclib`_ package.
+Requires the `python-irclib`_ package which can be installed via pip_:
+
+.. code:: sh
+
+    $ pip install python-irclib
 
 Setup your ``syslog.conf``::
 
@@ -20,6 +24,7 @@ For more information, see `RFC 3164`, "The BSD syslog Protocol".
 :License: MIT, see LICENSE for details.
 
 .. _python-irclib:  http://python-irclib.sourceforge.net/
+.. _pip:            http://www.pip-installer.org/
 .. _RFC 3164:       http://tools.ietf.org/html/rfc3164
 """
 
