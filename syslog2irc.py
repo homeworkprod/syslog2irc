@@ -7,11 +7,12 @@ syslog2IRC
 
 Receive syslog messages via UDP and show them on IRC.
 
-Requires the `python-irclib`_ package which can be installed via pip_:
+Requires the `python-irclib`_ package (tested with version 8.0.1) which can be
+installed via pip_:
 
 .. code:: sh
 
-    $ pip install python-irclib
+    $ pip install irc
 
 Setup your ``syslog.conf``::
 
@@ -35,8 +36,7 @@ from SocketServer import BaseRequestHandler, ThreadingUDPServer
 from threading import Thread
 from time import sleep, strftime, strptime
 
-from ircbot import SingleServerIRCBot
-from irclib import nm_to_n
+from irc.bot import SingleServerIRCBot
 
 
 DEFAULT_IRC_PORT = 6667
@@ -164,8 +164,8 @@ class SyslogBot(SingleServerIRCBot):
 
     def on_ctcp(self, conn, event):
         """Answer CTCP PING and VERSION queries."""
-        whonick = nm_to_n(event.source())
-        message = event.arguments()[0].lower()
+        whonick = event.source.nick
+        message = event.arguments[0].lower()
         if message == 'version':
             conn.notice(whonick, 'syslog2IRC')
         elif message == 'ping':
@@ -176,8 +176,8 @@ class SyslogBot(SingleServerIRCBot):
 
         Die, for example.
         """
-        whonick = nm_to_n(event.source())
-        message = event.arguments()[0]
+        whonick = event.source.nick
+        message = event.arguments[0]
         if message == 'die!':
             print 'Shutting down as requested by %s...' % whonick
             self.die('Shutting down.')
