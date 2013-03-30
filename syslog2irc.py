@@ -134,7 +134,7 @@ class SyslogRequestHandler(BaseRequestHandler):
             msg = 'Invalid message.'
         else:
             self.server.queue.put((self.client_address, msg))
-        print ('%s:%d' % self.client_address), str(msg)
+        print '%s:%d' % self.client_address, str(msg)
 
 
 class SyslogReceiveServer(ThreadingUDPServer):
@@ -183,7 +183,7 @@ class SyslogBot(SingleServerIRCBot):
         whonick = event.source.nick
         message = event.arguments[0]
         if message == 'die!':
-            print 'Shutting down as requested by %s...' % whonick
+            print 'Shutting down as requested by %s ...' % whonick
             self.die('Shutting down.')
 
     def say(self, msg):
