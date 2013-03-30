@@ -1,6 +1,5 @@
 # virtual environment
-env/*
+env/
 
 # Python bytecode
-*.pyc
-*.pyo
+*.py[co]
