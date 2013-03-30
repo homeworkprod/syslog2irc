@@ -35,7 +35,7 @@ For more information, see `RFC 3164`, "The BSD syslog Protocol".
 
 import argparse
 from collections import namedtuple
-from Queue import Queue
+from Queue import Empty, Queue
 from SocketServer import BaseRequestHandler, ThreadingUDPServer
 from threading import Thread
 from time import sleep, strftime, strptime
