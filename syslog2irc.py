@@ -27,8 +27,8 @@ For more information, see `RFC 3164`_, "The BSD syslog Protocol".
 Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 `RFC 3164`_. This program, however, only implements the latter.
 
-:Copyright: 2007-2013 Jochen Kupperschmidt
-:Date: 30-Mar-2013 (original release: 12-Apr-2007)
+:Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
+:Date: 02-Jun-2013 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
 
 .. _python-irclib:  http://python-irclib.sourceforge.net/
