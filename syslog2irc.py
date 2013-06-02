@@ -27,8 +27,8 @@ For more information, see `RFC 3164`_, "The BSD syslog Protocol".
 Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 `RFC 3164`_. This program, however, only implements the latter.
 
-:Copyright: 2007-2012 Jochen Kupperschmidt
-:Date: 06-Apr-2012 (original release: 12-Apr-2007)
+:Copyright: 2007-2013 Jochen Kupperschmidt
+:Date: 30-Mar-2013 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
 
 .. _python-irclib:  http://python-irclib.sourceforge.net/
@@ -39,10 +39,12 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 
 import argparse
 from collections import namedtuple
+from datetime import datetime
+from itertools import islice, takewhile
 from Queue import Empty, Queue
 from SocketServer import BaseRequestHandler, ThreadingUDPServer
 from threading import Thread
-from time import sleep, strftime, strptime
+from time import sleep, strftime
 
 from irc.bot import SingleServerIRCBot
 
@@ -54,7 +56,53 @@ DEFAULT_SYSLOG_PORT = 514
 # ---------------------------------------------------------------- #
 # syslog stuff
 
-class SyslogMessage(object):
+
+class SyslogMessageParser(object):
+
+    @classmethod
+    def parse(cls, data):
+        parser = cls(data)
+
+        facility_id, severity_id = parser._parse_priority_value()
+        timestamp = parser._parse_timestamp()
+        hostname = parser._parse_hostname()
+        message = ''.join(parser.data_iter)
+
+        return SyslogMessage(facility_id, severity_id, timestamp, hostname, message)
+
+    def __init__(self, data):
+        self.data_iter = iter(data[:1024])  # 1024 bytes max (as stated by the RFC).
+
+    def _parse_priority_value(self):
+        """Parse the priority value to extract facility and severity IDs."""
+        start_delim = self._take_slice(1)
+        assert start_delim == '<'
+        priority_value = self._take_until('>')
+        assert len(priority_value) in [1, 2, 3]
+        facility_id, severity_id = divmod(int(priority_value), 8)
+        return facility_id, severity_id
+
+    def _parse_timestamp(self):
+        timestamp_str = self._take_slice(15)
+        nothing = self._take_until(' ')  # Advance to next part.
+        assert nothing == ''
+        timestamp = datetime.strptime(timestamp_str, '%b %d %H:%M:%S')
+        timestamp = timestamp.replace(year=datetime.today().year)
+        return timestamp
+
+    def _parse_hostname(self):
+        return self._take_until(' ')
+
+    def _take_until(self, value):
+        return ''.join(takewhile(lambda c: c != value, self.data_iter))
+
+    def _take_slice(self, n):
+        return ''.join(islice(self.data_iter, n))
+
+
+class SyslogMessage(namedtuple('SyslogMessage',
+        'facility_id severity_id timestamp hostname message'
+    )):
     """A syslog message."""
 
     FACILITIES = {
@@ -83,6 +131,7 @@ class SyslogMessage(object):
         22: 'local use 6 (local6)',
         23: 'local use 7 (local7)',
         }
+
     SEVERITIES = {
         0: 'Emergency',
         1: 'Alert',
@@ -94,29 +143,13 @@ class SyslogMessage(object):
         7: 'Debug',
         }
 
-    def __init__(self, data):
-        # 1024 bytes max says RFC.
-        self.payload = data[:1024]
-        self.parse_priority()
-        self.parse_header()
+    @property
+    def facility_name(self):
+        return self.FACILITIES[self.facility_id]
 
-    def parse_priority(self):
-        """Extract and resolve priority."""
-        prio, self.payload = self.payload.split('>', 1)
-        self.priority_id = int(prio[1:])
-        self.facility_id, self.severity_id = divmod(self.priority_id, 8)
-        self.facility = self.FACILITIES[self.facility_id]
-        self.severity = self.SEVERITIES[self.severity_id]
-
-    def parse_header(self):
-        """Try to extract a RFC-compliant TIMESTAMP/HOSTNAME header."""
-        try:
-            self.timestamp = strptime(self.payload[:15], '%b %d %H:%M:%S')
-        except ValueError:
-            # Header is not RFC-compliant.
-            self.timestamp, self.hostname = None, None
-        else:
-            self.hostname, self.payload = self.payload[16:].split(' ', 1)
+    @property
+    def severity_name(self):
+        return self.SEVERITIES[self.severity_id]
 
     def __str__(self):
         s = ''
@@ -133,7 +166,7 @@ class SyslogRequestHandler(BaseRequestHandler):
 
     def handle(self):
         try:
-            msg = SyslogMessage(self.request[0].strip())
+            msg = SyslogMessageParser.parse(self.request[0].strip())
         except ValueError:
             msg = 'Invalid message.'
         else:
@@ -151,6 +184,7 @@ class SyslogReceiveServer(ThreadingUDPServer):
 
 # ---------------------------------------------------------------- #
 # IRC bot stuff
+
 
 class SyslogBot(SingleServerIRCBot):
 
@@ -197,6 +231,7 @@ class SyslogBot(SingleServerIRCBot):
 
 
 # ---------------------------------------------------------------- #
+
 
 def process_queue(announce_callback, queue, delay=2):
     """Process received messages in queue."""
