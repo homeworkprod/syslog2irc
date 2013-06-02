@@ -22,7 +22,10 @@ Or, to listen on a non-default port (here: 11514)::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
 
-For more information, see `RFC 3164`, "The BSD syslog Protocol".
+For more information, see `RFC 3164`_, "The BSD syslog Protocol".
+
+Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
+`RFC 3164`_. This program, however, only implements the latter.
 
 :Copyright: 2007-2012 Jochen Kupperschmidt
 :Date: 06-Apr-2012 (original release: 12-Apr-2007)
@@ -31,6 +34,7 @@ For more information, see `RFC 3164`, "The BSD syslog Protocol".
 .. _python-irclib:  http://python-irclib.sourceforge.net/
 .. _pip:            http://www.pip-installer.org/
 .. _RFC 3164:       http://tools.ietf.org/html/rfc3164
+.. _RFC 5424:       http://tools.ietf.org/html/rfc5424
 """
 
 import argparse
