@@ -37,7 +37,7 @@ module name!):
 
 
 :Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 07-Jul-2013
+:Date: 08-Jul-2013
 :License: MIT, see LICENSE for details.
 """
 
@@ -88,7 +88,7 @@ CURRENT_YEAR = datetime.today().year
         'CST',
         '1987 mymachine myproc[10]: %% It\'s time to make the do-nuts.  %%  Ingredients: Mix=OK, Jelly=OK # Devices: Mixer=OK, Jelly_Injector=OK, Frier=OK # Transport: Conveyer1=OK, Conveyer2=OK # %%',
     ),
-        # Example 4 from RFC 3164.
+        # Example 4 from RFC 3164 (included for the sake of completeness).
         # This cannot be parsed because the format of the TIMESTAMP field
         # is invalid.
         #'<0>1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!',
@@ -113,6 +113,7 @@ def test_syslog_message_parser(
         expected_timestamp,
         expected_hostname,
         expected_message):
+    """Test parsing of a syslog message."""
     actual = SyslogMessageParser.parse(data)
     assert actual.facility_id == expected_facility_id
     assert actual.facility_name == expected_facility_name
@@ -121,3 +122,28 @@ def test_syslog_message_parser(
     assert actual.timestamp == expected_timestamp
     assert actual.hostname == expected_hostname
     assert actual.message == expected_message
+
+@params(
+    (
+        1, 6, None, None, 'FYI',
+        '[Informational]: FYI',
+    ),
+    (
+        9, 4, datetime(2013, 7, 8, 0, 12, 55), None, 'Tick, tack, watch the clock!',
+        '[2013-07-08 00:12:55] [Warning]: Tick, tack, watch the clock!',
+    ),
+    (
+        12, 7, None, 'ntp.local', 'What time is it?',
+        '(ntp.local) [Debug]: What time is it?',
+    ),
+    (
+        0, 0, datetime(2008, 10, 18, 17, 34, 7), 'mainframe', 'WTF? S.O.S.!',
+        '[2008-10-18 17:34:07] (mainframe) [Emergency]: WTF? S.O.S.!',
+    ),
+)
+def test_syslog_message_str(facility_id, severity_id, timestamp, hostname,
+        message, expected):
+    """Test string representation of a syslog message."""
+    syslog_message = SyslogMessage(facility_id, severity_id, timestamp,
+        hostname, message)
+    assert str(syslog_message) == expected
