@@ -44,7 +44,7 @@ from itertools import islice, takewhile
 from Queue import Empty, Queue
 from SocketServer import BaseRequestHandler, ThreadingUDPServer
 from threading import Thread
-from time import sleep, strftime
+from time import sleep
 
 from irc.bot import SingleServerIRCBot
 
@@ -83,6 +83,7 @@ class SyslogMessageParser(object):
         return facility_id, severity_id
 
     def _parse_timestamp(self):
+        """Parse timestamp into a `datetime` instance."""
         timestamp_str = self._take_slice(15)
         nothing = self._take_until(' ')  # Advance to next part.
         assert nothing == ''
@@ -154,10 +155,10 @@ class SyslogMessage(namedtuple('SyslogMessage',
     def __str__(self):
         s = ''
         if self.timestamp is not None:
-            s += '[%s] ' % strftime('%Y-%m-%d %H:%M:%S', self.timestamp)
+            s += '[%s] ' % self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         if self.hostname is not None:
             s += '(%s) ' % self.hostname
-        s += '[%s]: %s' % (self.severity, self.payload)
+        s += '[%s]: %s' % (self.severity_name, self.message)
         return s
 
 
