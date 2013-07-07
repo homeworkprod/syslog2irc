@@ -37,12 +37,23 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 .. _RFC 5424:       http://tools.ietf.org/html/rfc5424
 """
 
+from __future__ import print_function
 import argparse
 from collections import namedtuple
 from datetime import datetime
 from itertools import islice, takewhile
-from Queue import Empty, Queue
-from SocketServer import BaseRequestHandler, ThreadingUDPServer
+try:
+    # Python 2.x
+    from Queue import Empty, Queue
+except ImportError:
+    # Python 3.x
+    from queue import Empty, Queue
+try:
+    # Python 2.x
+    from SocketServer import BaseRequestHandler, ThreadingUDPServer
+except ImportError:
+    # Python 3.x
+    from socketserver import BaseRequestHandler, ThreadingUDPServer
 from threading import Thread
 from time import sleep
 
@@ -169,12 +180,13 @@ class SyslogRequestHandler(BaseRequestHandler):
     def handle(self):
         try:
             data = self.request[0].strip()
+            data = data.decode('ascii')
             msg = SyslogMessageParser.parse(data)
         except ValueError:
             msg = 'Invalid message.'
         else:
             self.server.queue.put((self.client_address, msg))
-        print '%s:%d' % self.client_address, str(msg)
+        print('%s:%d' % self.client_address, msg)
 
 
 class SyslogReceiveServer(ThreadingUDPServer):
@@ -193,13 +205,13 @@ class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to the configured channels."""
 
     def __init__(self, host_and_port, channel_list, nickname, realname):
-        print 'Connecting to IRC server %s:%d ...' % host_and_port
+        print('Connecting to IRC server %s:%d ...' % host_and_port)
         SingleServerIRCBot.__init__(self, [host_and_port], nickname, realname)
         self.channel_list = channel_list
 
     def on_welcome(self, conn, event):
         """Join channels after connect."""
-        print 'Connected to %s:%d.' % conn.socket.getsockname()
+        print('Connected to %s:%d.' % conn.socket.getsockname())
         for channel, key in self.channel_list:
             conn.join(channel, key)
 
@@ -225,7 +237,7 @@ class IrcBot(SingleServerIRCBot):
         whonick = event.source.nick
         message = event.arguments[0]
         if message == 'shutdown!':
-            print 'Shutting down as requested by user %s ...' % whonick
+            print('Shutting down as requested by user %s ...' % whonick)
             self.die('Shutting down.')
 
     def say(self, msg):
@@ -299,7 +311,7 @@ def start_announcer(args, irc_channels):
         return bot.say
     else:
         # Just display messages on STDOUT.
-        print 'IRC output is disabled; writing to STDOUT instead.'
+        print('IRC output is disabled; writing to STDOUT instead.')
         return print
 
 def start_syslog_message_receiver(args):
