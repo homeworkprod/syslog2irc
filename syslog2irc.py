@@ -220,12 +220,12 @@ class IrcBot(SingleServerIRCBot):
     def on_privmsg(self, conn, event):
         """React on private messages.
 
-        Die, for example.
+        Shut down, for example.
         """
         whonick = event.source.nick
         message = event.arguments[0]
-        if message == 'die!':
-            print 'Shutting down as requested by %s ...' % whonick
+        if message == 'shutdown!':
+            print 'Shutting down as requested by user %s ...' % whonick
             self.die('Shutting down.')
 
     def say(self, msg):
