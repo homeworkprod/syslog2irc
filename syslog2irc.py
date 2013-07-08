@@ -286,15 +286,15 @@ class SyslogReceiveServer(ThreadingUDPServer):
 class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to the configured channels."""
 
-    def __init__(self, host_and_port, channel_list, nickname, realname):
+    def __init__(self, host_and_port, nickname, realname, channels):
         print('Connecting to IRC server %s:%d ...' % host_and_port)
         SingleServerIRCBot.__init__(self, [host_and_port], nickname, realname)
-        self.channel_list = channel_list
+        self.channels_with_keys = channels
 
     def on_welcome(self, conn, event):
         """Join channels after connect."""
         print('Connected to %s:%d.' % conn.socket.getsockname())
-        for channel, key in self.channel_list:
+        for channel, key in self.channels_with_keys:
             conn.join(channel, key)
 
     def on_nicknameinuse(self, conn, event):
@@ -319,12 +319,12 @@ class IrcBot(SingleServerIRCBot):
         whonick = event.source.nick
         message = event.arguments[0]
         if message == 'shutdown!':
-            print('Shutting down as requested on IRC by user %s ...' % whonick)
+            print('Shutdown requested on IRC by user %s.' % whonick)
             self.die('Shutting down.')  # Joins IRC bot thread.
 
     def say(self, msg):
         """Say message to channels."""
-        for channel, key in self.channel_list:
+        for channel, key in self.channels_with_keys:
             self.connection.privmsg(channel, msg)
 
 
@@ -382,22 +382,41 @@ def start_thread(target, name):
     t.daemon = True
     t.start()
 
-def start_announcer(args, irc_channels):
-    """If IRC output is enabled, configure the IRC bot and start it in a
-    separate thread. If it is disabled, just write to STDOUT.
 
-    Return the announce callback.
-    """
+class IrcAnnouncer(object):
+    """Announce syslog messages on IRC."""
+
+    THREAD_NAME = 'IrcBot'
+
+    def __init__(self, server, nickname, realname, channels):
+        self.bot = IrcBot(server, nickname, realname, channels)
+        start_thread(self.bot.start, self.THREAD_NAME)
+
+    def announce(self, message):
+        self.bot.say(message)
+
+    def is_alive(self):
+        return is_thread_alive(self.THREAD_NAME)
+
+
+class StdoutAnnouncer(object):
+    """Announce syslog messages on STDOUT."""
+
+    def announce(self, message):
+        print(message)
+
+    def is_alive(self):
+        return True
+
+
+def start_announcer(args, irc_channels):
+    """Create and return an announcer according to the configuration."""
     if args.irc_server:
-        # Prepare and start IRC bot.
-        bot = IrcBot(args.irc_server, irc_channels, args.irc_nickname,
-            args.irc_realname)
-        start_thread(bot.start, 'IrcBot')
-        return bot.say
+        return IrcAnnouncer(args.irc_server, args.irc_nickname,
+            args.irc_realname, irc_channels)
     else:
-        # Just display messages on STDOUT.
         print('No IRC server specified; will write to STDOUT instead.')
-        return print
+        return StdoutAnnouncer()
 
 def start_syslog_message_receiver(port):
     """Prepare the server to receive syslog messages on the given port and
@@ -415,13 +434,13 @@ def start_syslog_message_receiver(port):
     start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
 
-def process_queue(announce_callback, queue, delay=2):
+def process_queue(announcer, queue, delay=2):
     """Process received messages in queue."""
     while True:
         sleep(delay)
 
-        if not is_thread_alive('IrcBot'):
-            print('IRC bot thread is no longer alive; exiting.')
+        if not announcer.is_alive():
+            print('Exiting ...')
             sys.exit(0)
 
         try:
@@ -429,7 +448,7 @@ def process_queue(announce_callback, queue, delay=2):
         except Empty:
             continue
 
-        announce_callback('%s:%d ' % addr + str(msg))
+        announcer.announce('%s:%d ' % addr + str(msg))
 
 def is_thread_alive(name):
     """Return true if a thread with the given name is alive."""
@@ -438,9 +457,9 @@ def is_thread_alive(name):
 
 def main(irc_channels):
     args = parse_args()
-    announce_callback = start_announcer(args, irc_channels)
+    announcer = start_announcer(args, irc_channels)
     queue = start_syslog_message_receiver(args.syslog_port)
-    process_queue(announce_callback, queue)
+    process_queue(announcer, queue)
 
 if __name__ == '__main__':
     # Configure IRC channels to join.
