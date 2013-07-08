@@ -43,7 +43,6 @@ module name!):
 
 from __future__ import unicode_literals
 from datetime import datetime
-import unittest
 
 from nose2.tools import params
 
