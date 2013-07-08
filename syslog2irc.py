@@ -395,13 +395,19 @@ def start_announcer(args, irc_channels):
         print('IRC output is disabled; writing to STDOUT instead.')
         return print
 
-def start_syslog_message_receiver(args):
-    """Prepare the server to receive syslog messages on the configured port
-    and start it in a separate thread.
+def start_syslog_message_receiver(port):
+    """Prepare the server to receive syslog messages on the given port and
+    start it in a separate thread.
 
     Return the receiver queue.
     """
-    receiver = SyslogReceiveServer(args.syslog_port)
+    try:
+        receiver = SyslogReceiveServer(port)
+    except PermissionError:
+        sys.stderr.write('No permission to open port %d. Try to specify a '
+            'port number above 1,024 (or even 4,096) and up to 65,535 using '
+            'the `--syslog-port` option.\n' % port)
+        sys.exit(1)
     start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
 
@@ -429,7 +435,7 @@ def is_thread_alive(name):
 def main(irc_channels):
     args = parse_args()
     announce_callback = start_announcer(args, irc_channels)
-    queue = start_syslog_message_receiver(args)
+    queue = start_syslog_message_receiver(args.syslog_port)
     process_queue(announce_callback, queue)
 
 if __name__ == '__main__':
