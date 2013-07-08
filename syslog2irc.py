@@ -50,7 +50,7 @@ first:
 
 If no options are given, the IRC component will not be used. Instead, syslog
 messages will be written to STDOUT. This is helpful during setup of syslog
-message reception.
+message reception. Abort execution by pressing <Control-C>.
 
 .. code:: sh
 
