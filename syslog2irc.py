@@ -146,6 +146,31 @@ DEFAULT_IRC_PORT = 6667
 DEFAULT_SYSLOG_PORT = 514
 
 
+# A note on threads (implementation detail):
+#
+# This tool uses threads. Besides the main thread, there are two additional
+# threads: one for the syslog message receiver and one for the IRC bot. Both
+# are configured to be daemon threads.
+#
+# A Python application exits if no more non-daemon threads are running.
+#
+# In order to exit syslog2IRC when shutdown is requested on IRC, the IRC bot
+# will call `die()` which joins the IRC bot thread. The main thread and the
+# (daemonized) syslog message receiver thread remain.
+#
+# The queue-processing loop regularly queries the announcer if it is still
+# "alive" (i.e. if the IRC bot thread is still running). If it is not, the
+# queue processor (which runs in the main thread) calls `sys.exit()`. As the
+# syslog message receiver thread is the only one left, but runs as a daemon,
+# the application exits.
+#
+# The STDOUT announcer, on the other hand, does not run in a thread. The user
+# has to manually interrupt the application to exit.
+#
+# For details, see the documentation on the `threading` module that is part of
+# Python's standard library.
+
+
 # ---------------------------------------------------------------- #
 # syslog stuff
 
