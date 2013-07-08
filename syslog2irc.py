@@ -127,6 +127,8 @@ try:
 except ImportError:
     # Python 3.x
     from socketserver import BaseRequestHandler, ThreadingUDPServer
+import sys
+import threading
 from threading import Thread
 from time import sleep
 
@@ -310,8 +312,8 @@ class IrcBot(SingleServerIRCBot):
         whonick = event.source.nick
         message = event.arguments[0]
         if message == 'shutdown!':
-            print('Shutting down as requested by user %s ...' % whonick)
-            self.die('Shutting down.')
+            print('Shutting down as requested on IRC by user %s ...' % whonick)
+            self.die('Shutting down.')  # Joins IRC bot thread.
 
     def say(self, msg):
         """Say message to channels."""
@@ -370,6 +372,12 @@ def parse_args():
 
     return parser.parse_args()
 
+def start_thread(target, name):
+    """Create, configure, and start a new thread."""
+    t = Thread(target=target, name=name)
+    t.daemon = True
+    t.start()
+
 def start_announcer(args, irc_channels):
     """If IRC output is enabled, configure the IRC bot and start it in a
     separate thread. If it is disabled, just write to STDOUT.
@@ -380,7 +388,7 @@ def start_announcer(args, irc_channels):
         # Prepare and start IRC bot.
         bot = IrcBot(args.irc_server, irc_channels, args.irc_nickname,
             args.irc_realname)
-        Thread(target=bot.start).start()
+        start_thread(bot.start, 'IrcBot')
         return bot.say
     else:
         # Just display messages on STDOUT.
@@ -394,18 +402,29 @@ def start_syslog_message_receiver(args):
     Return the receiver queue.
     """
     receiver = SyslogReceiveServer(args.syslog_port)
-    Thread(target=receiver.serve_forever).start()
+    start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
 
 def process_queue(announce_callback, queue, delay=2):
     """Process received messages in queue."""
     while True:
         sleep(delay)
+
+        if not is_thread_alive('IrcBot'):
+            print('IRC bot thread is no longer alive; exiting.')
+            sys.exit(0)
+
         try:
-            addr, msg = queue.get()
+            addr, msg = queue.get_nowait()
         except Empty:
             continue
+
         announce_callback('%s:%d ' % addr + str(msg))
+
+def is_thread_alive(name):
+    """Return true if a thread with the given name is alive."""
+    alive_threads = threading.enumerate()
+    return any(filter(lambda t: t.name == name, alive_threads))
 
 def main(irc_channels):
     args = parse_args()
