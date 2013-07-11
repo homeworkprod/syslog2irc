@@ -316,7 +316,7 @@ class SyslogReceiveServer(ThreadingUDPServer):
 
 
 class IrcBot(SingleServerIRCBot):
-    """An IRC bot to forward syslog messages to the configured channels."""
+    """An IRC bot to forward syslog messages to channels."""
 
     def __init__(self, server_spec, nickname, realname, channels):
         print('Connecting to IRC server %s:%s ...' % (server_spec.host,
@@ -328,6 +328,7 @@ class IrcBot(SingleServerIRCBot):
         """Join channels after connect."""
         print('Connected to %s:%d.' % conn.socket.getsockname())
         for channel, key in self.channels_with_keys:
+            print('Joining channel %s ...' % channel)
             conn.join(channel, key)
 
     def on_nicknameinuse(self, conn, event):
@@ -355,10 +356,9 @@ class IrcBot(SingleServerIRCBot):
             print('Shutdown requested on IRC by user %s.' % whonick)
             self.die('Shutting down.')  # Joins IRC bot thread.
 
-    def say(self, msg):
-        """Say message to channels."""
-        for channel, key in self.channels_with_keys:
-            self.connection.privmsg(channel, msg)
+    def say(self, channel, message):
+        """Say message on channel."""
+        self.connection.privmsg(channel, message)
 
 
 # ---------------------------------------------------------------- #
@@ -421,8 +421,8 @@ class IrcAnnouncer(object):
         self.bot = IrcBot(server, nickname, realname, channels)
         start_thread(self.bot.start, self.THREAD_NAME)
 
-    def announce(self, message):
-        self.bot.say(message)
+    def announce(self, channel, message):
+        self.bot.say(channel, message)
 
     def is_alive(self):
         return is_thread_alive(self.THREAD_NAME)
@@ -431,8 +431,8 @@ class IrcAnnouncer(object):
 class StdoutAnnouncer(object):
     """Announce syslog messages on STDOUT."""
 
-    def announce(self, message):
-        print(message)
+    def announce(self, channel, message):
+        print('%s> %s' % (channel, message))
 
     def is_alive(self):
         return True
@@ -463,8 +463,8 @@ def start_syslog_message_receiver(port):
     start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
 
-def process_queue(announcer, queue, delay=2):
-    """Process received messages in queue."""
+def process_queue(queue, announcer, channels, delay=2):
+    """Retrieve messages from queue and announce them."""
     while True:
         sleep(delay)
 
@@ -479,7 +479,8 @@ def process_queue(announcer, queue, delay=2):
 
         output = ('%s:%d ' % sender_address) \
             + format_syslog_message(syslog_message)
-        announcer.announce(output)
+        for channel, key in channels:
+            announcer.announce(channel, output)
 
 def is_thread_alive(name):
     """Return true if a thread with the given name is alive."""
@@ -490,7 +491,7 @@ def main(irc_channels):
     args = parse_args()
     announcer = start_announcer(args, irc_channels)
     queue = start_syslog_message_receiver(args.syslog_port)
-    process_queue(announcer, queue)
+    process_queue(queue, announcer, irc_channels)
 
 if __name__ == '__main__':
     # Configure IRC channels to join.
