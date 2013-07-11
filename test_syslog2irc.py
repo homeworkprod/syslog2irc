@@ -46,7 +46,8 @@ from datetime import datetime
 
 from nose2.tools import params
 
-from syslog2irc import SyslogMessage, SyslogMessageParser
+from syslog2irc import (format_syslog_message, SyslogMessage,
+    SyslogMessageParser)
 
 
 CURRENT_YEAR = datetime.today().year
@@ -140,9 +141,9 @@ def test_syslog_message_parser(
         '[2008-10-18 17:34:07] (mainframe) [Emergency]: WTF? S.O.S.!',
     ),
 )
-def test_syslog_message_str(facility_id, severity_id, timestamp, hostname,
+def test_format_syslog_message(facility_id, severity_id, timestamp, hostname,
         message, expected):
     """Test string representation of a syslog message."""
     syslog_message = SyslogMessage(facility_id, severity_id, timestamp,
         hostname, message)
-    assert str(syslog_message) == expected
+    assert format_syslog_message(syslog_message) == expected
