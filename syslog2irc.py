@@ -315,6 +315,9 @@ class SyslogReceiveServer(ThreadingUDPServer):
 # IRC bot stuff
 
 
+IrcChannel = namedtuple('IrcChannel', 'name password')
+
+
 class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to channels."""
 
@@ -322,14 +325,15 @@ class IrcBot(SingleServerIRCBot):
         print('Connecting to IRC server %s:%s ...' % (server_spec.host,
             server_spec.port))
         SingleServerIRCBot.__init__(self, [server_spec], nickname, realname)
-        self.channels_with_keys = channels
+        # Note: `self.channels` already exists in super class.
+        self.channels_to_join = channels
 
     def on_welcome(self, conn, event):
         """Join channels after connect."""
         print('Connected to %s:%d.' % conn.socket.getsockname())
-        for channel, key in self.channels_with_keys:
-            print('Joining channel %s ...' % channel)
-            conn.join(channel, key)
+        for channel in self.channels_to_join:
+            print('Joining channel %s ...' % channel.name)
+            conn.join(channel.name, channel.password)
 
     def on_nicknameinuse(self, conn, event):
         """Choose another nickname if conflicting."""
@@ -463,7 +467,7 @@ def start_syslog_message_receiver(port):
     start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
 
-def process_queue(queue, announcer, channels, delay=2):
+def process_queue(queue, announcer, irc_channels, delay=2):
     """Retrieve messages from queue and announce them."""
     while True:
         sleep(delay)
@@ -479,8 +483,8 @@ def process_queue(queue, announcer, channels, delay=2):
 
         output = ('%s:%d ' % sender_address) \
             + format_syslog_message(syslog_message)
-        for channel, key in channels:
-            announcer.announce(channel, output)
+        for channel in irc_channels:
+            announcer.announce(channel.name, output)
 
 def is_thread_alive(name):
     """Return true if a thread with the given name is alive."""
@@ -494,9 +498,9 @@ def main(irc_channels):
     process_queue(queue, announcer, irc_channels)
 
 if __name__ == '__main__':
-    # Configure IRC channels to join.
+    # Configure IRC channels to join and announce to.
     IRC_CHANNELS = [
-        ('#examplechannel', 'secret'),
+        IrcChannel('#examplechannel', 'secret'),
     ]
 
     main(IRC_CHANNELS)
