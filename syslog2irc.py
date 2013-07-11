@@ -265,11 +265,11 @@ class SyslogMessage(namedtuple('SyslogMessage',
 
     @property
     def facility_name(self):
-        return self.FACILITIES[self.facility_id]
+        return SyslogMessage.FACILITIES[self.facility_id]
 
     @property
     def severity_name(self):
-        return self.SEVERITIES[self.severity_id]
+        return SyslogMessage.SEVERITIES[self.severity_id]
 
     def __str__(self):
         s = ''
