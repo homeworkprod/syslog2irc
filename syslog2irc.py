@@ -397,13 +397,15 @@ def parse_args():
 
     return parser.parse_args()
 
-HostAndPort = namedtuple('HostAndPort', ['host', 'port'])
+_HostAndPort = namedtuple('HostAndPort', ['host', 'port'])
+
+def HostAndPort(host, port=DEFAULT_IRC_PORT):
+    return _HostAndPort(host, int(port))
 
 def parse_irc_server_arg(value):
     """Parse a hostname with optional port."""
-    host, port_str = value.partition(':')[::2]
-    port = int(port_str) if port_str else DEFAULT_IRC_PORT
-    return HostAndPort(host, port)
+    fragments = value.split(':', 1)
+    return HostAndPort(*fragments)
 
 def start_thread(target, name):
     """Create, configure, and start a new thread."""
