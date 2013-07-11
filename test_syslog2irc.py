@@ -37,7 +37,7 @@ module name!):
 
 
 :Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 09-Jul-2013
+:Date: 11-Jul-2013
 :License: MIT, see LICENSE for details.
 """
 
