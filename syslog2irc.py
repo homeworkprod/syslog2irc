@@ -365,17 +365,6 @@ class IrcBot(SingleServerIRCBot):
 
 def parse_args():
     """Setup and apply the command line arguments parser."""
-
-    HostAndPort = namedtuple('HostAndPort', ['host', 'port'])
-
-    def host_and_port(port_default):
-        def parse_host_and_port(value):
-            """Parse a hostname with optional port."""
-            host, port_str = value.partition(':')[::2]
-            port = int(port_str) if port_str else port_default
-            return HostAndPort(host, port)
-        return parse_host_and_port
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--irc-nickname',
@@ -392,7 +381,7 @@ def parse_args():
 
     parser.add_argument('--irc-server',
         dest='irc_server',
-        type=host_and_port(DEFAULT_IRC_PORT),
+        type=parse_irc_server_arg,
         help='IRC server (host and, optionally, port) to connect to'
             + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
             + ' default port: %d]' % DEFAULT_IRC_PORT,
@@ -407,6 +396,14 @@ def parse_args():
         metavar='PORT')
 
     return parser.parse_args()
+
+HostAndPort = namedtuple('HostAndPort', ['host', 'port'])
+
+def parse_irc_server_arg(value):
+    """Parse a hostname with optional port."""
+    host, port_str = value.partition(':')[::2]
+    port = int(port_str) if port_str else DEFAULT_IRC_PORT
+    return HostAndPort(host, port)
 
 def start_thread(target, name):
     """Create, configure, and start a new thread."""

@@ -46,8 +46,8 @@ from datetime import datetime
 
 from nose2.tools import params
 
-from syslog2irc import (format_syslog_message, SyslogMessage,
-    SyslogMessageParser)
+from syslog2irc import (format_syslog_message, parse_irc_server_arg,
+    SyslogMessage, SyslogMessageParser)
 
 
 CURRENT_YEAR = datetime.today().year
@@ -147,3 +147,13 @@ def test_format_syslog_message(facility_id, severity_id, timestamp, hostname,
     syslog_message = SyslogMessage(facility_id, severity_id, timestamp,
         hostname, message)
     assert format_syslog_message(syslog_message) == expected
+
+@params(
+    ('localhost',      'localhost', 6667),
+    ('127.0.0.1',      '127.0.0.1', 6667),
+    ('127.0.0.1:6669', '127.0.0.1', 6669),
+)
+def test_parse_irc_server_arg(arg_value, expected_host, expected_port):
+    actual = parse_irc_server_arg(arg_value)
+    assert actual.host == expected_host
+    assert actual.port == expected_port
