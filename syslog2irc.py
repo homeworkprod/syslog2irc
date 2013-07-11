@@ -271,14 +271,21 @@ class SyslogMessage(namedtuple('SyslogMessage',
     def severity_name(self):
         return SyslogMessage.SEVERITIES[self.severity_id]
 
-    def __str__(self):
-        s = ''
-        if self.timestamp is not None:
-            s += '[%s] ' % self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        if self.hostname is not None:
-            s += '(%s) ' % self.hostname
-        s += '[%s]: %s' % (self.severity_name, self.message)
-        return s
+
+def format_syslog_message(syslog_message):
+    """Format a syslog message to be displayed."""
+    def _generate():
+        timestamp_format = '%Y-%m-%d %H:%M:%S'
+        if syslog_message.timestamp is not None:
+            yield '[%s] ' % syslog_message.timestamp.strftime(timestamp_format)
+
+        if syslog_message.hostname is not None:
+            yield '(%s) ' % syslog_message.hostname
+
+        yield '[%s]: %s' % (syslog_message.severity_name,
+            syslog_message.message)
+
+    return ''.join(_generate())
 
 
 class SyslogRequestHandler(BaseRequestHandler):
@@ -288,12 +295,12 @@ class SyslogRequestHandler(BaseRequestHandler):
         try:
             data = self.request[0].strip()
             data = data.decode('ascii')
-            msg = SyslogMessageParser.parse(data)
+            syslog_message = SyslogMessageParser.parse(data)
         except ValueError:
-            msg = 'Invalid message.'
+            print('Invalid message received from %s:%d.' % self.client_address)
         else:
-            self.server.queue.put((self.client_address, msg))
-        print('%s:%d' % self.client_address, msg)
+            self.server.queue.put((self.client_address, syslog_message))
+            print('%s:%d ->' % self.client_address, syslog_message)
 
 
 class SyslogReceiveServer(ThreadingUDPServer):
@@ -469,11 +476,13 @@ def process_queue(announcer, queue, delay=2):
             sys.exit(0)
 
         try:
-            addr, msg = queue.get_nowait()
+            sender_address, syslog_message = queue.get_nowait()
         except Empty:
             continue
 
-        announcer.announce('%s:%d ' % addr + str(msg))
+        output = ('%s:%d ' % sender_address) \
+            + format_syslog_message(syslog_message)
+        announcer.announce(output)
 
 def is_thread_alive(name):
     """Return true if a thread with the given name is alive."""
