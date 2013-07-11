@@ -139,10 +139,10 @@ import threading
 from threading import Thread
 from time import sleep
 
-from irc.bot import SingleServerIRCBot
+from irc.bot import ServerSpec, SingleServerIRCBot
 
 
-DEFAULT_IRC_PORT = 6667
+DEFAULT_IRC_PORT = ServerSpec('').port
 DEFAULT_SYSLOG_PORT = 514
 
 
@@ -318,9 +318,10 @@ class SyslogReceiveServer(ThreadingUDPServer):
 class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to the configured channels."""
 
-    def __init__(self, host_and_port, nickname, realname, channels):
-        print('Connecting to IRC server %s:%d ...' % host_and_port)
-        SingleServerIRCBot.__init__(self, [host_and_port], nickname, realname)
+    def __init__(self, server_spec, nickname, realname, channels):
+        print('Connecting to IRC server %s:%s ...' % (server_spec.host,
+            server_spec.port))
+        SingleServerIRCBot.__init__(self, [server_spec], nickname, realname)
         self.channels_with_keys = channels
 
     def on_welcome(self, conn, event):
@@ -397,15 +398,12 @@ def parse_args():
 
     return parser.parse_args()
 
-_HostAndPort = namedtuple('HostAndPort', ['host', 'port'])
-
-def HostAndPort(host, port=DEFAULT_IRC_PORT):
-    return _HostAndPort(host, int(port))
-
 def parse_irc_server_arg(value):
     """Parse a hostname with optional port."""
     fragments = value.split(':', 1)
-    return HostAndPort(*fragments)
+    if len(fragments) > 1:
+        fragments[1] = int(fragments[1])
+    return ServerSpec(*fragments)
 
 def start_thread(target, name):
     """Create, configure, and start a new thread."""
