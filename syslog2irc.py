@@ -459,10 +459,11 @@ def start_syslog_message_receiver(port):
     """
     try:
         receiver = SyslogReceiveServer(port)
-    except PermissionError:
-        sys.stderr.write('No permission to open port %d. Try to specify a '
-            'port number above 1,024 (or even 4,096) and up to 65,535 using '
-            'the `--syslog-port` option.\n' % port)
+    except Exception as e:
+        sys.stderr.write('Error %d: %s\n' % (e.errno, e.strerror))
+        sys.stderr.write('Probably no permission to open port %d. Try to '
+            'specify a port number above 1,024 (or even 4,096) and up to '
+            '65,535 using the `--syslog-port` option.\n' % port)
         sys.exit(1)
     start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
