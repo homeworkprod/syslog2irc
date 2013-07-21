@@ -142,7 +142,6 @@ except ImportError:
     # Python 3.x
     from socketserver import BaseRequestHandler, ThreadingUDPServer
 import sys
-import threading
 from threading import Thread
 from time import sleep
 
@@ -163,14 +162,12 @@ DEFAULT_SYSLOG_PORT = 514
 # A Python application exits if no more non-daemon threads are running.
 #
 # In order to exit syslog2IRC when shutdown is requested on IRC, the IRC bot
-# will call `die()` which joins the IRC bot thread. The main thread and the
-# (daemonized) syslog message receiver thread remain.
+# will call `die()`, which will join the IRC bot thread. The main thread and
+# the (daemonized) syslog message receiver thread remain.
 #
-# The queue-processing loop regularly queries the announcer if it is still
-# "alive" (i.e. if the IRC bot thread is still running). If it is not, the
-# queue processor (which runs in the main thread) calls `sys.exit()`. As the
-# syslog message receiver thread is the only one left, but runs as a daemon,
-# the application exits.
+# Additionally, a dedidacted signal is sent that sets a flag that causes the
+# main loop to stop. As the syslog message receiver thread is the only one
+# left, but runs as a daemon, the application exits.
 #
 # The STDOUT announcer, on the other hand, does not run in a thread. The user
 # has to manually interrupt the application to exit.
@@ -347,6 +344,7 @@ class SyslogReceiveServer(ThreadingUDPServer):
 IrcChannel = namedtuple('IrcChannel', 'name password')
 
 irc_channels_joined = signal('irc-channels-joined ')
+shutdown_requested = signal('shutdown-requested')
 
 
 class IrcBot(SingleServerIRCBot):
@@ -391,6 +389,7 @@ class IrcBot(SingleServerIRCBot):
         message = event.arguments[0]
         if message == 'shutdown!':
             print('Shutdown requested on IRC by user %s.' % whonick)
+            shutdown_requested.send()
             self.die('Shutting down.')  # Joins IRC bot thread.
 
     def say(self, channel, message):
@@ -460,18 +459,12 @@ class IrcAnnouncer(object):
     def announce(self, channel, message):
         self.bot.say(channel, message)
 
-    def is_alive(self):
-        return is_thread_alive(self.THREAD_NAME)
-
 
 class StdoutAnnouncer(object):
     """Announce syslog messages on STDOUT."""
 
     def announce(self, channel, message):
         print('%s> %s' % (channel, message))
-
-    def is_alive(self):
-        return True
 
 
 def start_announcer(args, irc_channels):
@@ -494,11 +487,6 @@ def start_thread(target, name):
     t.daemon = True
     t.start()
 
-def is_thread_alive(name):
-    """Return true if a thread with the given name is alive."""
-    alive_threads = threading.enumerate()
-    return any(filter(lambda t: t.name == name, alive_threads))
-
 
 # ---------------------------------------------------------------- #
 
@@ -509,6 +497,9 @@ class QueueProcessor(object):
         self.queue = Queue()
         syslog_message_received.connect(self.syslog_message_received_callback)
 
+        self.shutdown = False
+        shutdown_requested.connect(self.shutdown_requested_callback)
+
         self.joined_all_channels = False
         irc_channels_joined.connect(self.all_channels_joined_callback)
 
@@ -516,6 +507,9 @@ class QueueProcessor(object):
             syslog_message=None):
         print('%s:%d ->' % client_address, syslog_message)
         self.queue.put((client_address, syslog_message))
+
+    def shutdown_requested_callback(self, sender):
+        self.shutdown = True
 
     def all_channels_joined_callback(self, sender):
         self.joined_all_channels = True
@@ -527,11 +521,7 @@ class QueueProcessor(object):
 
     def process_queue(self, announcer, irc_channels, timeout=2):
         """Retrieve messages from the queue and announce them."""
-        while True:
-            if not announcer.is_alive():
-                print('Exiting ...')
-                sys.exit(0)
-
+        while not self.shutdown:
             try:
                 sender_address, syslog_message = self.queue.get(timeout=timeout)
             except Empty:
@@ -541,6 +531,8 @@ class QueueProcessor(object):
                 + format_syslog_message(syslog_message)
             for channel in irc_channels:
                 announcer.announce(channel.name, output)
+
+        print('Shutting down ...')
 
 
 def main(irc_channels):
