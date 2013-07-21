@@ -318,6 +318,24 @@ class SyslogReceiveServer(ThreadingUDPServer):
         ThreadingUDPServer.__init__(self, ('', port), SyslogRequestHandler)
         self.queue = Queue()
 
+    @classmethod
+    def start(cls, port):
+        """Start in a separate thread.
+
+        Return the receiver queue.
+        """
+        try:
+            receiver = cls(port)
+        except Exception as e:
+            sys.stderr.write('Error %d: %s\n' % (e.errno, e.strerror))
+            sys.stderr.write('Probably no permission to open port %d. Try to '
+                'specify a port number above 1,024 (or even 4,096) and up to '
+                '65,535 using the `--syslog-port` option.\n' % port)
+            sys.exit(1)
+
+        start_thread(receiver.serve_forever, 'SyslogReceiveServer')
+        return receiver.queue
+
 
 # ---------------------------------------------------------------- #
 # IRC bot stuff
@@ -462,23 +480,6 @@ def start_announcer(args, irc_channels):
         print('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
 
-def start_syslog_message_receiver(port):
-    """Prepare the server to receive syslog messages on the given port and
-    start it in a separate thread.
-
-    Return the receiver queue.
-    """
-    try:
-        receiver = SyslogReceiveServer(port)
-    except Exception as e:
-        sys.stderr.write('Error %d: %s\n' % (e.errno, e.strerror))
-        sys.stderr.write('Probably no permission to open port %d. Try to '
-            'specify a port number above 1,024 (or even 4,096) and up to '
-            '65,535 using the `--syslog-port` option.\n' % port)
-        sys.exit(1)
-    start_thread(receiver.serve_forever, 'SyslogReceiveServer')
-    return receiver.queue
-
 
 class QueueProcessor(object):
 
@@ -520,7 +521,7 @@ def is_thread_alive(name):
 def main(irc_channels):
     args = parse_args()
     announcer = start_announcer(args, irc_channels)
-    queue = start_syslog_message_receiver(args.syslog_port)
+    queue = SyslogReceiveServer.start(args.syslog_port)
     queue_processor = QueueProcessor()
     queue_processor.wait()
     queue_processor.process_queue(queue, announcer, irc_channels)
