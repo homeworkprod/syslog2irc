@@ -296,6 +296,9 @@ def format_syslog_message(syslog_message):
     return ''.join(_generate())
 
 
+syslog_message_received = signal('syslog-message-received')
+
+
 class SyslogRequestHandler(BaseRequestHandler):
     """Handler for syslog messages."""
 
@@ -307,8 +310,10 @@ class SyslogRequestHandler(BaseRequestHandler):
         except ValueError:
             print('Invalid message received from %s:%d.' % self.client_address)
         else:
-            self.server.queue.put((self.client_address, syslog_message))
-            print('%s:%d ->' % self.client_address, syslog_message)
+            port = self.server.get_port()
+            syslog_message_received.send(port,
+                client_address=self.client_address,
+                syslog_message=syslog_message)
 
 
 class SyslogReceiveServer(ThreadingUDPServer):
@@ -316,14 +321,10 @@ class SyslogReceiveServer(ThreadingUDPServer):
 
     def __init__(self, port):
         ThreadingUDPServer.__init__(self, ('', port), SyslogRequestHandler)
-        self.queue = Queue()
 
     @classmethod
     def start(cls, port):
-        """Start in a separate thread.
-
-        Return the receiver queue.
-        """
+        """Start in a separate thread."""
         try:
             receiver = cls(port)
         except Exception as e:
@@ -334,7 +335,9 @@ class SyslogReceiveServer(ThreadingUDPServer):
             sys.exit(1)
 
         start_thread(receiver.serve_forever, 'SyslogReceiveServer')
-        return receiver.queue
+
+    def get_port(self):
+        return self.server_address[1]
 
 
 # ---------------------------------------------------------------- #
@@ -360,8 +363,9 @@ class IrcBot(SingleServerIRCBot):
         """Join channels after connect."""
         print('Connected to %s:%d.' % conn.socket.getsockname())
         for channel in self.channels_to_join:
-            print('Joining channel %s ...' % channel.name)
+            print('Joining channel %s ... ' % channel.name, end='')
             conn.join(channel.name, channel.password)
+            print('joined.')
         irc_channels_joined.send()
 
     def on_nicknameinuse(self, conn, event):
@@ -484,8 +488,16 @@ def start_announcer(args, irc_channels):
 class QueueProcessor(object):
 
     def __init__(self):
+        self.queue = Queue()
+        syslog_message_received.connect(self.syslog_message_received_callback)
+
         self.joined_all_channels = False
         irc_channels_joined.connect(self.all_channels_joined_callback)
+
+    def syslog_message_received_callback(self, sender, client_address=None,
+            syslog_message=None):
+        print('%s:%d ->' % client_address, syslog_message)
+        self.queue.put((client_address, syslog_message))
 
     def all_channels_joined_callback(self, sender):
         self.joined_all_channels = True
@@ -495,15 +507,15 @@ class QueueProcessor(object):
         while not self.joined_all_channels:
             sleep(0.5)
 
-    def process_queue(self, queue, announcer, irc_channels, timeout=2):
-        """Retrieve messages from queue and announce them."""
+    def process_queue(self, announcer, irc_channels, timeout=2):
+        """Retrieve messages from the queue and announce them."""
         while True:
             if not announcer.is_alive():
                 print('Exiting ...')
                 sys.exit(0)
 
             try:
-                sender_address, syslog_message = queue.get(timeout=timeout)
+                sender_address, syslog_message = self.queue.get(timeout=timeout)
             except Empty:
                 continue
 
@@ -521,10 +533,10 @@ def is_thread_alive(name):
 def main(irc_channels):
     args = parse_args()
     announcer = start_announcer(args, irc_channels)
-    queue = SyslogReceiveServer.start(args.syslog_port)
+    SyslogReceiveServer.start(args.syslog_port)
     queue_processor = QueueProcessor()
     queue_processor.wait()
-    queue_processor.process_queue(queue, announcer, irc_channels)
+    queue_processor.process_queue(announcer, irc_channels)
 
 if __name__ == '__main__':
     # Configure IRC channels to join and announce to.
