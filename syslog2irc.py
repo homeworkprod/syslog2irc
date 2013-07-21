@@ -131,12 +131,6 @@ from datetime import datetime
 from itertools import islice, takewhile
 try:
     # Python 2.x
-    from Queue import Empty, Queue
-except ImportError:
-    # Python 3.x
-    from queue import Empty, Queue
-try:
-    # Python 2.x
     from SocketServer import BaseRequestHandler, ThreadingUDPServer
 except ImportError:
     # Python 3.x
@@ -165,7 +159,7 @@ DEFAULT_SYSLOG_PORT = 514
 # will call `die()`, which will join the IRC bot thread. The main thread and
 # the (daemonized) syslog message receiver thread remain.
 #
-# Additionally, a dedidacted signal is sent that sets a flag that causes the
+# Additionally, a dedicated signal is sent that sets a flag that causes the
 # main loop to stop. As the syslog message receiver thread is the only one
 # left, but runs as a daemon, the application exits.
 #
@@ -491,10 +485,12 @@ def start_thread(target, name):
 # ---------------------------------------------------------------- #
 
 
-class QueueProcessor(object):
+class Processor(object):
 
-    def __init__(self):
-        self.queue = Queue()
+    def __init__(self, announcer, irc_channels):
+        self.announcer = announcer
+        self.irc_channels = irc_channels
+
         syslog_message_received.connect(self.syslog_message_received_callback)
 
         self.shutdown = False
@@ -507,7 +503,11 @@ class QueueProcessor(object):
             syslog_message=None):
         print('Received message from %s:%d on port %d -> %s'
             % (source_address[0], source_address[1], port, syslog_message))
-        self.queue.put((source_address, syslog_message))
+
+        output = ('%s:%d ' % source_address) \
+            + format_syslog_message(syslog_message)
+        for channel in self.irc_channels:
+            self.announcer.announce(channel.name, output)
 
     def shutdown_requested_callback(self, sender):
         self.shutdown = True
@@ -520,18 +520,10 @@ class QueueProcessor(object):
         while not self.joined_all_channels:
             sleep(0.5)
 
-    def process_queue(self, announcer, irc_channels, timeout=2):
-        """Retrieve messages from the queue and announce them."""
+    def run(self):
+        """Run the main loop until shutdown is requested."""
         while not self.shutdown:
-            try:
-                source_address, syslog_message = self.queue.get(timeout=timeout)
-            except Empty:
-                continue
-
-            output = ('%s:%d ' % source_address) \
-                + format_syslog_message(syslog_message)
-            for channel in irc_channels:
-                announcer.announce(channel.name, output)
+            sleep(0.5)
 
         print('Shutting down ...')
 
@@ -540,9 +532,9 @@ def main(irc_channels):
     args = parse_args()
     announcer = start_announcer(args, irc_channels)
     SyslogReceiveServer.start(args.syslog_port)
-    queue_processor = QueueProcessor()
-    queue_processor.wait()
-    queue_processor.process_queue(announcer, irc_channels)
+    processor = Processor(announcer, irc_channels)
+    processor.wait()
+    processor.run()
 
 if __name__ == '__main__':
     # Configure IRC channels to join and announce to.
