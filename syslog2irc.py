@@ -425,44 +425,6 @@ class IrcBot(SingleServerIRCBot):
 
 
 # ---------------------------------------------------------------- #
-# command line argument parsing
-
-
-def parse_args():
-    """Setup and apply the command line arguments parser."""
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--irc-nickname',
-        dest='irc_nickname',
-        default='syslog',
-        help='the IRC nickname the bot should use',
-        metavar='NICKNAME')
-
-    parser.add_argument('--irc-realname',
-        dest='irc_realname',
-        default='syslog2IRC',
-        help='the IRC realname the bot should use',
-        metavar='REALNAME')
-
-    parser.add_argument('--irc-server',
-        dest='irc_server',
-        type=parse_irc_server_arg,
-        help='IRC server (host and, optionally, port) to connect to'
-            + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
-            + ' default port: %d]' % DEFAULT_IRC_PORT,
-        metavar='SERVER')
-
-    return parser.parse_args()
-
-def parse_irc_server_arg(value):
-    """Parse a hostname with optional port."""
-    fragments = value.split(':', 1)
-    if len(fragments) > 1:
-        fragments[1] = int(fragments[1])
-    return ServerSpec(*fragments)
-
-
-# ---------------------------------------------------------------- #
 # announcing
 
 
@@ -553,6 +515,47 @@ class Processor(object):
             sleep(0.5)
 
         print('Shutting down ...')
+
+
+# ---------------------------------------------------------------- #
+# command line argument parsing
+
+
+def parse_args():
+    """Setup and apply the command line arguments parser."""
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--irc-nickname',
+        dest='irc_nickname',
+        default='syslog',
+        help='the IRC nickname the bot should use',
+        metavar='NICKNAME')
+
+    parser.add_argument('--irc-realname',
+        dest='irc_realname',
+        default='syslog2IRC',
+        help='the IRC realname the bot should use',
+        metavar='REALNAME')
+
+    parser.add_argument('--irc-server',
+        dest='irc_server',
+        type=parse_irc_server_arg,
+        help='IRC server (host and, optionally, port) to connect to'
+            + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
+            + ' default port: %d]' % DEFAULT_IRC_PORT,
+        metavar='SERVER')
+
+    return parser.parse_args()
+
+def parse_irc_server_arg(value):
+    """Parse a hostname with optional port."""
+    fragments = value.split(':', 1)
+    if len(fragments) > 1:
+        fragments[1] = int(fragments[1])
+    return ServerSpec(*fragments)
+
+
+# ---------------------------------------------------------------- #
 
 
 def main(routes):
