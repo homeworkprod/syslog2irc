@@ -120,7 +120,7 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 
 
 :Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 11-Jul-2013 (original release: 12-Apr-2007)
+:Date: 21-Jul-2013 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
 """
 
