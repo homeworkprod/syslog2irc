@@ -137,7 +137,6 @@ except ImportError:
 import sys
 import threading
 from threading import Thread
-from time import sleep
 
 from irc.bot import ServerSpec, SingleServerIRCBot
 
@@ -468,17 +467,15 @@ def start_syslog_message_receiver(port):
     start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
 
-def process_queue(queue, announcer, irc_channels, delay=2):
+def process_queue(queue, announcer, irc_channels, timeout=2):
     """Retrieve messages from queue and announce them."""
     while True:
-        sleep(delay)
-
         if not announcer.is_alive():
             print('Exiting ...')
             sys.exit(0)
 
         try:
-            sender_address, syslog_message = queue.get_nowait()
+            sender_address, syslog_message = queue.get(timeout=timeout)
         except Empty:
             continue
 
