@@ -8,17 +8,23 @@ syslog2IRC
 Receive syslog messages via UDP and show them on IRC.
 
 
+Requirements
+------------
+
+- Python 2.7+ (tested with 2.7.3) or Python 3+ (tested with 3.3.2)
+- irclib_ (tested with 8.3.1)
+- blinker_ (tested with 1.3)
+
+
 Installation
 ------------
 
-Needs Python 2.7+ or Python 3+ (tested with 3.3.2).
-
-Also requires the `python-irclib`_ package (tested with 8.3.1), which can be
-installed via pip_:
+irclib_ and blinker_ can be installed via pip_:
 
 .. code:: sh
 
     $ pip install irc
+    $ pip install blinker
 
 
 Configuration
@@ -105,11 +111,12 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 
-.. _python-irclib:  http://python-irclib.sourceforge.net/
-.. _pip:            http://www.pip-installer.org/
-.. _IANA:           http://www.iana.org/
-.. _RFC 3164:       http://tools.ietf.org/html/rfc3164
-.. _RFC 5424:       http://tools.ietf.org/html/rfc5424
+.. _irclib:   http://python-irclib.sourceforge.net/
+.. _blinker:  http://pythonhosted.org/blinker/
+.. _pip:      http://www.pip-installer.org/
+.. _IANA:     http://www.iana.org/
+.. _RFC 3164: http://tools.ietf.org/html/rfc3164
+.. _RFC 5424: http://tools.ietf.org/html/rfc5424
 
 
 :Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
@@ -137,7 +144,9 @@ except ImportError:
 import sys
 import threading
 from threading import Thread
+from time import sleep
 
+from blinker import signal
 from irc.bot import ServerSpec, SingleServerIRCBot
 
 
@@ -316,6 +325,8 @@ class SyslogReceiveServer(ThreadingUDPServer):
 
 IrcChannel = namedtuple('IrcChannel', 'name password')
 
+irc_channels_joined = signal('irc-channels-joined ')
+
 
 class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to channels."""
@@ -333,6 +344,7 @@ class IrcBot(SingleServerIRCBot):
         for channel in self.channels_to_join:
             print('Joining channel %s ...' % channel.name)
             conn.join(channel.name, channel.password)
+        irc_channels_joined.send()
 
     def on_nicknameinuse(self, conn, event):
         """Choose another nickname if conflicting."""
@@ -467,22 +479,38 @@ def start_syslog_message_receiver(port):
     start_thread(receiver.serve_forever, 'SyslogReceiveServer')
     return receiver.queue
 
-def process_queue(queue, announcer, irc_channels, timeout=2):
-    """Retrieve messages from queue and announce them."""
-    while True:
-        if not announcer.is_alive():
-            print('Exiting ...')
-            sys.exit(0)
 
-        try:
-            sender_address, syslog_message = queue.get(timeout=timeout)
-        except Empty:
-            continue
+class QueueProcessor(object):
 
-        output = ('%s:%d ' % sender_address) \
-            + format_syslog_message(syslog_message)
-        for channel in irc_channels:
-            announcer.announce(channel.name, output)
+    def __init__(self):
+        self.joined_all_channels = False
+        irc_channels_joined.connect(self.all_channels_joined_callback)
+
+    def all_channels_joined_callback(self, sender):
+        self.joined_all_channels = True
+
+    def wait(self):
+        """Wait until all IRC channels have been joined."""
+        while not self.joined_all_channels:
+            sleep(0.5)
+
+    def process_queue(self, queue, announcer, irc_channels, timeout=2):
+        """Retrieve messages from queue and announce them."""
+        while True:
+            if not announcer.is_alive():
+                print('Exiting ...')
+                sys.exit(0)
+
+            try:
+                sender_address, syslog_message = queue.get(timeout=timeout)
+            except Empty:
+                continue
+
+            output = ('%s:%d ' % sender_address) \
+                + format_syslog_message(syslog_message)
+            for channel in irc_channels:
+                announcer.announce(channel.name, output)
+
 
 def is_thread_alive(name):
     """Return true if a thread with the given name is alive."""
@@ -493,7 +521,9 @@ def main(irc_channels):
     args = parse_args()
     announcer = start_announcer(args, irc_channels)
     queue = start_syslog_message_receiver(args.syslog_port)
-    process_queue(queue, announcer, irc_channels)
+    queue_processor = QueueProcessor()
+    queue_processor.wait()
+    queue_processor.process_queue(queue, announcer, irc_channels)
 
 if __name__ == '__main__':
     # Configure IRC channels to join and announce to.

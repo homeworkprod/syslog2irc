@@ -4,17 +4,23 @@ syslog2IRC
 Receive syslog messages via UDP and show them on IRC.
 
 
+Requirements
+------------
+
+- Python 2.7+ (tested with 2.7.3) or Python 3+ (tested with 3.3.2)
+- irclib_ (tested with 8.3.1)
+- blinker_ (tested with 1.3)
+
+
 Installation
 ------------
 
-Needs Python 2.7+ or Python 3+ (tested with 3.3.2).
-
-Also requires the `python-irclib`_ package (tested with 8.3.1), which can be
-installed via pip_:
+irclib_ and blinker_ can be installed via pip_:
 
 .. code:: sh
 
     $ pip install irc
+    $ pip install blinker
 
 
 Configuration
