@@ -309,7 +309,7 @@ class SyslogRequestHandler(BaseRequestHandler):
         else:
             port = self.server.get_port()
             syslog_message_received.send(port,
-                client_address=self.client_address,
+                source_address=self.client_address,
                 syslog_message=syslog_message)
 
 
@@ -503,10 +503,11 @@ class QueueProcessor(object):
         self.joined_all_channels = False
         irc_channels_joined.connect(self.all_channels_joined_callback)
 
-    def syslog_message_received_callback(self, sender, client_address=None,
+    def syslog_message_received_callback(self, port, source_address=None,
             syslog_message=None):
-        print('%s:%d ->' % client_address, syslog_message)
-        self.queue.put((client_address, syslog_message))
+        print('Received message from %s:%d on port %d -> %s'
+            % (source_address[0], source_address[1], port, syslog_message))
+        self.queue.put((source_address, syslog_message))
 
     def shutdown_requested_callback(self, sender):
         self.shutdown = True
@@ -523,11 +524,11 @@ class QueueProcessor(object):
         """Retrieve messages from the queue and announce them."""
         while not self.shutdown:
             try:
-                sender_address, syslog_message = self.queue.get(timeout=timeout)
+                source_address, syslog_message = self.queue.get(timeout=timeout)
             except Empty:
                 continue
 
-            output = ('%s:%d ' % sender_address) \
+            output = ('%s:%d ' % source_address) \
                 + format_syslog_message(syslog_message)
             for channel in irc_channels:
                 announcer.announce(channel.name, output)
