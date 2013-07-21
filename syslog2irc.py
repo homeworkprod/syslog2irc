@@ -258,7 +258,7 @@ class SyslogMessage(namedtuple('SyslogMessage',
         21: 'local use 5 (local5)',
         22: 'local use 6 (local6)',
         23: 'local use 7 (local7)',
-        }
+    }
 
     SEVERITIES = {
         0: 'Emergency',
@@ -269,7 +269,7 @@ class SyslogMessage(namedtuple('SyslogMessage',
         5: 'Notice',
         6: 'Informational',
         7: 'Debug',
-        }
+    }
 
     @property
     def facility_name(self):
@@ -399,6 +399,7 @@ class IrcBot(SingleServerIRCBot):
 
 
 # ---------------------------------------------------------------- #
+# command line argument parsing
 
 
 def parse_args():
@@ -442,11 +443,9 @@ def parse_irc_server_arg(value):
         fragments[1] = int(fragments[1])
     return ServerSpec(*fragments)
 
-def start_thread(target, name):
-    """Create, configure, and start a new thread."""
-    t = Thread(target=target, name=name)
-    t.daemon = True
-    t.start()
+
+# ---------------------------------------------------------------- #
+# announcing
 
 
 class IrcAnnouncer(object):
@@ -483,6 +482,25 @@ def start_announcer(args, irc_channels):
     else:
         print('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
+
+
+# ---------------------------------------------------------------- #
+# threads
+
+
+def start_thread(target, name):
+    """Create, configure, and start a new thread."""
+    t = Thread(target=target, name=name)
+    t.daemon = True
+    t.start()
+
+def is_thread_alive(name):
+    """Return true if a thread with the given name is alive."""
+    alive_threads = threading.enumerate()
+    return any(filter(lambda t: t.name == name, alive_threads))
+
+
+# ---------------------------------------------------------------- #
 
 
 class QueueProcessor(object):
@@ -524,11 +542,6 @@ class QueueProcessor(object):
             for channel in irc_channels:
                 announcer.announce(channel.name, output)
 
-
-def is_thread_alive(name):
-    """Return true if a thread with the given name is alive."""
-    alive_threads = threading.enumerate()
-    return any(filter(lambda t: t.name == name, alive_threads))
 
 def main(irc_channels):
     args = parse_args()
