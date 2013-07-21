@@ -40,8 +40,41 @@ Or, when syslog2IRC listens on a non-default port (here: 11514)::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
 
-To specify the IRC channels to join, adjust the list ``IRC_CHANNELS``, which
-is expected to contain (channel name, password) pairs.
+To specify which IRC channels to join and forward syslog messages to, create
+``IrcChannel`` instances and reference them in the ``routes`` mapping.
+
+A simple routing from the default syslog port, 514, to a single IRC channel
+without a password looks like this:
+
+.. code:: python
+
+    irc_channel1 = IrcChannel('#examplechannel1', '')
+
+    routes = {
+        514: [
+            irc_channel1,
+        ],
+    }
+
+In a more complex setup, syslog messages could be received on two ports (514
+and 55514), with those received on the first port being forwarded to two IRC
+channels, and those received on the letter port being forwarded exclusively to
+the second channel.
+
+.. code:: python
+
+    irc_channel1 = IrcChannel('#examplechannel1', '')
+    irc_channel2 = IrcChannel('#examplechannel2', 'zePassword')
+
+    routes = {
+        514: [
+            irc_channel1,
+            irc_channel2,
+        ],
+        55514: [
+            irc_channel2,
+        ],
+    }
 
 
 Usage
@@ -61,13 +94,6 @@ message reception. Abort execution by pressing <Control-C>.
 .. code:: sh
 
     $ python syslog2irc.py
-
-If the syslog deamon is configured to forward to a port other than the
-default, specify that:
-
-.. code:: sh
-
-    $ python syslog2irc.py --syslog-port 11514
 
 Send some messages to syslog2IRC using your system's syslog message sender tool
 (`logger`, in this example):
@@ -120,7 +146,7 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 
 
 :Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 21-Jul-2013 (original release: 12-Apr-2007)
+:Date: 22-Jul-2013 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
 """
 
@@ -128,7 +154,7 @@ from __future__ import print_function
 import argparse
 from collections import namedtuple
 from datetime import datetime
-from itertools import islice, takewhile
+from itertools import chain, islice, takewhile
 try:
     # Python 2.x
     from SocketServer import BaseRequestHandler, ThreadingUDPServer
@@ -144,7 +170,6 @@ from irc.bot import ServerSpec, SingleServerIRCBot
 
 
 DEFAULT_IRC_PORT = ServerSpec('').port
-DEFAULT_SYSLOG_PORT = 514
 
 
 # A note on threads (implementation detail):
@@ -322,13 +347,21 @@ class SyslogReceiveServer(ThreadingUDPServer):
             sys.stderr.write('Error %d: %s\n' % (e.errno, e.strerror))
             sys.stderr.write('Probably no permission to open port %d. Try to '
                 'specify a port number above 1,024 (or even 4,096) and up to '
-                '65,535 using the `--syslog-port` option.\n' % port)
+                '65,535.\n' % port)
             sys.exit(1)
 
-        start_thread(receiver.serve_forever, 'SyslogReceiveServer')
+        thread_name = 'SyslogReceiveServer-port%d' % port
+        start_thread(receiver.serve_forever, thread_name)
 
     def get_port(self):
         return self.server_address[1]
+
+
+def start_syslog_message_receivers(routes):
+    """Start one syslog message receiving server for each port."""
+    reception_ports = routes.keys()
+    for port in reception_ports:
+        SyslogReceiveServer.start(port)
 
 
 # ---------------------------------------------------------------- #
@@ -419,14 +452,6 @@ def parse_args():
             + ' default port: %d]' % DEFAULT_IRC_PORT,
         metavar='SERVER')
 
-    parser.add_argument('--syslog-port',
-        dest='syslog_port',
-        type=int,
-        default=DEFAULT_SYSLOG_PORT,
-        help='the port to listen on for syslog messages [default: %d]'
-            % DEFAULT_SYSLOG_PORT,
-        metavar='PORT')
-
     return parser.parse_args()
 
 def parse_irc_server_arg(value):
@@ -461,14 +486,15 @@ class StdoutAnnouncer(object):
         print('%s> %s' % (channel, message))
 
 
-def start_announcer(args, irc_channels):
+def start_announcer(args, routes):
     """Create and return an announcer according to the configuration."""
-    if args.irc_server:
-        return IrcAnnouncer(args.irc_server, args.irc_nickname,
-            args.irc_realname, irc_channels)
-    else:
+    if not args.irc_server:
         print('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
+
+    irc_channels = frozenset(chain(*routes.values()))
+    return IrcAnnouncer(args.irc_server, args.irc_nickname, args.irc_realname,
+        irc_channels)
 
 
 # ---------------------------------------------------------------- #
@@ -487,9 +513,9 @@ def start_thread(target, name):
 
 class Processor(object):
 
-    def __init__(self, announcer, irc_channels):
+    def __init__(self, announcer, routes):
         self.announcer = announcer
-        self.irc_channels = irc_channels
+        self.routes = routes
 
         syslog_message_received.connect(self.syslog_message_received_callback)
 
@@ -506,7 +532,8 @@ class Processor(object):
 
         output = ('%s:%d ' % source_address) \
             + format_syslog_message(syslog_message)
-        for channel in self.irc_channels:
+        irc_channels = self.routes.get(port)
+        for channel in irc_channels:
             self.announcer.announce(channel.name, output)
 
     def shutdown_requested_callback(self, sender):
@@ -528,18 +555,30 @@ class Processor(object):
         print('Shutting down ...')
 
 
-def main(irc_channels):
+def main(routes):
     args = parse_args()
-    announcer = start_announcer(args, irc_channels)
-    SyslogReceiveServer.start(args.syslog_port)
-    processor = Processor(announcer, irc_channels)
+    announcer = start_announcer(args, routes)
+    start_syslog_message_receivers(routes)
+
+    processor = Processor(announcer, routes)
     processor.wait()
     processor.run()
 
 if __name__ == '__main__':
-    # Configure IRC channels to join and announce to.
-    IRC_CHANNELS = [
-        IrcChannel('#examplechannel', 'secret'),
-    ]
+    # IRC channels to join (with optional password).
+    irc_channel1 = IrcChannel('#examplechannel1', '')
+    irc_channel2 = IrcChannel('#examplechannel2', 'zePassword')
 
-    main(IRC_CHANNELS)
+    # Routing for syslog messages from the ports on which they are received to
+    # the IRC channels they should be announced on.
+    routes = {
+        514: [
+            irc_channel1,
+            irc_channel2,
+        ],
+        55514: [
+            irc_channel2,
+        ],
+    }
+
+    main(routes)
