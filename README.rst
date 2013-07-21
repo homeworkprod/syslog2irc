@@ -36,8 +36,41 @@ Or, when syslog2IRC listens on a non-default port (here: 11514)::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
 
-To specify the IRC channels to join, adjust the list ``IRC_CHANNELS``, which
-is expected to contain (channel name, password) pairs.
+To specify which IRC channels to join and forward syslog messages to, create
+``IrcChannel`` instances and reference them in the ``routes`` mapping.
+
+A simple routing from the default syslog port, 514, to a single IRC channel
+without a password looks like this:
+
+.. code:: python
+
+    irc_channel1 = IrcChannel('#examplechannel1', '')
+
+    routes = {
+        514: [
+            irc_channel1,
+        ],
+    }
+
+In a more complex setup, syslog messages could be received on two ports (514
+and 55514), with those received on the first port being forwarded to two IRC
+channels, and those received on the letter port being forwarded exclusively to
+the second channel.
+
+.. code:: python
+
+    irc_channel1 = IrcChannel('#examplechannel1', '')
+    irc_channel2 = IrcChannel('#examplechannel2', 'zePassword')
+
+    routes = {
+        514: [
+            irc_channel1,
+            irc_channel2,
+        ],
+        55514: [
+            irc_channel2,
+        ],
+    }
 
 
 Usage
@@ -57,13 +90,6 @@ message reception. Abort execution by pressing <Control-C>.
 .. code:: sh
 
     $ python syslog2irc.py
-
-If the syslog deamon is configured to forward to a port other than the
-default, specify that:
-
-.. code:: sh
-
-    $ python syslog2irc.py --syslog-port 11514
 
 Send some messages to syslog2IRC using your system's syslog message sender tool
 (`logger`, in this example):
@@ -107,13 +133,14 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 
-.. _python-irclib:  http://python-irclib.sourceforge.net/
-.. _pip:            http://www.pip-installer.org/
-.. _IANA:           http://www.iana.org/
-.. _RFC 3164:       http://tools.ietf.org/html/rfc3164
-.. _RFC 5424:       http://tools.ietf.org/html/rfc5424
+.. _irclib:   http://python-irclib.sourceforge.net/
+.. _blinker:  http://pythonhosted.org/blinker/
+.. _pip:      http://www.pip-installer.org/
+.. _IANA:     http://www.iana.org/
+.. _RFC 3164: http://tools.ietf.org/html/rfc3164
+.. _RFC 5424: http://tools.ietf.org/html/rfc5424
 
 
 :Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 09-Jul-2013 (original release: 12-Apr-2007)
+:Date: 22-Jul-2013 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
