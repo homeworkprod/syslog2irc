@@ -80,7 +80,7 @@ the second channel.
 Usage
 -----
 
-You might want to familiarze yourself with the available command line options
+You might want to familiarize yourself with the available command line options
 first:
 
 .. code:: sh
