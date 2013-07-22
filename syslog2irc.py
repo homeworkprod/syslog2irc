@@ -461,7 +461,7 @@ def collect_channels(routes):
     """Collect the unique IRC channels from the routes mapping."""
     return frozenset(chain(*routes.values()))
 
-def prepare_announce_callables_for_ports(announcer, routes):
+def prepare_announce_callables(announcer, routes):
     """Return a mapping from syslog ports to announce callables."""
     def create_callable(channel):
         return partial(announcer.announce, channel.name)
@@ -490,41 +490,39 @@ class Processor(object):
     def __init__(self, announce_callables_by_port):
         self.announce_callables_by_port = announce_callables_by_port
 
-        syslog_message_received.connect(self.syslog_message_received_callback)
-
         self.shutdown = False
-        shutdown_requested.connect(self.shutdown_requested_callback)
+        shutdown_requested.connect(self.handle_shutdown_requested)
 
-        self.joined_all_channels = False
-        irc_channels_joined.connect(self.all_channels_joined_callback)
+        self.channels_joined = False
+        irc_channels_joined.connect(self.handle_channels_joined)
 
-    def syslog_message_received_callback(self, port, source_address=None,
+    def handle_shutdown_requested(self, sender):
+        self.shutdown = True
+
+    def handle_channels_joined (self, sender):
+        self.channels_joined = True
+
+    def run(self):
+        """Run the main loop until shutdown is requested."""
+        while not self.channels_joined:
+            sleep(0.5)
+
+        syslog_message_received.connect(self.handle_syslog_message_received)
+
+        while not self.shutdown:
+            sleep(0.5)
+
+        print('Shutting down ...')
+
+    def handle_syslog_message_received(self, port, source_address=None,
             syslog_message=None):
         print('Received message from %s:%d on port %d -> %s'
             % (source_address[0], source_address[1], port, syslog_message))
 
         output = ('%s:%d ' % source_address) \
             + format_syslog_message(syslog_message)
-        for announce_callable in self.announce_callables_by_port.get(port):
-            announce_callable(output)
-
-    def shutdown_requested_callback(self, sender):
-        self.shutdown = True
-
-    def all_channels_joined_callback(self, sender):
-        self.joined_all_channels = True
-
-    def wait(self):
-        """Wait until all IRC channels have been joined."""
-        while not self.joined_all_channels:
-            sleep(0.5)
-
-    def run(self):
-        """Run the main loop until shutdown is requested."""
-        while not self.shutdown:
-            sleep(0.5)
-
-        print('Shutting down ...')
+        for announce in self.announce_callables_by_port.get(port):
+            announce(output)
 
 
 # ---------------------------------------------------------------- #
@@ -569,15 +567,14 @@ def parse_irc_server_arg(value):
 
 
 def main(routes):
+    """Application entry point"""
     args = parse_args()
-    channels = collect_channels(routes)
     announcer = start_announcer(args, routes)
-    announce_callables_by_port = prepare_announce_callables_for_ports(announcer, routes)
+    announce_callables_by_port = prepare_announce_callables(announcer, routes)
 
     start_syslog_message_receivers(routes)
 
     processor = Processor(announce_callables_by_port)
-    processor.wait()
     processor.run()
 
 if __name__ == '__main__':
