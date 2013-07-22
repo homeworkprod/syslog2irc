@@ -154,6 +154,7 @@ from __future__ import print_function
 import argparse
 from collections import namedtuple
 from datetime import datetime
+from functools import partial
 from itertools import chain, islice, takewhile
 try:
     # Python 2.x
@@ -454,9 +455,22 @@ def start_announcer(args, routes):
         print('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
 
-    irc_channels = frozenset(chain(*routes.values()))
+    channels = collect_channels(routes)
     return IrcAnnouncer(args.irc_server, args.irc_nickname, args.irc_realname,
-        irc_channels)
+        channels)
+
+def collect_channels(routes):
+    """Collect the unique IRC channels from the routes mapping."""
+    return frozenset(chain(*routes.values()))
+
+def prepare_announce_callables_for_ports(announcer, routes):
+    """Return a mapping from syslog ports to announce callables."""
+    def create_callable(channel):
+        return partial(announcer.announce, channel.name)
+
+    return {
+        port: [create_callable(channel) for channel in channels]
+            for port, channels in routes.items()}
 
 
 # ---------------------------------------------------------------- #
@@ -475,9 +489,8 @@ def start_thread(target, name):
 
 class Processor(object):
 
-    def __init__(self, announcer, routes):
-        self.announcer = announcer
-        self.routes = routes
+    def __init__(self, announce_callables_by_port):
+        self.announce_callables_by_port = announce_callables_by_port
 
         syslog_message_received.connect(self.syslog_message_received_callback)
 
@@ -494,9 +507,8 @@ class Processor(object):
 
         output = ('%s:%d ' % source_address) \
             + format_syslog_message(syslog_message)
-        irc_channels = self.routes.get(port)
-        for channel in irc_channels:
-            self.announcer.announce(channel.name, output)
+        for announce_callable in self.announce_callables_by_port.get(port):
+            announce_callable(output)
 
     def shutdown_requested_callback(self, sender):
         self.shutdown = True
@@ -560,10 +572,13 @@ def parse_irc_server_arg(value):
 
 def main(routes):
     args = parse_args()
+    channels = collect_channels(routes)
     announcer = start_announcer(args, routes)
+    announce_callables_by_port = prepare_announce_callables_for_ports(announcer, routes)
+
     start_syslog_message_receivers(routes)
 
-    processor = Processor(announcer, routes)
+    processor = Processor(announce_callables_by_port)
     processor.wait()
     processor.run()
 
