@@ -432,11 +432,9 @@ class IrcBot(SingleServerIRCBot):
 class IrcAnnouncer(object):
     """Announce syslog messages on IRC."""
 
-    THREAD_NAME = 'IrcBot'
-
     def __init__(self, server, nickname, realname, channels):
         self.bot = IrcBot(server, nickname, realname, channels)
-        start_thread(self.bot.start, self.THREAD_NAME)
+        start_thread(self.bot.start, 'IrcAnnouncer')
 
     def announce(self, channel, message):
         self.bot.say(channel, message)
