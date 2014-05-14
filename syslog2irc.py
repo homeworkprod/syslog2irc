@@ -371,7 +371,7 @@ def start_syslog_message_receivers(routes):
 
 IrcChannel = namedtuple('IrcChannel', 'name password')
 
-irc_channels_joined = signal('irc-channels-joined ')
+irc_channels_joined = signal('irc-channels-joined')
 shutdown_requested = signal('shutdown-requested')
 
 
