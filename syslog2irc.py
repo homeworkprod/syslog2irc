@@ -232,6 +232,7 @@ class SyslogMessageParser(object):
         timestamp_str = self._take_slice(15)
         nothing = self._take_until(' ')  # Advance to next part.
         assert nothing == ''
+
         timestamp = datetime.strptime(timestamp_str, '%b %d %H:%M:%S')
         timestamp = timestamp.replace(year=datetime.today().year)
         return timestamp
@@ -298,19 +299,19 @@ class SyslogMessage(namedtuple('SyslogMessage',
         return SyslogMessage.SEVERITIES[self.severity_id]
 
 
-def format_syslog_message(syslog_message):
+def format_syslog_message(message):
     """Format a syslog message to be displayed."""
     def _generate():
-        timestamp_format = '%Y-%m-%d %H:%M:%S'
-        if syslog_message.timestamp is not None:
-            yield '[%s] ' % syslog_message.timestamp.strftime(
+        if message.timestamp is not None:
+            timestamp_format = '%Y-%m-%d %H:%M:%S'
+            formatted_timestamp = message.timestamp.strftime(
                 timestamp_format)
+            yield '[{}] '.format(formatted_timestamp)
 
-        if syslog_message.hostname is not None:
-            yield '(%s) ' % syslog_message.hostname
+        if message.hostname is not None:
+            yield '({}) '.format(message.hostname)
 
-        yield '[%s]: %s' % (syslog_message.severity_name,
-            syslog_message.message)
+        yield '[{0.severity_name}]: {0.message}'.format(message)
 
     return ''.join(_generate())
 
@@ -327,8 +328,8 @@ class SyslogRequestHandler(BaseRequestHandler):
             data = data.decode('ascii')
             syslog_message = SyslogMessageParser.parse(data)
         except ValueError:
-            print('Invalid message received from %s:%d.'
-                % self.client_address)
+            print('Invalid message received from {}:{:d}.'.format(
+                *self.client_address))
         else:
             port = self.server.get_port()
             syslog_message_received.send(port,
@@ -349,13 +350,15 @@ class SyslogReceiveServer(ThreadingUDPServer):
         try:
             receiver = cls(port)
         except Exception as e:
-            sys.stderr.write('Error %d: %s\n' % (e.errno, e.strerror))
-            sys.stderr.write('Probably no permission to open port %d. '
+            sys.stderr.write('Error {0.errno:d}: {0.strerror}\n'
+                .format(e))
+            sys.stderr.write(
+                'Probably no permission to open port {}. '
                 'Try to specify a port number above 1,024 (or even '
-                '4,096) and up to 65,535.\n' % port)
+                '4,096) and up to 65,535.\n'.format(port))
             sys.exit(1)
 
-        thread_name = 'SyslogReceiveServer-port%d' % port
+        thread_name = 'SyslogReceiveServer-port{:d}'.format(port)
         start_thread(receiver.serve_forever, thread_name)
 
     def get_port(self):
@@ -387,8 +390,8 @@ class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to channels."""
 
     def __init__(self, server_spec, nickname, realname, channels):
-        print('Connecting to IRC server %s:%s ...' % (server_spec.host,
-            server_spec.port))
+        print('Connecting to IRC server {0.host}:{0.port:d} ...'
+            .format(server_spec))
         SingleServerIRCBot.__init__(self, [server_spec], nickname,
             realname)
         # Note: `self.channels` already exists in super class.
@@ -396,9 +399,11 @@ class IrcBot(SingleServerIRCBot):
 
     def on_welcome(self, conn, event):
         """Join channels after connect."""
-        print('Connected to %s:%d.' % conn.socket.getsockname())
+        print('Connected to {}:{:d}.'
+            .format(*conn.socket.getsockname()))
         for channel in self.channels_to_join:
-            print('Joining channel %s ... ' % channel.name, end='')
+            print('Joining channel {} ... '.format(channel.name),
+                end='')
             conn.join(channel.name, channel.password or '')
             print('joined.')
         irc_channels_joined.send()
@@ -425,7 +430,8 @@ class IrcBot(SingleServerIRCBot):
         whonick = event.source.nick
         message = event.arguments[0]
         if message == 'shutdown!':
-            print('Shutdown requested on IRC by user %s.' % whonick)
+            print('Shutdown requested on IRC by user {}.'
+                .format(whonick))
             shutdown_requested.send()
             self.die('Shutting down.')  # Joins IRC bot thread.
 
@@ -453,7 +459,7 @@ class StdoutAnnouncer(object):
     """Announce syslog messages on STDOUT."""
 
     def announce(self, channel, message):
-        print('%s> %s' % (channel, message))
+        print('{}> {}'.format(channel, message))
 
 
 def start_announcer(args, routes):
@@ -526,11 +532,11 @@ class Processor(object):
 
     def handle_syslog_message_received(self, port, source_address=None,
             syslog_message=None):
-        print('Received message from %s:%d on port %d -> %s' % (
-            source_address[0], source_address[1], port, syslog_message))
+        source = '{0[0]}:{0[1]:d} '.format(source_address)
+        print('Received message from {} on port {:d} -> {}'
+            .format(source, port, syslog_message))
 
-        output = ('%s:%d ' % source_address) \
-            + format_syslog_message(syslog_message)
+        output = source + format_syslog_message(syslog_message)
         for announce in self.announce_callables_by_port.get(port):
             announce(output)
 
@@ -560,7 +566,7 @@ def parse_args():
         type=parse_irc_server_arg,
         help='IRC server (host and, optionally, port) to connect to'
             + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
-            + ' default port: %d]' % DEFAULT_IRC_PORT,
+            + ' default port: {:d}]'.format(DEFAULT_IRC_PORT),
         metavar='SERVER')
 
     return parser.parse_args()
