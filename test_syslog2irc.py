@@ -47,7 +47,7 @@ from unittest import TestCase
 from nose2.tools import params
 
 from syslog2irc import (IrcChannel, format_syslog_message, parse_irc_server_arg,
-    SyslogMessage, SyslogMessageParser)
+    SyslogMessage, SyslogMessageParser, SyslogSeverity)
 
 
 CURRENT_YEAR = datetime.today().year
@@ -122,37 +122,52 @@ class SyslogTestCase(TestCase):
 
         self.assertEqual(actual.facility_id, expected_facility_id)
         self.assertEqual(actual.facility_name, expected_facility_name)
-        self.assertEqual(actual.severity_id, expected_severity_id)
-        self.assertEqual(actual.severity_name, expected_severity_name)
+        self.assertEqual(actual.severity.value, expected_severity_id)
+        self.assertEqual(actual.severity.name, expected_severity_name)
         self.assertEqual(actual.timestamp, expected_timestamp)
         self.assertEqual(actual.hostname, expected_hostname)
         self.assertEqual(actual.message, expected_message)
 
     @params(
         (
-            1, 6, None, None, 'FYI',
+            1,
+            SyslogSeverity.Informational,
+            None,
+            None,
+            'FYI',
             '[Informational]: FYI',
         ),
         (
-            9, 4, datetime(2013, 7, 8, 0, 12, 55), None, 'Tick, tack, watch the clock!',
+            9,
+            SyslogSeverity.Warning,
+            datetime(2013, 7, 8, 0, 12, 55),
+            None,
+            'Tick, tack, watch the clock!',
             '[2013-07-08 00:12:55] [Warning]: Tick, tack, watch the clock!',
         ),
         (
-            12, 7, None, 'ntp.local', 'What time is it?',
+            12,
+            SyslogSeverity.Debug,
+            None,
+            'ntp.local',
+            'What time is it?',
             '(ntp.local) [Debug]: What time is it?',
         ),
         (
-            0, 0, datetime(2008, 10, 18, 17, 34, 7), 'mainframe', 'WTF? S.O.S.!',
+            0,
+            SyslogSeverity.Emergency,
+            datetime(2008, 10, 18, 17, 34, 7),
+            'mainframe',
+            'WTF? S.O.S.!',
             '[2008-10-18 17:34:07] (mainframe) [Emergency]: WTF? S.O.S.!',
         ),
     )
-    def test_format_syslog_message(self, facility_id, severity_id, timestamp,
+    def test_format_syslog_message(self, facility_id, severity, timestamp,
             hostname, message, expected):
         """Test string representation of a syslog message."""
-        syslog_message = SyslogMessage(facility_id, severity_id, timestamp,
-            hostname, message)
+        message = SyslogMessage(facility_id, severity, timestamp, hostname, message)
 
-        actual = format_syslog_message(syslog_message)
+        actual = format_syslog_message(message)
 
         self.assertEqual(actual, expected)
 

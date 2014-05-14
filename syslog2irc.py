@@ -14,6 +14,7 @@ Requirements
 - Python 2.7+ (tested with 2.7.3) or Python 3+ (tested with 3.3.2)
 - irc_ (tested with 8.3.1)
 - blinker_ (tested with 1.3)
+- enum34_ (tested with 1.0) on Python versions before 3.4
 
 
 Installation
@@ -23,8 +24,14 @@ irc_ and blinker_ can be installed via pip_:
 
 .. code:: sh
 
-    $ pip install irc
-    $ pip install blinker
+    $ pip install irc blinker
+
+As of Python 3.4, an enum module is part of the standard library. For
+older versions of Python, install the enum34_ module:
+
+.. code:: sh
+
+    $ pip install enum34
 
 
 Configuration
@@ -134,6 +141,7 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 .. _irc:      https://bitbucket.org/jaraco/irc
 .. _blinker:  http://pythonhosted.org/blinker/
+.. _enum34:   https://pypi.python.org/pypi/enum34
 .. _pip:      http://www.pip-installer.org/
 .. _IANA:     http://www.iana.org/
 .. _RFC 3164: http://tools.ietf.org/html/rfc3164
@@ -149,6 +157,7 @@ from __future__ import print_function
 import argparse
 from collections import namedtuple
 from datetime import datetime
+from enum import Enum
 from functools import partial
 from itertools import chain, islice, takewhile
 try:
@@ -195,6 +204,17 @@ DEFAULT_IRC_PORT = ServerSpec('').port
 # syslog stuff
 
 
+class SyslogSeverity(Enum):
+    Emergency = 0
+    Alert = 1
+    Critical = 2
+    Error = 3
+    Warning = 4
+    Notice = 5
+    Informational = 6
+    Debug = 7
+
+
 class SyslogMessageParser(object):
     """Parse syslog messages."""
 
@@ -203,12 +223,13 @@ class SyslogMessageParser(object):
         parser = cls(data)
 
         facility_id, severity_id = parser._parse_priority_value()
+        severity = SyslogSeverity(severity_id)
         timestamp = parser._parse_timestamp()
         hostname = parser._parse_hostname()
         message = ''.join(parser.data_iter)
 
-        return SyslogMessage(facility_id, severity_id, timestamp,
-            hostname, message)
+        return SyslogMessage(facility_id, severity, timestamp, hostname,
+            message)
 
     def __init__(self, data):
         max_bytes = 1024  # as stated by the RFC
@@ -248,7 +269,7 @@ class SyslogMessageParser(object):
 
 
 class SyslogMessage(namedtuple('SyslogMessage',
-        'facility_id severity_id timestamp hostname message'
+        'facility_id severity timestamp hostname message'
     )):
     """A syslog message."""
 
@@ -279,24 +300,9 @@ class SyslogMessage(namedtuple('SyslogMessage',
         23: 'local use 7 (local7)',
     }
 
-    SEVERITIES = {
-        0: 'Emergency',
-        1: 'Alert',
-        2: 'Critical',
-        3: 'Error',
-        4: 'Warning',
-        5: 'Notice',
-        6: 'Informational',
-        7: 'Debug',
-    }
-
     @property
     def facility_name(self):
         return SyslogMessage.FACILITIES[self.facility_id]
-
-    @property
-    def severity_name(self):
-        return SyslogMessage.SEVERITIES[self.severity_id]
 
 
 def format_syslog_message(message):
@@ -311,7 +317,7 @@ def format_syslog_message(message):
         if message.hostname is not None:
             yield '({}) '.format(message.hostname)
 
-        yield '[{0.severity_name}]: {0.message}'.format(message)
+        yield '[{0.severity.name}]: {0.message}'.format(message)
 
     return ''.join(_generate())
 
