@@ -12,14 +12,14 @@ Requirements
 ------------
 
 - Python 2.7+ (tested with 2.7.3) or Python 3+ (tested with 3.3.2)
-- irclib_ (tested with 8.3.1)
+- irc_ (tested with 8.3.1)
 - blinker_ (tested with 1.3)
 
 
 Installation
 ------------
 
-irclib_ and blinker_ can be installed via pip_:
+irc_ and blinker_ can be installed via pip_:
 
 .. code:: sh
 
@@ -137,7 +137,7 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
 `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 
-.. _irclib:   http://python-irclib.sourceforge.net/
+.. _irc:      https://bitbucket.org/jaraco/irc
 .. _blinker:  http://pythonhosted.org/blinker/
 .. _pip:      http://www.pip-installer.org/
 .. _IANA:     http://www.iana.org/
