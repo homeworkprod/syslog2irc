@@ -30,9 +30,9 @@ irc_ and blinker_ can be installed via pip_:
 Configuration
 -------------
 
-Setup your ``syslog.conf`` or ``rsyslog.conf`` (commonly found in ``/etc``) to
-send syslog messages to syslog2IRC on the default syslog port (514, UDP, as
-assigned by IANA_)::
+Setup your ``syslog.conf`` or ``rsyslog.conf`` (commonly found in
+``/etc``) to send syslog messages to syslog2IRC on the default syslog
+port (514, UDP, as assigned by IANA_)::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on
 
@@ -40,11 +40,12 @@ Or, when syslog2IRC listens on a non-default port (here: 11514)::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
 
-To specify which IRC channels to join and forward syslog messages to, create
-``IrcChannel`` instances and reference them in the ``routes`` mapping.
+To specify which IRC channels to join and forward syslog messages to,
+create ``IrcChannel`` instances and reference them in the ``routes``
+mapping.
 
-A simple routing from the default syslog port, 514, to a single IRC channel
-without a password looks like this:
+A simple routing from the default syslog port, 514, to a single IRC
+channel without a password looks like this:
 
 .. code:: python
 
@@ -54,10 +55,10 @@ without a password looks like this:
         514: [irc_channel1],
     }
 
-In a more complex setup, syslog messages could be received on two ports (514
-and 55514), with those received on the first port being forwarded to two IRC
-channels, and those received on the letter port being forwarded exclusively to
-the second channel.
+In a more complex setup, syslog messages could be received on two ports
+(514 and 55514), with those received on the first port being forwarded
+to two IRC channels, and those received on the letter port being
+forwarded exclusively to the second channel.
 
 .. code:: python
 
@@ -73,32 +74,32 @@ the second channel.
 Usage
 -----
 
-You might want to familiarize yourself with the available command line options
-first:
+You might want to familiarize yourself with the available command line
+options first:
 
 .. code:: sh
 
     $ python syslog2irc.py -h
 
-If no options are given, the IRC component will not be used. Instead, syslog
-messages will be written to STDOUT. This is helpful during setup of syslog
-message reception. Abort execution by pressing <Control-C>.
+If no options are given, the IRC component will not be used. Instead,
+syslog messages will be written to STDOUT. This is helpful during setup
+of syslog message reception. Abort execution by pressing <Control-C>.
 
 .. code:: sh
 
     $ python syslog2irc.py
 
-Send some messages to syslog2IRC using your system's syslog message sender tool
-(`logger`, in this example):
+Send some messages to syslog2IRC using your system's syslog message
+sender tool (`logger`, in this example):
 
 .. code:: sh
 
     $ logger 'Hi there!'
     $ logger -p kern.alert 'Whoa!'
 
-Note that each message will appear twice on the console syslog2IRC was started
-because the handler itself will write it there anyway (so you have a log on
-what would be sent to IRC).
+Note that each message will appear twice on the console syslog2IRC was
+started because the handler itself will write it there anyway (so you
+have a log on what would be sent to IRC).
 
 If receiving syslog messages works, connect to an IRC server:
 
@@ -106,19 +107,20 @@ If receiving syslog messages works, connect to an IRC server:
 
     $ python syslog2irc.py irc.example.com
 
-After a moment, you should see that syslog2IRC has connected to the server.
-The IRC bot should then enter the channel(s) you have configured (see
-Configuration_).
+After a moment, you should see that syslog2IRC has connected to the
+server. The IRC bot should then enter the channel(s) you have configured
+(see Configuration_).
 
-To use another port on the IRC server than the default (6667), specify it like
-this (6669 in this case):
+To use another port on the IRC server than the default (6667), specify
+it like this (6669 in this case):
 
 .. code:: sh
 
     $ python syslog2irc.py irc.example.com:6669
 
 In order to shut down syslog2IRC, send a query message with the text
-"shutdown!" to the IRC bot. It should then quit, and syslog2IRC should exit.
+"shutdown!" to the IRC bot. It should then quit, and syslog2IRC should
+exit.
 
 
 Further Reading
@@ -126,8 +128,8 @@ Further Reading
 
 For more information, see `RFC 3164`_, "The BSD syslog Protocol".
 
-Please note that there is `RFC 5424`_, "The Syslog Protocol", which obsoletes
-`RFC 3164`_. syslog2IRC, however, only implements the latter.
+Please note that there is `RFC 5424`_, "The Syslog Protocol", which
+obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 
 .. _irc:      https://bitbucket.org/jaraco/irc
@@ -168,28 +170,28 @@ DEFAULT_IRC_PORT = ServerSpec('').port
 
 # A note on threads (implementation detail):
 #
-# This tool uses threads. Besides the main thread, there are two additional
-# threads: one for the syslog message receiver and one for the IRC bot. Both
-# are configured to be daemon threads.
+# This tool uses threads. Besides the main thread, there are two
+# additional threads: one for the syslog message receiver and one for
+# the IRC bot. Both are configured to be daemon threads.
 #
 # A Python application exits if no more non-daemon threads are running.
 #
-# In order to exit syslog2IRC when shutdown is requested on IRC, the IRC bot
-# will call `die()`, which will join the IRC bot thread. The main thread and
-# the (daemonized) syslog message receiver thread remain.
+# In order to exit syslog2IRC when shutdown is requested on IRC, the IRC
+# bot will call `die()`, which will join the IRC bot thread. The main
+# thread and the (daemonized) syslog message receiver thread remain.
 #
-# Additionally, a dedicated signal is sent that sets a flag that causes the
-# main loop to stop. As the syslog message receiver thread is the only one
-# left, but runs as a daemon, the application exits.
+# Additionally, a dedicated signal is sent that sets a flag that causes
+# the main loop to stop. As the syslog message receiver thread is the
+# only one left, but runs as a daemon, the application exits.
 #
-# The STDOUT announcer, on the other hand, does not run in a thread. The user
-# has to manually interrupt the application to exit.
+# The STDOUT announcer, on the other hand, does not run in a thread. The
+# user has to manually interrupt the application to exit.
 #
-# For details, see the documentation on the `threading` module that is part of
-# Python's standard library.
+# For details, see the documentation on the `threading` module that is
+# part of Python's standard library.
 
 
-# ---------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
 # syslog stuff
 
 
@@ -205,13 +207,17 @@ class SyslogMessageParser(object):
         hostname = parser._parse_hostname()
         message = ''.join(parser.data_iter)
 
-        return SyslogMessage(facility_id, severity_id, timestamp, hostname, message)
+        return SyslogMessage(facility_id, severity_id, timestamp,
+            hostname, message)
 
     def __init__(self, data):
-        self.data_iter = iter(data[:1024])  # 1024 bytes max (as stated by the RFC).
+        max_bytes = 1024  # as stated by the RFC
+        self.data_iter = iter(data[:max_bytes])
 
     def _parse_priority_value(self):
-        """Parse the priority value to extract facility and severity IDs."""
+        """Parse the priority value to extract facility and severity
+        IDs.
+        """
         start_delim = self._take_slice(1)
         assert start_delim == '<'
         priority_value = self._take_until('>')
@@ -295,7 +301,8 @@ def format_syslog_message(syslog_message):
     def _generate():
         timestamp_format = '%Y-%m-%d %H:%M:%S'
         if syslog_message.timestamp is not None:
-            yield '[%s] ' % syslog_message.timestamp.strftime(timestamp_format)
+            yield '[%s] ' % syslog_message.timestamp.strftime(
+                timestamp_format)
 
         if syslog_message.hostname is not None:
             yield '(%s) ' % syslog_message.hostname
@@ -318,7 +325,8 @@ class SyslogRequestHandler(BaseRequestHandler):
             data = data.decode('ascii')
             syslog_message = SyslogMessageParser.parse(data)
         except ValueError:
-            print('Invalid message received from %s:%d.' % self.client_address)
+            print('Invalid message received from %s:%d.'
+                % self.client_address)
         else:
             port = self.server.get_port()
             syslog_message_received.send(port,
@@ -330,7 +338,8 @@ class SyslogReceiveServer(ThreadingUDPServer):
     """UDP server that waits for syslog messages."""
 
     def __init__(self, port):
-        ThreadingUDPServer.__init__(self, ('', port), SyslogRequestHandler)
+        ThreadingUDPServer.__init__(self, ('', port),
+            SyslogRequestHandler)
 
     @classmethod
     def start(cls, port):
@@ -339,9 +348,9 @@ class SyslogReceiveServer(ThreadingUDPServer):
             receiver = cls(port)
         except Exception as e:
             sys.stderr.write('Error %d: %s\n' % (e.errno, e.strerror))
-            sys.stderr.write('Probably no permission to open port %d. Try to '
-                'specify a port number above 1,024 (or even 4,096) and up to '
-                '65,535.\n' % port)
+            sys.stderr.write('Probably no permission to open port %d. '
+                'Try to specify a port number above 1,024 (or even '
+                '4,096) and up to 65,535.\n' % port)
             sys.exit(1)
 
         thread_name = 'SyslogReceiveServer-port%d' % port
@@ -358,7 +367,7 @@ def start_syslog_message_receivers(routes):
         SyslogReceiveServer.start(port)
 
 
-# ---------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
 # IRC bot stuff
 
 
@@ -378,7 +387,8 @@ class IrcBot(SingleServerIRCBot):
     def __init__(self, server_spec, nickname, realname, channels):
         print('Connecting to IRC server %s:%s ...' % (server_spec.host,
             server_spec.port))
-        SingleServerIRCBot.__init__(self, [server_spec], nickname, realname)
+        SingleServerIRCBot.__init__(self, [server_spec], nickname,
+            realname)
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels
 
@@ -422,7 +432,7 @@ class IrcBot(SingleServerIRCBot):
         self.connection.privmsg(channel, message)
 
 
-# ---------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
 # announcing
 
 
@@ -451,8 +461,8 @@ def start_announcer(args, routes):
         return StdoutAnnouncer()
 
     channels = collect_channels(routes)
-    return IrcAnnouncer(args.irc_server, args.irc_nickname, args.irc_realname,
-        channels)
+    return IrcAnnouncer(args.irc_server, args.irc_nickname,
+        args.irc_realname, channels)
 
 def collect_channels(routes):
     """Collect the unique IRC channels from the routes mapping."""
@@ -468,7 +478,7 @@ def prepare_announce_callables(announcer, routes):
             for port, channels in routes.items()}
 
 
-# ---------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
 # threads
 
 
@@ -479,7 +489,7 @@ def start_thread(target, name):
     t.start()
 
 
-# ---------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
 
 
 class Processor(object):
@@ -504,7 +514,8 @@ class Processor(object):
         while not self.channels_joined:
             sleep(0.5)
 
-        syslog_message_received.connect(self.handle_syslog_message_received)
+        syslog_message_received.connect(
+            self.handle_syslog_message_received)
 
         while not self.shutdown:
             sleep(0.5)
@@ -513,8 +524,8 @@ class Processor(object):
 
     def handle_syslog_message_received(self, port, source_address=None,
             syslog_message=None):
-        print('Received message from %s:%d on port %d -> %s'
-            % (source_address[0], source_address[1], port, syslog_message))
+        print('Received message from %s:%d on port %d -> %s' % (
+            source_address[0], source_address[1], port, syslog_message))
 
         output = ('%s:%d ' % source_address) \
             + format_syslog_message(syslog_message)
@@ -522,7 +533,7 @@ class Processor(object):
             announce(output)
 
 
-# ---------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
 # command line argument parsing
 
 
@@ -560,14 +571,15 @@ def parse_irc_server_arg(value):
     return ServerSpec(*fragments)
 
 
-# ---------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
 
 
 def main(routes):
     """Application entry point"""
     args = parse_args()
     announcer = start_announcer(args, routes)
-    announce_callables_by_port = prepare_announce_callables(announcer, routes)
+    announce_callables_by_port = prepare_announce_callables(announcer,
+        routes)
 
     start_syslog_message_receivers(routes)
 
@@ -579,8 +591,8 @@ if __name__ == '__main__':
     irc_channel1 = IrcChannel('#examplechannel1')
     irc_channel2 = IrcChannel('#examplechannel2', password='zePassword')
 
-    # routing for syslog messages from the ports on which they are received to
-    # the IRC channels they should be announced on
+    # routing for syslog messages from the ports on which they are
+    # received to the IRC channels they should be announced on
     routes = {
           514: [irc_channel1, irc_channel2],
         55514: [irc_channel2],
