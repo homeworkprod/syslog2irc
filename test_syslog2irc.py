@@ -46,7 +46,7 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import (format_syslog_message, parse_irc_server_arg,
+from syslog2irc import (IrcChannel, format_syslog_message, parse_irc_server_arg,
     SyslogMessage, SyslogMessageParser)
 
 
@@ -155,6 +155,18 @@ class SyslogTestCase(TestCase):
         actual = format_syslog_message(syslog_message)
 
         self.assertEqual(actual, expected)
+
+
+class IrcTestCase(TestCase):
+
+    @params(
+        (IrcChannel('#example'),                         '#example',      None    ),
+        (IrcChannel('#example', password=None),          '#example',      None    ),
+        (IrcChannel('#headquarters', password='secret'), '#headquarters', 'secret'),
+    )
+    def test_irc_channel_creation(self, channel, expected_name, expected_password):
+        self.assertEqual(channel.name, expected_name)
+        self.assertEqual(channel.password, expected_password)
 
 
 class ArgumentParserTestCase(TestCase):
