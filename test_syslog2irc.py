@@ -47,7 +47,7 @@ from unittest import TestCase
 from nose2.tools import params
 
 from syslog2irc import (IrcChannel, format_syslog_message, parse_irc_server_arg,
-    SyslogMessage, SyslogMessageParser, SyslogSeverity)
+    SyslogFacility, SyslogMessage, SyslogMessageParser, SyslogSeverity)
 
 
 CURRENT_YEAR = datetime.today().year
@@ -59,7 +59,7 @@ class SyslogTestCase(TestCase):
         (
             # Example 1 from RFC 3164.
             '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
-            4,
+            SyslogFacility.security4,
             'security/authorization messages',
             SyslogSeverity.critical,
             datetime(CURRENT_YEAR, 10, 11, 22, 14, 15),
@@ -69,7 +69,7 @@ class SyslogTestCase(TestCase):
         (
             # Example 2 from RFC 3164.
             '<13>Feb  5 17:32:18 10.0.0.99 Use the BFG!',
-            1,
+            SyslogFacility.user,
             'user-level messages',
             SyslogSeverity.notice,
             datetime(CURRENT_YEAR, 2, 5, 17, 32, 18),
@@ -81,7 +81,7 @@ class SyslogTestCase(TestCase):
             # Note that the HOSTNAME and MSG fields in this example are not
             # consistent with what the RFC defines.
             '<165>Aug 24 05:34:00 CST 1987 mymachine myproc[10]: %% It\'s time to make the do-nuts.  %%  Ingredients: Mix=OK, Jelly=OK # Devices: Mixer=OK, Jelly_Injector=OK, Frier=OK # Transport: Conveyer1=OK, Conveyer2=OK # %%',
-            20,
+            SyslogFacility.local4,
             'local use 4 (local4)',
             SyslogSeverity.notice,
             datetime(CURRENT_YEAR, 8, 24, 5, 34, 0),
@@ -95,7 +95,7 @@ class SyslogTestCase(TestCase):
         (
             # Example 5 from RFC 3164.
             '<0>Oct 22 10:52:12 scapegoat 1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!',
-            0,
+            SyslogFacility.kernel,
             'kernel messages',
             SyslogSeverity.emergency,
             datetime(CURRENT_YEAR, 10, 22, 10, 52, 12),
@@ -106,8 +106,8 @@ class SyslogTestCase(TestCase):
     def test_syslog_message_parser(
             self,
             data,
-            expected_facility_id,
-            expected_facility_name,
+            expected_facility,
+            expected_facility_description,
             expected_severity,
             expected_timestamp,
             expected_hostname,
@@ -115,8 +115,8 @@ class SyslogTestCase(TestCase):
         """Test parsing of a syslog message."""
         actual = SyslogMessageParser.parse(data)
 
-        self.assertEqual(actual.facility_id, expected_facility_id)
-        self.assertEqual(actual.facility_name, expected_facility_name)
+        self.assertEqual(actual.facility, expected_facility)
+        self.assertEqual(actual.facility.description, expected_facility_description)
         self.assertEqual(actual.severity, expected_severity)
         self.assertEqual(actual.timestamp, expected_timestamp)
         self.assertEqual(actual.hostname, expected_hostname)
@@ -124,7 +124,7 @@ class SyslogTestCase(TestCase):
 
     @params(
         (
-            1,
+            SyslogFacility.user,
             SyslogSeverity.informational,
             None,
             None,
@@ -132,7 +132,7 @@ class SyslogTestCase(TestCase):
             '[informational]: FYI',
         ),
         (
-            9,
+            SyslogFacility.clock9,
             SyslogSeverity.warning,
             datetime(2013, 7, 8, 0, 12, 55),
             None,
@@ -140,7 +140,7 @@ class SyslogTestCase(TestCase):
             '[2013-07-08 00:12:55] [warning]: Tick, tack, watch the clock!',
         ),
         (
-            12,
+            SyslogFacility.ntp,
             SyslogSeverity.debug,
             None,
             'ntp.local',
@@ -148,7 +148,7 @@ class SyslogTestCase(TestCase):
             '(ntp.local) [debug]: What time is it?',
         ),
         (
-            0,
+            SyslogFacility.kernel,
             SyslogSeverity.emergency,
             datetime(2008, 10, 18, 17, 34, 7),
             'mainframe',
@@ -156,10 +156,11 @@ class SyslogTestCase(TestCase):
             '[2008-10-18 17:34:07] (mainframe) [emergency]: WTF? S.O.S.!',
         ),
     )
-    def test_format_syslog_message(self, facility_id, severity, timestamp,
+    def test_format_syslog_message(self, facility, severity, timestamp,
             hostname, message, expected):
         """Test string representation of a syslog message."""
-        message = SyslogMessage(facility_id, severity, timestamp, hostname, message)
+        message = SyslogMessage(facility, severity, timestamp, hostname,
+            message)
 
         actual = format_syslog_message(message)
 
