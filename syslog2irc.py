@@ -220,8 +220,10 @@ class SyslogMessageParser(object):
         """
         start_delim = self._take_slice(1)
         assert start_delim == '<'
+
         priority_value = self._take_until('>')
-        assert len(priority_value) in [1, 2, 3]
+        assert len(priority_value) in {1, 2, 3}
+
         facility_id, severity_id = divmod(int(priority_value), 8)
         return facility_id, severity_id
 
