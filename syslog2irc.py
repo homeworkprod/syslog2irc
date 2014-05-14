@@ -48,7 +48,7 @@ without a password looks like this:
 
 .. code:: python
 
-    irc_channel1 = IrcChannel('#examplechannel1', '')
+    irc_channel1 = IrcChannel('#examplechannel1')
 
     routes = {
         514: [
@@ -63,8 +63,8 @@ the second channel.
 
 .. code:: python
 
-    irc_channel1 = IrcChannel('#examplechannel1', '')
-    irc_channel2 = IrcChannel('#examplechannel2', 'zePassword')
+    irc_channel1 = IrcChannel('#examplechannel1')
+    irc_channel2 = IrcChannel('#examplechannel2', password='zePassword')
 
     routes = {
         514: [
@@ -369,7 +369,11 @@ def start_syslog_message_receivers(routes):
 # IRC bot stuff
 
 
-IrcChannel = namedtuple('IrcChannel', 'name password')
+class IrcChannel(namedtuple('IrcChannel', 'name password')):
+
+    def __new__(cls, name, password=None):
+        return super(IrcChannel, cls).__new__(cls, name, password)
+
 
 irc_channels_joined = signal('irc-channels-joined')
 shutdown_requested = signal('shutdown-requested')
@@ -390,7 +394,7 @@ class IrcBot(SingleServerIRCBot):
         print('Connected to %s:%d.' % conn.socket.getsockname())
         for channel in self.channels_to_join:
             print('Joining channel %s ... ' % channel.name, end='')
-            conn.join(channel.name, channel.password)
+            conn.join(channel.name, channel.password or '')
             print('joined.')
         irc_channels_joined.send()
 
@@ -578,9 +582,9 @@ def main(routes):
     processor.run()
 
 if __name__ == '__main__':
-    # IRC channels to join (with optional password).
-    irc_channel1 = IrcChannel('#examplechannel1', '')
-    irc_channel2 = IrcChannel('#examplechannel2', 'zePassword')
+    # IRC channels to join
+    irc_channel1 = IrcChannel('#examplechannel1')
+    irc_channel2 = IrcChannel('#examplechannel2', password='zePassword')
 
     # Routing for syslog messages from the ports on which they are received to
     # the IRC channels they should be announced on.
