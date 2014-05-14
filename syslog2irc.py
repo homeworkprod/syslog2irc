@@ -51,9 +51,7 @@ without a password looks like this:
     irc_channel1 = IrcChannel('#examplechannel1')
 
     routes = {
-        514: [
-            irc_channel1,
-        ],
+        514: [irc_channel1],
     }
 
 In a more complex setup, syslog messages could be received on two ports (514
@@ -67,13 +65,8 @@ the second channel.
     irc_channel2 = IrcChannel('#examplechannel2', password='zePassword')
 
     routes = {
-        514: [
-            irc_channel1,
-            irc_channel2,
-        ],
-        55514: [
-            irc_channel2,
-        ],
+          514: [irc_channel1, irc_channel2],
+        55514: [irc_channel2],
     }
 
 
@@ -586,16 +579,11 @@ if __name__ == '__main__':
     irc_channel1 = IrcChannel('#examplechannel1')
     irc_channel2 = IrcChannel('#examplechannel2', password='zePassword')
 
-    # Routing for syslog messages from the ports on which they are received to
-    # the IRC channels they should be announced on.
+    # routing for syslog messages from the ports on which they are received to
+    # the IRC channels they should be announced on
     routes = {
-        514: [
-            irc_channel1,
-            irc_channel2,
-        ],
-        55514: [
-            irc_channel2,
-        ],
+          514: [irc_channel1, irc_channel2],
+        55514: [irc_channel2],
     }
 
     main(routes)
