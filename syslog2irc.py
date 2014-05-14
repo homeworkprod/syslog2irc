@@ -205,14 +205,14 @@ DEFAULT_IRC_PORT = ServerSpec('').port
 
 
 class SyslogSeverity(Enum):
-    Emergency = 0
-    Alert = 1
-    Critical = 2
-    Error = 3
-    Warning = 4
-    Notice = 5
-    Informational = 6
-    Debug = 7
+    emergency = 0
+    alert = 1
+    critical = 2
+    error = 3
+    warning = 4
+    notice = 5
+    informational = 6
+    debug = 7
 
 
 class SyslogMessageParser(object):
