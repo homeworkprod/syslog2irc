@@ -61,8 +61,7 @@ class SyslogTestCase(TestCase):
             '<34>Oct 11 22:14:15 mymachine su: \'su root\' failed for lonvick on /dev/pts/8',
             4,
             'security/authorization messages',
-            2,
-            'Critical',
+            SyslogSeverity.Critical,
             datetime(CURRENT_YEAR, 10, 11, 22, 14, 15),
             'mymachine',
             'su: \'su root\' failed for lonvick on /dev/pts/8',
@@ -72,8 +71,7 @@ class SyslogTestCase(TestCase):
             '<13>Feb  5 17:32:18 10.0.0.99 Use the BFG!',
             1,
             'user-level messages',
-            5,
-            'Notice',
+            SyslogSeverity.Notice,
             datetime(CURRENT_YEAR, 2, 5, 17, 32, 18),
             '10.0.0.99',
             'Use the BFG!',
@@ -85,8 +83,7 @@ class SyslogTestCase(TestCase):
             '<165>Aug 24 05:34:00 CST 1987 mymachine myproc[10]: %% It\'s time to make the do-nuts.  %%  Ingredients: Mix=OK, Jelly=OK # Devices: Mixer=OK, Jelly_Injector=OK, Frier=OK # Transport: Conveyer1=OK, Conveyer2=OK # %%',
             20,
             'local use 4 (local4)',
-            5,
-            'Notice',
+            SyslogSeverity.Notice,
             datetime(CURRENT_YEAR, 8, 24, 5, 34, 0),
             'CST',
             '1987 mymachine myproc[10]: %% It\'s time to make the do-nuts.  %%  Ingredients: Mix=OK, Jelly=OK # Devices: Mixer=OK, Jelly_Injector=OK, Frier=OK # Transport: Conveyer1=OK, Conveyer2=OK # %%',
@@ -100,8 +97,7 @@ class SyslogTestCase(TestCase):
             '<0>Oct 22 10:52:12 scapegoat 1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!',
             0,
             'kernel messages',
-            0,
-            'Emergency',
+            SyslogSeverity.Emergency,
             datetime(CURRENT_YEAR, 10, 22, 10, 52, 12),
             'scapegoat',
             '1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!',
@@ -112,8 +108,7 @@ class SyslogTestCase(TestCase):
             data,
             expected_facility_id,
             expected_facility_name,
-            expected_severity_id,
-            expected_severity_name,
+            expected_severity,
             expected_timestamp,
             expected_hostname,
             expected_message):
@@ -122,8 +117,7 @@ class SyslogTestCase(TestCase):
 
         self.assertEqual(actual.facility_id, expected_facility_id)
         self.assertEqual(actual.facility_name, expected_facility_name)
-        self.assertEqual(actual.severity.value, expected_severity_id)
-        self.assertEqual(actual.severity.name, expected_severity_name)
+        self.assertEqual(actual.severity, expected_severity)
         self.assertEqual(actual.timestamp, expected_timestamp)
         self.assertEqual(actual.hostname, expected_hostname)
         self.assertEqual(actual.message, expected_message)
