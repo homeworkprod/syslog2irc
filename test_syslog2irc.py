@@ -53,7 +53,7 @@ from syslog2irc import (format_syslog_message, parse_irc_server_arg,
 CURRENT_YEAR = datetime.today().year
 
 
-class Syslog2IrcTestCase(TestCase):
+class SyslogTestCase(TestCase):
 
     @params(
         (
@@ -155,6 +155,9 @@ class Syslog2IrcTestCase(TestCase):
         actual = format_syslog_message(syslog_message)
 
         self.assertEqual(actual, expected)
+
+
+class ArgumentParserTestCase(TestCase):
 
     @params(
         ('localhost',      'localhost', 6667),
