@@ -13,5 +13,6 @@ setup(
     install_requires=[
         'blinker >= 1.3',
         'irc >= 8.3.1',
+        'enum34 >= 1.0',
     ],
 )
