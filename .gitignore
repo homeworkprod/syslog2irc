@@ -1,5 +1,5 @@
-# virtual environment
-env/
-
 # Python bytecode
 *.py[co]
+
+# virtual environment
+venv/
