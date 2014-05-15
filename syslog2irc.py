@@ -148,9 +148,10 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 .. _RFC 5424: http://tools.ietf.org/html/rfc5424
 
 
-:Copyright: 2007-2013 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 22-Jul-2013 (original release: 12-Apr-2007)
+:Copyright: 2007-2014 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
+:Date: 15-May-2014 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
+:Version: 0.6
 """
 
 from __future__ import print_function
