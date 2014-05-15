@@ -438,17 +438,29 @@ class IrcBot(SingleServerIRCBot):
         """Join channels after connect."""
         print('Connected to {}:{:d}.'
             .format(*conn.socket.getsockname()))
+
+        channel_names = sorted(c.name for c in self.channels_to_join)
+        print('Joining channels: {}'.format(', '.join(channel_names)))
+
         for channel in self.channels_to_join:
-            print('Joining channel {} ... '.format(channel.name),
-                end='')
             conn.join(channel.name, channel.password or '')
-            print('joined.')
+
         irc_channels_joined.send()
 
     def on_nicknameinuse(self, conn, event):
         """Choose another nickname if conflicting."""
         self._nickname += '_'
         conn.nick(self._nickname)
+
+    def on_join(self, conn, event):
+        """Successfully joined channel."""
+        channel = event.target
+        print('Joined channel {}.'.format(channel))
+
+    def on_badchannelkey(self, conn, event):
+        """Channel could not be joined due to wrong password."""
+        channel = event.arguments[0]
+        print('Cannot join channel {} (bad key).'.format(channel))
 
     def on_ctcp(self, conn, event):
         """Answer CTCP PING and VERSION queries."""
