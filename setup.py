@@ -10,9 +10,4 @@ setup(
     author='Jochen Kupperschmidt',
     author_email='homework@nwsnet.de',
     url='http://homework.nwsnet.de/releases/c474/#syslog2irc',
-    install_requires=[
-        'blinker >= 1.3',
-        'irc >= 8.3.1',
-        'enum34 >= 1.0',
-    ],
 )
