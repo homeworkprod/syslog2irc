@@ -11,7 +11,8 @@ Receive syslog messages via UDP and show them on IRC.
 Requirements
 ------------
 
-- Python 2.7+ (tested with 2.7.6) or Python 3.2+ (tested with 3.3.5 and 3.4.0)
+- Python 2.7+ (tested with 2.7.6) or 3.2+ (tested with 3.2.3, 3.3.5,
+  and 3.4.0)
 - irc_ (tested with 8.9.1)
 - blinker_ (tested with 1.3)
 - enum34_ (tested with 1.0) on Python versions before 3.4
