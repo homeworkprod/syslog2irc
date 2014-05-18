@@ -435,6 +435,9 @@ class IrcBot(SingleServerIRCBot):
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels
 
+    def get_version(self):
+        return 'syslog2IRC'
+
     def on_welcome(self, conn, event):
         """Join channels after connect."""
         print('Connected to {}:{:d}.'
@@ -465,15 +468,6 @@ class IrcBot(SingleServerIRCBot):
         """Channel could not be joined due to wrong password."""
         channel = event.arguments[0]
         print('Cannot join channel {} (bad key).'.format(channel))
-
-    def on_ctcp(self, conn, event):
-        """Answer CTCP PING and VERSION queries."""
-        whonick = event.source.nick
-        message = event.arguments[0].lower()
-        if message == 'version':
-            conn.notice(whonick, 'syslog2IRC')
-        elif message == 'ping':
-            conn.pong(whonick)
 
     def on_privmsg(self, conn, event):
         """React on private messages.
