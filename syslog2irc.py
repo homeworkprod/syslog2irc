@@ -455,8 +455,11 @@ class IrcBot(SingleServerIRCBot):
 
     def on_join(self, conn, event):
         """Successfully joined channel."""
+        joined_nick = event.source.nick
         channel = event.target
-        print('Joined channel {}.'.format(channel))
+
+        if joined_nick == self._nickname:
+            print('Joined channel {}.'.format(channel))
 
     def on_badchannelkey(self, conn, event):
         """Channel could not be joined due to wrong password."""
