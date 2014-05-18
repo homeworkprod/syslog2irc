@@ -415,6 +415,7 @@ def start_syslog_message_receivers(routes):
 
 
 class IrcChannel(namedtuple('IrcChannel', 'name password')):
+    """An IRC channel with optional password."""
 
     def __new__(cls, name, password=None):
         return super(IrcChannel, cls).__new__(cls, name, password)
@@ -425,7 +426,7 @@ shutdown_requested = signal('shutdown-requested')
 
 
 class IrcBot(SingleServerIRCBot):
-    """An IRC bot to forward syslog messages to channels."""
+    """An IRC bot to forward syslog messages to IRC channels."""
 
     def __init__(self, server_spec, nickname, realname, channels):
         print('Connecting to IRC server {0.host}:{0.port:d} ...'
@@ -579,6 +580,7 @@ class Processor(object):
 
     def handle_syslog_message_received(self, port, source_address=None,
             message=None):
+        """Log and announce an incoming syslog message."""
         source = '{0[0]}:{0[1]:d}'.format(source_address)
 
         print('Received message from {} on port {:d} -> {}'
