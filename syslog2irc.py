@@ -538,30 +538,17 @@ class Processor(object):
 
         self.ports_to_channel_names = defaultdict(set)
 
-        self.ready = True
-
         self.shutdown = False
         shutdown_requested.connect(self.handle_shutdown_requested)
 
     def register_route(self, port, channel_name):
         self.ports_to_channel_names[port].add(channel_name)
 
-    def wait_for_signal_before_starting(self, signal):
-        """Don't accept messages until the signal is sent."""
-        self.ready = False
-        signal.connect(self.handle_start_signal)
-
-    def handle_start_signal(self, sender, **kw):
-        self.ready = True
-
     def handle_shutdown_requested(self, sender):
         self.shutdown = True
 
     def run(self):
         """Run the main loop until shutdown is requested."""
-        while not self.ready:
-            sleep(0.5)
-
         print('Starting to accept syslog messages.')
         syslog_message_received.connect(
             self.handle_syslog_message_received)
@@ -641,9 +628,7 @@ def start_processor(announcer, channel_names_to_ports, use_irc):
         for port in ports:
             processor.register_route(port, channel)
 
-    if use_irc:
-        processor.wait_for_signal_before_starting(irc_channel_joined)
-    else:
+    if not use_irc:
         for channel in channel_names_to_ports.keys():
             irc_channel_joined.send(channel=channel)
 
