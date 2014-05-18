@@ -286,6 +286,10 @@ class SyslogSeverity(Enum):
     debug = 7
 
 
+SyslogMessage = namedtuple('SyslogMessage',
+    'facility severity timestamp hostname message')
+
+
 class SyslogMessageParser(object):
     """Parse syslog messages."""
 
@@ -338,12 +342,6 @@ class SyslogMessageParser(object):
 
     def _take_slice(self, n):
         return ''.join(islice(self.data_iter, n))
-
-
-class SyslogMessage(namedtuple('SyslogMessage',
-        'facility severity timestamp hostname message'
-    )):
-    """A syslog message."""
 
 
 def format_syslog_message(message):
