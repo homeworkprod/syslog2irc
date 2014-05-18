@@ -553,21 +553,25 @@ class Processor(object):
     def __init__(self, announce_callables_by_port):
         self.announce_callables_by_port = announce_callables_by_port
 
+        self.ready = True
+
         self.shutdown = False
         shutdown_requested.connect(self.handle_shutdown_requested)
 
-        self.channels_joined = False
-        irc_channels_joined.connect(self.handle_channels_joined)
+    def wait_for_signal_before_starting(self, signal):
+        """Don't accept messages until the signal is sent."""
+        self.ready = False
+        signal.connect(self.handle_start_signal)
+
+    def handle_start_signal(self, sender):
+        self.ready = True
 
     def handle_shutdown_requested(self, sender):
         self.shutdown = True
 
-    def handle_channels_joined (self, sender):
-        self.channels_joined = True
-
     def run(self):
         """Run the main loop until shutdown is requested."""
-        while not self.channels_joined:
+        while not self.ready:
             sleep(0.5)
 
         syslog_message_received.connect(
@@ -643,6 +647,8 @@ def main(routes):
     start_syslog_message_receivers(routes)
 
     processor = Processor(announce_callables_by_port)
+    if args.irc_server:
+        processor.wait_for_signal_before_starting(irc_channels_joined)
     processor.run()
 
 if __name__ == '__main__':
