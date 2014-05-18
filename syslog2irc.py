@@ -402,10 +402,9 @@ class SyslogReceiveServer(ThreadingUDPServer):
         return self.server_address[1]
 
 
-def start_syslog_message_receivers(routes):
+def start_syslog_message_receivers(ports):
     """Start one syslog message receiving server for each port."""
-    reception_ports = routes.keys()
-    for port in reception_ports:
+    for port in ports:
         SyslogReceiveServer.start(port)
 
 
@@ -508,19 +507,14 @@ class StdoutAnnouncer(object):
         print('{}> {}'.format(channel, message))
 
 
-def start_announcer(args, routes):
+def start_announcer(args, irc_channels):
     """Create and return an announcer according to the configuration."""
     if not args.irc_server:
         print('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
 
-    channels = collect_channels(routes)
     return IrcAnnouncer(args.irc_server, args.irc_nickname,
-        args.irc_realname, channels)
-
-def collect_channels(routes):
-    """Collect the unique IRC channels from the routes mapping."""
-    return frozenset(chain(*routes.values()))
+        args.irc_realname, irc_channels)
 
 
 # -------------------------------------------------------------------- #
@@ -539,9 +533,9 @@ def start_thread(target, name):
 
 class Processor(object):
 
-    def __init__(self, announcer, routes):
+    def __init__(self, announcer, ports_to_channel_names):
         self.announcer = announcer
-        self.routes = routes
+        self.ports_to_channel_names = ports_to_channel_names
 
         self.ready = True
 
@@ -583,8 +577,8 @@ class Processor(object):
 
         formatted_message = format_syslog_message(message)
         irc_message = '{} {}'.format(source, formatted_message)
-        for irc_channel in self.routes.get(port):
-            self.announcer.announce(irc_channel.name, irc_message)
+        for channel_name in self.ports_to_channel_names.get(port):
+            self.announcer.announce(channel_name, irc_message)
 
 
 # -------------------------------------------------------------------- #
@@ -627,15 +621,20 @@ def parse_irc_server_arg(value):
 
 # -------------------------------------------------------------------- #
 
-
 def main(routes):
     """Application entry point"""
     args = parse_args()
-    announcer = start_announcer(args, routes)
 
-    start_syslog_message_receivers(routes)
+    irc_channels = frozenset(chain(*routes.values()))
+    announcer = start_announcer(args, irc_channels)
 
-    processor = Processor(announcer, routes)
+    ports = routes.keys()
+    start_syslog_message_receivers(ports)
+
+    ports_to_channel_names = {
+        port: [channel.name for channel in channels]
+            for port, channels in routes.items()}
+    processor = Processor(announcer, ports_to_channel_names)
     if args.irc_server:
         processor.wait_for_signal_before_starting(irc_channel_joined)
     processor.run()
