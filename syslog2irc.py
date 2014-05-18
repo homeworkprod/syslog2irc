@@ -202,6 +202,15 @@ DEFAULT_IRC_PORT = ServerSpec('').port
 
 
 # -------------------------------------------------------------------- #
+# signals
+
+
+syslog_message_received = signal('syslog-message-received')
+irc_channel_joined = signal('irc-channel-joined')
+shutdown_requested = signal('shutdown-requested')
+
+
+# -------------------------------------------------------------------- #
 # syslog stuff
 
 
@@ -354,9 +363,6 @@ def format_syslog_message(message):
     return ''.join(_generate())
 
 
-syslog_message_received = signal('syslog-message-received')
-
-
 class SyslogRequestHandler(BaseRequestHandler):
     """Handler for syslog messages."""
 
@@ -417,10 +423,6 @@ class IrcChannel(namedtuple('IrcChannel', 'name password')):
 
     def __new__(cls, name, password=None):
         return super(IrcChannel, cls).__new__(cls, name, password)
-
-
-irc_channel_joined = signal('irc-channel-joined')
-shutdown_requested = signal('shutdown-requested')
 
 
 class IrcBot(SingleServerIRCBot):
