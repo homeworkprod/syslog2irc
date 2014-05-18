@@ -365,15 +365,14 @@ class SyslogRequestHandler(BaseRequestHandler):
         try:
             data = self.request[0].strip()
             data = data.decode('ascii')
-            syslog_message = SyslogMessageParser.parse(data)
+            message = SyslogMessageParser.parse(data)
         except ValueError:
             print('Invalid message received from {}:{:d}.'.format(
                 *self.client_address))
         else:
             port = self.server.get_port()
             syslog_message_received.send(port,
-                source_address=self.client_address,
-                syslog_message=syslog_message)
+                source_address=self.client_address, message=message)
 
 
 class SyslogReceiveServer(ThreadingUDPServer):
@@ -582,13 +581,13 @@ class Processor(object):
         print('Shutting down ...')
 
     def handle_syslog_message_received(self, port, source_address=None,
-            syslog_message=None):
+            message=None):
         source = '{0[0]}:{0[1]:d}'.format(source_address)
 
         print('Received message from {} on port {:d} -> {}'
-            .format(source, port, syslog_message))
+            .format(source, port, message))
 
-        formatted_message = format_syslog_message(syslog_message)
+        formatted_message = format_syslog_message(message)
         output = '{} {}'.format(source, formatted_message)
         for announce in self.announce_callables_by_port.get(port):
             announce(output)
