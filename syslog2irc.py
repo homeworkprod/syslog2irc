@@ -363,16 +363,16 @@ class SyslogRequestHandler(BaseRequestHandler):
 
     def handle(self):
         try:
-            data = self.request[0].strip()
-            data = data.decode('ascii')
+            data = self.request[0].strip().decode('ascii')
             message = SyslogMessageParser.parse(data)
         except ValueError:
             print('Invalid message received from {}:{:d}.'.format(
                 *self.client_address))
-        else:
-            port = self.server.get_port()
-            syslog_message_received.send(port,
-                source_address=self.client_address, message=message)
+            return
+
+        port = self.server.get_port()
+        syslog_message_received.send(port,
+            source_address=self.client_address, message=message)
 
 
 class SyslogReceiveServer(ThreadingUDPServer):
