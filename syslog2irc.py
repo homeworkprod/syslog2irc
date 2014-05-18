@@ -157,7 +157,7 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 from __future__ import print_function
 import argparse
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from datetime import datetime
 from enum import Enum, unique
 from itertools import chain, islice, takewhile
@@ -533,14 +533,18 @@ def start_thread(target, name):
 
 class Processor(object):
 
-    def __init__(self, announcer, ports_to_channel_names):
+    def __init__(self, announcer):
         self.announcer = announcer
-        self.ports_to_channel_names = ports_to_channel_names
+
+        self.ports_to_channel_names = defaultdict(set)
 
         self.ready = True
 
         self.shutdown = False
         shutdown_requested.connect(self.handle_shutdown_requested)
+
+    def register_route(self, port, channel_name):
+        self.ports_to_channel_names[port].add(channel_name)
 
     def wait_for_signal_before_starting(self, signal):
         """Don't accept messages until the signal is sent."""
@@ -577,7 +581,7 @@ class Processor(object):
 
         formatted_message = format_syslog_message(message)
         irc_message = '{} {}'.format(source, formatted_message)
-        for channel_name in self.ports_to_channel_names.get(port):
+        for channel_name in self.ports_to_channel_names[port]:
             self.announcer.announce(channel_name, irc_message)
 
 
@@ -631,10 +635,10 @@ def main(routes):
     ports = routes.keys()
     start_syslog_message_receivers(ports)
 
-    ports_to_channel_names = {
-        port: [channel.name for channel in channels]
-            for port, channels in routes.items()}
-    processor = Processor(announcer, ports_to_channel_names)
+    processor = Processor(announcer)
+    for port, channels in routes.items():
+        for channel in channels:
+            processor.register_route(port, channel.name)
     if args.irc_server:
         processor.wait_for_signal_before_starting(irc_channel_joined)
     processor.run()
