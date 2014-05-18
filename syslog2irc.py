@@ -421,7 +421,7 @@ class IrcChannel(namedtuple('IrcChannel', 'name password')):
         return super(IrcChannel, cls).__new__(cls, name, password)
 
 
-irc_channels_joined = signal('irc-channels-joined')
+irc_channel_joined = signal('irc-channel-joined')
 shutdown_requested = signal('shutdown-requested')
 
 
@@ -450,8 +450,6 @@ class IrcBot(SingleServerIRCBot):
         for channel in self.channels_to_join:
             conn.join(channel.name, channel.password or '')
 
-        irc_channels_joined.send()
-
     def on_nicknameinuse(self, conn, event):
         """Choose another nickname if conflicting."""
         self._nickname += '_'
@@ -463,7 +461,8 @@ class IrcBot(SingleServerIRCBot):
         channel = event.target
 
         if joined_nick == self._nickname:
-            print('Joined channel {}.'.format(channel))
+            print('Joined IRC channel {}.'.format(channel))
+            irc_channel_joined.send(channel=channel)
 
     def on_badchannelkey(self, conn, event):
         """Channel could not be joined due to wrong password."""
@@ -563,7 +562,7 @@ class Processor(object):
         self.ready = False
         signal.connect(self.handle_start_signal)
 
-    def handle_start_signal(self, sender):
+    def handle_start_signal(self, sender, **kw):
         self.ready = True
 
     def handle_shutdown_requested(self, sender):
@@ -574,6 +573,7 @@ class Processor(object):
         while not self.ready:
             sleep(0.5)
 
+        print('Starting to accept syslog messages.')
         syslog_message_received.connect(
             self.handle_syslog_message_received)
 
@@ -648,7 +648,7 @@ def main(routes):
 
     processor = Processor(announce_callables_by_port)
     if args.irc_server:
-        processor.wait_for_signal_before_starting(irc_channels_joined)
+        processor.wait_for_signal_before_starting(irc_channel_joined)
     processor.run()
 
 if __name__ == '__main__':
