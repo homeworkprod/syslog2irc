@@ -160,7 +160,6 @@ import argparse
 from collections import namedtuple
 from datetime import datetime
 from enum import Enum, unique
-from functools import partial
 from itertools import chain, islice, takewhile
 try:
     # Python 2.x
@@ -523,15 +522,6 @@ def collect_channels(routes):
     """Collect the unique IRC channels from the routes mapping."""
     return frozenset(chain(*routes.values()))
 
-def prepare_announce_callables(announcer, routes):
-    """Return a mapping from syslog ports to announce callables."""
-    def create_callable(channel):
-        return partial(announcer.announce, channel.name)
-
-    return {
-        port: [create_callable(channel) for channel in channels]
-            for port, channels in routes.items()}
-
 
 # -------------------------------------------------------------------- #
 # threads
@@ -549,8 +539,9 @@ def start_thread(target, name):
 
 class Processor(object):
 
-    def __init__(self, announce_callables_by_port):
-        self.announce_callables_by_port = announce_callables_by_port
+    def __init__(self, announcer, routes):
+        self.announcer = announcer
+        self.routes = routes
 
         self.ready = True
 
@@ -591,9 +582,9 @@ class Processor(object):
             .format(source, port, message))
 
         formatted_message = format_syslog_message(message)
-        output = '{} {}'.format(source, formatted_message)
-        for announce in self.announce_callables_by_port.get(port):
-            announce(output)
+        irc_message = '{} {}'.format(source, formatted_message)
+        for irc_channel in self.routes.get(port):
+            self.announcer.announce(irc_channel.name, irc_message)
 
 
 # -------------------------------------------------------------------- #
@@ -641,12 +632,10 @@ def main(routes):
     """Application entry point"""
     args = parse_args()
     announcer = start_announcer(args, routes)
-    announce_callables_by_port = prepare_announce_callables(announcer,
-        routes)
 
     start_syslog_message_receivers(routes)
 
-    processor = Processor(announce_callables_by_port)
+    processor = Processor(announcer, routes)
     if args.irc_server:
         processor.wait_for_signal_before_starting(irc_channel_joined)
     processor.run()
