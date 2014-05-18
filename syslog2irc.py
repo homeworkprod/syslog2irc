@@ -211,7 +211,7 @@ shutdown_requested = signal('shutdown-requested')
 
 
 # -------------------------------------------------------------------- #
-# syslog stuff
+# syslog
 
 
 @unique
@@ -413,7 +413,7 @@ def start_syslog_message_receivers(ports):
 
 
 # -------------------------------------------------------------------- #
-# IRC bot stuff
+# IRC
 
 
 class IrcChannel(namedtuple('IrcChannel', 'name password')):
@@ -624,6 +624,7 @@ def parse_irc_server_arg(value):
 
 
 # -------------------------------------------------------------------- #
+
 
 def main(routes):
     """Application entry point"""
