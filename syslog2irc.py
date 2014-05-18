@@ -583,11 +583,13 @@ class Processor(object):
 
     def handle_syslog_message_received(self, port, source_address=None,
             syslog_message=None):
-        source = '{0[0]}:{0[1]:d} '.format(source_address)
+        source = '{0[0]}:{0[1]:d}'.format(source_address)
+
         print('Received message from {} on port {:d} -> {}'
             .format(source, port, syslog_message))
 
-        output = source + format_syslog_message(syslog_message)
+        formatted_message = format_syslog_message(syslog_message)
+        output = '{} {}'.format(source, formatted_message)
         for announce in self.announce_callables_by_port.get(port):
             announce(output)
 
