@@ -625,6 +625,29 @@ def parse_irc_server_arg(value):
 
 # -------------------------------------------------------------------- #
 
+def map_channel_names_to_ports(routes):
+    channel_names_to_ports = defaultdict(set)
+    for port, channels in routes.items():
+        for channel in channels:
+            channel_names_to_ports[channel.name].add(port)
+    return channel_names_to_ports
+
+def start_processor(announcer, channel_names_to_ports, use_irc):
+    processor = Processor(announcer)
+
+    @irc_channel_joined.connect
+    def register_route(sender, channel=None):
+        ports = channel_names_to_ports[channel]
+        for port in ports:
+            processor.register_route(port, channel)
+
+    if use_irc:
+        processor.wait_for_signal_before_starting(irc_channel_joined)
+    else:
+        for channel in channel_names_to_ports.keys():
+            irc_channel_joined.send(channel=channel)
+
+    processor.run()
 
 def main(routes):
     """Application entry point"""
@@ -636,13 +659,9 @@ def main(routes):
     ports = routes.keys()
     start_syslog_message_receivers(ports)
 
-    processor = Processor(announcer)
-    for port, channels in routes.items():
-        for channel in channels:
-            processor.register_route(port, channel.name)
-    if args.irc_server:
-        processor.wait_for_signal_before_starting(irc_channel_joined)
-    processor.run()
+    channel_names_to_ports = map_channel_names_to_ports(routes)
+    use_irc = bool(args.irc_server)
+    start_processor(announcer, channel_names_to_ports, use_irc)
 
 if __name__ == '__main__':
     # IRC channels to join

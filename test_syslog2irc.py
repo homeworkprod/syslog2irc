@@ -47,8 +47,9 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import (IrcChannel, format_syslog_message, parse_irc_server_arg,
-    SyslogFacility, SyslogMessage, SyslogMessageParser, SyslogSeverity)
+from syslog2irc import (IrcChannel, format_syslog_message, \
+    map_channel_names_to_ports, parse_irc_server_arg, SyslogFacility, \
+    SyslogMessage, SyslogMessageParser, SyslogSeverity)
 
 
 CURRENT_YEAR = datetime.today().year
@@ -192,3 +193,34 @@ class ArgumentParserTestCase(TestCase):
 
         self.assertEqual(actual.host, expected_host)
         self.assertEqual(actual.port, expected_port)
+
+
+class RoutingTestCase(TestCase):
+
+    irc_channel1 = IrcChannel('#example1')
+    irc_channel2 = IrcChannel('#example2', password='opensesame')
+
+    @params(
+        (
+            {
+                514: [irc_channel1],
+            },
+            {
+                '#example1': {514},
+            },
+        ),
+        (
+            {
+                  514: [irc_channel1, irc_channel2],
+                55514: [irc_channel2],
+            },
+            {
+                '#example1': {514},
+                '#example2': {514, 55514},
+            },
+        ),
+    )
+    def test_map_channel_names_to_ports(self, routes, expected):
+        actual = map_channel_names_to_ports(routes)
+
+        self.assertEqual(actual, expected)
