@@ -440,7 +440,7 @@ class IrcBot(SingleServerIRCBot):
     def on_welcome(self, conn, event):
         """Join channels after connect."""
         print('Connected to {}:{:d}.'
-            .format(*conn.socket.getsockname()))
+            .format(*conn.socket.getpeername()))
 
         channel_names = sorted(c.name for c in self.channels_to_join)
         print('Joining channels: {}'.format(', '.join(channel_names)))
