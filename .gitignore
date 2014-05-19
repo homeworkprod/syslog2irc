@@ -2,4 +2,7 @@
 *.py[co]
 
 # virtual environment
-venv/
+venv
+
+# tox' local data
+.tox
