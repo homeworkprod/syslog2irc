@@ -494,6 +494,8 @@ class IrcAnnouncer(object):
 
     def __init__(self, server, nickname, realname, channels):
         self.bot = IrcBot(server, nickname, realname, channels)
+
+    def start(self):
         start_thread(self.bot.start, 'IrcAnnouncer')
 
     def announce(self, channel, message):
@@ -503,11 +505,14 @@ class IrcAnnouncer(object):
 class StdoutAnnouncer(object):
     """Announce syslog messages on STDOUT."""
 
+    def start(self):
+        pass
+
     def announce(self, channel, message):
         print('{}> {}'.format(channel, message))
 
 
-def start_announcer(args, irc_channels):
+def create_announcer(args, irc_channels):
     """Create and return an announcer according to the configuration."""
     if not args.irc_server:
         print('No IRC server specified; will write to STDOUT instead.')
@@ -535,13 +540,14 @@ class Processor(object):
 
     def __init__(self, announcer, channel_names_to_ports):
         self.announcer = announcer
-
         self.channel_names_to_ports = channel_names_to_ports
         self.ports_to_channel_names = defaultdict(set)
-        irc_channel_joined.connect(self.enable_channel)
-
         self.shutdown = False
+
+    def connect_to_signals(self):
+        irc_channel_joined.connect(self.enable_channel)
         shutdown_requested.connect(self.handle_shutdown_requested)
+        syslog_message_received.connect(self.handle_syslog_message)
 
     def enable_channel(self, sender, channel=None):
         ports = self.channel_names_to_ports[channel]
@@ -557,16 +563,12 @@ class Processor(object):
 
     def run(self):
         """Run the main loop until shutdown is requested."""
-        print('Starting to accept syslog messages.')
-        syslog_message_received.connect(
-            self.handle_syslog_message_received)
-
         while not self.shutdown:
             sleep(0.5)
 
         print('Shutting down ...')
 
-    def handle_syslog_message_received(self, port, source_address=None,
+    def handle_syslog_message(self, port, source_address=None,
             message=None):
         """Log and announce an incoming syslog message."""
         source = '{0[0]}:{0[1]:d}'.format(source_address)
@@ -627,28 +629,30 @@ def map_channel_names_to_ports(routes):
             channel_names_to_ports[channel.name].add(port)
     return channel_names_to_ports
 
-def start_processor(announcer, channel_names_to_ports, use_irc):
+def main(routes):
+    """Application entry point"""
+    args = parse_args()
+    irc_channels = frozenset(chain(*routes.values()))
+    channel_names_to_ports = map_channel_names_to_ports(routes)
+    ports = routes.keys()
+
+    announcer = create_announcer(args, irc_channels)
     processor = Processor(announcer, channel_names_to_ports)
 
-    if not use_irc:
+    # Up to this point, no signals must have been sent.
+    processor.connect_to_signals()
+
+    # Signals are allowed be sent from here on.
+
+    start_syslog_message_receivers(ports)
+    announcer.start()
+
+    if not args.irc_server:
+        # Fake channel joins.
         for channel in channel_names_to_ports.keys():
             irc_channel_joined.send(channel=channel)
 
     processor.run()
-
-def main(routes):
-    """Application entry point"""
-    args = parse_args()
-
-    irc_channels = frozenset(chain(*routes.values()))
-    announcer = start_announcer(args, irc_channels)
-
-    ports = routes.keys()
-    start_syslog_message_receivers(ports)
-
-    channel_names_to_ports = map_channel_names_to_ports(routes)
-    use_irc = bool(args.irc_server)
-    start_processor(announcer, channel_names_to_ports, use_irc)
 
 if __name__ == '__main__':
     # IRC channels to join

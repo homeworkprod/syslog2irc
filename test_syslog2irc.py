@@ -230,23 +230,20 @@ class RoutingTestCase(TestCase):
 class ProcessorTestCase(TestCase):
 
     def test_shutdown_flag_set_on_shutdown_signal(self):
-        announcer = None
-        channel_names_to_ports = {}
-
-        processor = Processor(announcer, channel_names_to_ports)
+        processor = self._create_processor()
         self.assertEqual(processor.shutdown, False)
 
         shutdown_requested.send()
         self.assertEqual(processor.shutdown, True)
 
     def test_ports_to_channel_names_mapping_extended_on_join_signal(self):
-        announcer = None
         channel_names_to_ports = {
             '#example1': {514},
             '#example2': {514, 55514},
         }
 
-        processor = Processor(announcer, channel_names_to_ports)
+        processor = self._create_processor(
+            channel_names_to_ports=channel_names_to_ports)
         self.assertEqual(processor.ports_to_channel_names, {})
 
         irc_channel_joined.send(channel='#example1')
@@ -259,3 +256,9 @@ class ProcessorTestCase(TestCase):
             514: {'#example1', '#example2'},
             55514: {'#example2'},
         })
+
+    def _create_processor(self, announcer=None,
+            channel_names_to_ports=None):
+        processor = Processor(announcer, channel_names_to_ports or {})
+        processor.connect_to_signals()
+        return processor
