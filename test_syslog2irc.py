@@ -36,9 +36,9 @@ module name!):
 
 
 :Copyright: 2007-2014 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 15-May-2014 (original release: 12-Apr-2007)
+:Date: 19-May-2014 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
-:Version: 0.6
+:Version: 0.7
 """
 
 from __future__ import unicode_literals
