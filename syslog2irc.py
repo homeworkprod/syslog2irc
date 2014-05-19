@@ -533,16 +533,24 @@ def start_thread(target, name):
 
 class Processor(object):
 
-    def __init__(self, announcer):
+    def __init__(self, announcer, channel_names_to_ports):
         self.announcer = announcer
 
+        self.channel_names_to_ports = channel_names_to_ports
         self.ports_to_channel_names = defaultdict(set)
+        irc_channel_joined.connect(self.enable_channel)
 
         self.shutdown = False
         shutdown_requested.connect(self.handle_shutdown_requested)
 
-    def register_route(self, port, channel_name):
-        self.ports_to_channel_names[port].add(channel_name)
+    def enable_channel(self, sender, channel=None):
+        ports = self.channel_names_to_ports[channel]
+
+        print('Enabled forwarding to channel {} from ports {}.'
+            .format(channel, ports))
+
+        for port in ports:
+            self.ports_to_channel_names[port].add(channel)
 
     def handle_shutdown_requested(self, sender):
         self.shutdown = True
@@ -620,13 +628,7 @@ def map_channel_names_to_ports(routes):
     return channel_names_to_ports
 
 def start_processor(announcer, channel_names_to_ports, use_irc):
-    processor = Processor(announcer)
-
-    @irc_channel_joined.connect
-    def register_route(sender, channel=None):
-        ports = channel_names_to_ports[channel]
-        for port in ports:
-            processor.register_route(port, channel)
+    processor = Processor(announcer, channel_names_to_ports)
 
     if not use_irc:
         for channel in channel_names_to_ports.keys():
