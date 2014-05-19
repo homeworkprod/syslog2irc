@@ -47,8 +47,9 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import (IrcChannel, format_syslog_message, \
-    map_channel_names_to_ports, parse_irc_server_arg, SyslogFacility, \
+from syslog2irc import (IrcChannel, format_syslog_message,
+    irc_channel_joined, map_channel_names_to_ports,
+    parse_irc_server_arg, Processor, shutdown_requested, SyslogFacility,
     SyslogMessage, SyslogMessageParser, SyslogSeverity)
 
 
@@ -224,3 +225,37 @@ class RoutingTestCase(TestCase):
         actual = map_channel_names_to_ports(routes)
 
         self.assertEqual(actual, expected)
+
+
+class ProcessorTestCase(TestCase):
+
+    def test_shutdown_flag_set_on_shutdown_signal(self):
+        announcer = None
+        channel_names_to_ports = {}
+
+        processor = Processor(announcer, channel_names_to_ports)
+        self.assertEqual(processor.shutdown, False)
+
+        shutdown_requested.send()
+        self.assertEqual(processor.shutdown, True)
+
+    def test_ports_to_channel_names_mapping_extended_on_join_signal(self):
+        announcer = None
+        channel_names_to_ports = {
+            '#example1': {514},
+            '#example2': {514, 55514},
+        }
+
+        processor = Processor(announcer, channel_names_to_ports)
+        self.assertEqual(processor.ports_to_channel_names, {})
+
+        irc_channel_joined.send(channel='#example1')
+        self.assertEqual(processor.ports_to_channel_names, {
+            514: {'#example1'},
+        })
+
+        irc_channel_joined.send(channel='#example2')
+        self.assertEqual(processor.ports_to_channel_names, {
+            514: {'#example1', '#example2'},
+            55514: {'#example2'},
+        })
