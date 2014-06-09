@@ -399,7 +399,7 @@ class SyslogReceiveServer(ThreadingUDPServer):
                 '4,096) and up to 65,535.\n'.format(port))
             sys.exit(1)
 
-        thread_name = 'SyslogReceiveServer-port{:d}'.format(port)
+        thread_name = '{}-port{:d}'.format(cls.__name__, port)
         start_thread(receiver.serve_forever, thread_name)
 
     def get_port(self):
