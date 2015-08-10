@@ -2,6 +2,12 @@ syslog2IRC Changelog
 ====================
 
 
+Version 0.? (released on ??-???-????)
+-------------------------------------
+
+- Dropped support for Python 3.2.
+
+
 Version 0.7 (released on 19-May-2014)
 -------------------------------------
 
