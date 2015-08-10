@@ -1,10 +1,19 @@
+# -*- coding: utf-8 -*-
+
+import codecs
+
 from setuptools import setup
+
+
+with codecs.open('README.rst', encoding='utf-8') as f:
+    long_description = f.read()
 
 
 setup(
     name='syslog2IRC',
     version='0.8',
     description='A proxy to forward syslog messages to IRC',
+    long_description=long_description,
     url='http://homework.nwsnet.de/releases/c474/#syslog2irc',
     author='Jochen Kupperschmidt',
     author_email='homework@nwsnet.de',
