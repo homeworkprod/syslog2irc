@@ -473,6 +473,7 @@ def parse_args():
 
     return parser.parse_args()
 
+
 def parse_irc_server_arg(value):
     """Parse a hostname with optional port."""
     fragments = value.split(':', 1)
@@ -489,6 +490,7 @@ def map_channel_names_to_ports(routes):
         for channel in channels:
             channel_names_to_ports[channel.name].add(port)
     return channel_names_to_ports
+
 
 def main(routes):
     """Application entry point"""
@@ -514,6 +516,7 @@ def main(routes):
             irc_channel_joined.send(channel=channel)
 
     processor.run()
+
 
 if __name__ == '__main__':
     # IRC channels to join
