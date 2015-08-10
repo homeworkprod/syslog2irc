@@ -5,9 +5,10 @@ setup(
     name='syslog2IRC',
     version='0.8',
     description='A proxy to forward syslog messages to IRC',
+    url='http://homework.nwsnet.de/releases/c474/#syslog2irc',
     author='Jochen Kupperschmidt',
     author_email='homework@nwsnet.de',
-    url='http://homework.nwsnet.de/releases/c474/#syslog2irc',
+    license='MIT',
     classifiers=[
         'Environment :: Console',
         'Intended Audience :: System Administrators',
