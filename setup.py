@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='syslog2IRC',
-    version='0.7',
+    version='0.8',
     description='A proxy to forward syslog messages to IRC',
     author='Jochen Kupperschmidt',
     author_email='homework@nwsnet.de',

@@ -10,24 +10,17 @@ Requirements
 - Python 2.7+ (tested with 2.7.6) or 3.3+ (tested with 3.3.5, and 3.4.0)
 - irc_ (tested with 8.9.1)
 - blinker_ (tested with 1.3)
-- enum34_ (tested with 1.0) on Python versions before 3.4
+- syslogmp_ (tested with 0.1)
 
 
 Installation
 ------------
 
-irc_ and blinker_ can be installed via pip_:
+The required packages can be installed via pip_:
 
 .. code:: sh
 
-    $ pip install irc blinker
-
-As of Python 3.4, an enum module is part of the standard library. For
-older versions of Python, install the enum34_ module:
-
-.. code:: sh
-
-    $ pip install enum34
+    $ pip install -r requirements.txt
 
 
 Configuration
@@ -137,14 +130,14 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 .. _irc:      https://bitbucket.org/jaraco/irc
 .. _blinker:  http://pythonhosted.org/blinker/
-.. _enum34:   https://pypi.python.org/pypi/enum34
+.. _syslogmp: http://homework.nwsnet.de/releases/76d6/#syslogmp
 .. _pip:      http://www.pip-installer.org/
 .. _IANA:     http://www.iana.org/
 .. _RFC 3164: http://tools.ietf.org/html/rfc3164
 .. _RFC 5424: http://tools.ietf.org/html/rfc5424
 
 
-:Copyright: 2007-2014 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 19-May-2014 (original release: 12-Apr-2007)
+:Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
+:Date: 10-Aug-2015 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
-:Version: 0.7
+:Version: 0.8

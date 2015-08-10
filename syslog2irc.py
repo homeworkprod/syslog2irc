@@ -14,24 +14,17 @@ Requirements
 - Python 2.7+ (tested with 2.7.6) or 3.3+ (tested with 3.3.5, and 3.4.0)
 - irc_ (tested with 8.9.1)
 - blinker_ (tested with 1.3)
-- enum34_ (tested with 1.0) on Python versions before 3.4
+- syslogmp_ (tested with 0.1)
 
 
 Installation
 ------------
 
-irc_ and blinker_ can be installed via pip_:
+The required packages can be installed via pip_:
 
 .. code:: sh
 
-    $ pip install irc blinker
-
-As of Python 3.4, an enum module is part of the standard library. For
-older versions of Python, install the enum34_ module:
-
-.. code:: sh
-
-    $ pip install enum34
+    $ pip install -r requirements.txt
 
 
 Configuration
@@ -141,25 +134,23 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 .. _irc:      https://bitbucket.org/jaraco/irc
 .. _blinker:  http://pythonhosted.org/blinker/
-.. _enum34:   https://pypi.python.org/pypi/enum34
+.. _syslogmp: http://homework.nwsnet.de/releases/76d6/#syslogmp
 .. _pip:      http://www.pip-installer.org/
 .. _IANA:     http://www.iana.org/
 .. _RFC 3164: http://tools.ietf.org/html/rfc3164
 .. _RFC 5424: http://tools.ietf.org/html/rfc5424
 
 
-:Copyright: 2007-2014 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 19-May-2014 (original release: 12-Apr-2007)
+:Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
+:Date: 10-Aug-2015 (original release: 12-Apr-2007)
 :License: MIT, see LICENSE for details.
-:Version: 0.7
+:Version: 0.8
 """
 
 from __future__ import print_function
 import argparse
 from collections import defaultdict, namedtuple
-from datetime import datetime
-from enum import Enum, unique
-from itertools import chain, islice, takewhile
+from itertools import chain
 try:
     # Python 2.x
     from SocketServer import BaseRequestHandler, ThreadingUDPServer
@@ -172,6 +163,7 @@ from time import sleep
 
 from blinker import signal
 from irc.bot import ServerSpec, SingleServerIRCBot
+import syslogmp
 
 
 DEFAULT_IRC_PORT = ServerSpec('').port
@@ -213,136 +205,6 @@ shutdown_requested = signal('shutdown-requested')
 # syslog
 
 
-@unique
-class SyslogFacility(Enum):
-    kernel = 0
-    user = 1
-    mail = 2
-    system_daemons = 3
-    security4 = 4
-    internal = 5
-    line_printer = 6
-    network_news = 7
-    uucp = 8
-    clock9 = 9
-    security10 = 10
-    ftp = 11
-    ntp = 12
-    log_audit = 13
-    log_alert = 14
-    clock15 = 15
-    local0 = 16
-    local1 = 17
-    local2 = 18
-    local3 = 19
-    local4 = 20
-    local5 = 21
-    local6 = 22
-    local7 = 23
-
-    @property
-    def description(self):
-        return SYSLOG_FACILITY_DESCRIPTIONS[self.value]
-
-
-SYSLOG_FACILITY_DESCRIPTIONS = {
-    0: 'kernel messages',
-    1: 'user-level messages',
-    2: 'mail system',
-    3: 'system daemons',
-    4: 'security/authorization messages',
-    5: 'messages generated internally by syslogd',
-    6: 'line printer subsystem',
-    7: 'network news subsystem',
-    8: 'UUCP subsystem',
-    9: 'clock daemon',
-    10: 'security/authorization messages',
-    11: 'FTP daemon',
-    12: 'NTP subsystem',
-    13: 'log audit',
-    14: 'log alert',
-    15: 'clock daemon',
-    16: 'local use 0 (local0)',
-    17: 'local use 1 (local1)',
-    18: 'local use 2 (local2)',
-    19: 'local use 3 (local3)',
-    20: 'local use 4 (local4)',
-    21: 'local use 5 (local5)',
-    22: 'local use 6 (local6)',
-    23: 'local use 7 (local7)',
-}
-
-
-@unique
-class SyslogSeverity(Enum):
-    emergency = 0
-    alert = 1
-    critical = 2
-    error = 3
-    warning = 4
-    notice = 5
-    informational = 6
-    debug = 7
-
-
-SyslogMessage = namedtuple('SyslogMessage',
-    'facility severity timestamp hostname message')
-
-
-class SyslogMessageParser(object):
-    """Parse syslog messages."""
-
-    @classmethod
-    def parse(cls, data):
-        parser = cls(data)
-
-        facility_id, severity_id = parser._parse_priority_value()
-        facility = SyslogFacility(facility_id)
-        severity = SyslogSeverity(severity_id)
-        timestamp = parser._parse_timestamp()
-        hostname = parser._parse_hostname()
-        message = ''.join(parser.data_iter)
-
-        return SyslogMessage(facility, severity, timestamp, hostname,
-            message)
-
-    def __init__(self, data):
-        max_bytes = 1024  # as stated by the RFC
-        self.data_iter = iter(data[:max_bytes])
-
-    def _parse_priority_value(self):
-        """Parse the priority value to extract facility and severity
-        IDs.
-        """
-        start_delim = self._take_slice(1)
-        assert start_delim == '<'
-
-        priority_value = self._take_until('>')
-        assert len(priority_value) in {1, 2, 3}
-
-        facility_id, severity_id = divmod(int(priority_value), 8)
-        return facility_id, severity_id
-
-    def _parse_timestamp(self):
-        """Parse timestamp into a `datetime` instance."""
-        timestamp_str = self._take_slice(15)
-        nothing = self._take_until(' ')  # Advance to next part.
-        assert nothing == ''
-
-        timestamp = datetime.strptime(timestamp_str, '%b %d %H:%M:%S')
-        timestamp = timestamp.replace(year=datetime.today().year)
-        return timestamp
-
-    def _parse_hostname(self):
-        return self._take_until(' ')
-
-    def _take_until(self, value):
-        return ''.join(takewhile(lambda c: c != value, self.data_iter))
-
-    def _take_slice(self, n):
-        return ''.join(islice(self.data_iter, n))
-
-
 def format_syslog_message(message):
     """Format a syslog message to be displayed."""
     def _generate():
@@ -366,7 +228,7 @@ class SyslogRequestHandler(BaseRequestHandler):
     def handle(self):
         try:
             data = self.request[0].strip().decode('ascii')
-            message = SyslogMessageParser.parse(data)
+            message = syslogmp.parse(data)
         except ValueError:
             print('Invalid message received from {}:{:d}.'.format(
                 *self.client_address))
