@@ -1,10 +1,14 @@
 # Python bytecode
-*.py[co]
+__pycache__/
+*.py[cod]
 
 # virtual environment
-venv
+venv/
 
-# tox' local data
-.tox
+# packaging/distribution
+build/
+dist/
+*.egg-info/
 
-*.egg-info
+# testing
+.tox/
