@@ -8,6 +8,7 @@ venv/
 # packaging/distribution
 build/
 dist/
+*.egg
 *.egg-info/
 
 # testing
