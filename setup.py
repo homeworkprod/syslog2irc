@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import codecs
+import sys
 
 from setuptools import setup
 
 
 with codecs.open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
+
+
+# Require the 'enum34' package on Python versions before 3.4.
+version_dependent_install_requires = []
+if sys.version_info[:2] < (3, 4):
+    version_dependent_install_requires.append('enum34')
 
 
 setup(
@@ -36,4 +43,11 @@ setup(
         'Topic :: System :: Networking :: Monitoring',
         'Topic :: System :: Systems Administration',
     ],
+    install_requires=[
+        'blinker >= 1.3',
+        'irc >= 8.9.1',
+        'syslogmp >= 0.1.1',
+    ] + version_dependent_install_requires,
+    tests_require=['nose2'],
+    test_suite='nose2.collector.collector',
 )
