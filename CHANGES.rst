@@ -2,6 +2,12 @@ syslog2IRC Changelog
 ====================
 
 
+Version 0.8.1 (unreleased)
+--------------------------
+
+- Spread tests to separate modules.
+
+
 Version 0.8 (released on 10-Aug-2015)
 -------------------------------------
 
