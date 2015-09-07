@@ -23,7 +23,7 @@ class SyslogMessageFormattingTestCase(TestCase):
             Severity.informational,
             None,
             None,
-            'FYI',
+            b'FYI',
             '[informational]: FYI',
         ),
         (
@@ -31,7 +31,7 @@ class SyslogMessageFormattingTestCase(TestCase):
             Severity.warning,
             datetime(2013, 7, 8, 0, 12, 55),
             None,
-            'Tick, tack, watch the clock!',
+            b'Tick, tack, watch the clock!',
             '[2013-07-08 00:12:55] [warning]: Tick, tack, watch the clock!',
         ),
         (
@@ -39,7 +39,7 @@ class SyslogMessageFormattingTestCase(TestCase):
             Severity.debug,
             None,
             'ntp.local',
-            'What time is it?',
+            b'What time is it?',
             '(ntp.local) [debug]: What time is it?',
         ),
         (
@@ -47,7 +47,7 @@ class SyslogMessageFormattingTestCase(TestCase):
             Severity.emergency,
             datetime(2008, 10, 18, 17, 34, 7),
             'mainframe',
-            'WTF? S.O.S.!',
+            b'WTF? S.O.S.!',
             '[2008-10-18 17:34:07] (mainframe) [emergency]: WTF? S.O.S.!',
         ),
     )

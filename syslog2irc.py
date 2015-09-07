@@ -227,7 +227,10 @@ def format_syslog_message(message):
         if message.hostname is not None:
             yield '({}) '.format(message.hostname)
 
-        yield '[{0.severity.name}]: {0.message}'.format(message)
+        severity_name = message.severity.name
+        # Important: The message text is a byte string.
+        message_text = message.message.decode('ascii')
+        yield '[{}]: {}'.format(severity_name, message_text)
 
     return ''.join(_generate())
 
@@ -237,7 +240,7 @@ class SyslogRequestHandler(BaseRequestHandler):
 
     def handle(self):
         try:
-            data = self.request[0].strip().decode('ascii')
+            data = self.request[0]
             message = syslogmp.parse(data)
         except ValueError:
             print('Invalid message received from {}:{:d}.'.format(
