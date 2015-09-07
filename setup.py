@@ -46,7 +46,7 @@ setup(
     install_requires=[
         'blinker >= 1.3',
         'irc >= 8.9.1',
-        'syslogmp >= 0.1.1',
+        'syslogmp >= 0.2',
     ] + version_dependent_install_requires,
     tests_require=['nose2'],
     test_suite='nose2.collector.collector',

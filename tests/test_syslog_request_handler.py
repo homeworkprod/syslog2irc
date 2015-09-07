@@ -28,7 +28,7 @@ class SyslogRequestHandlerTestCase(TestCase):
             Severity.emergency,
             datetime(CURRENT_YEAR, 10, 22, 10, 52, 12),
             'scapegoat',
-            '1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!')
+            b'1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!')
 
         # Example 5 from RFC 3164.
         data = b'<0>Oct 22 10:52:12 scapegoat 1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!'

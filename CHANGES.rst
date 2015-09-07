@@ -5,6 +5,7 @@ syslog2IRC Changelog
 Version 0.8.1 (unreleased)
 --------------------------
 
+- Adapted to version 0.2 of syslogmp.
 - Spread tests to separate modules.
 
 
