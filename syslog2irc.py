@@ -27,6 +27,16 @@ The required packages can be installed via pip_:
     $ pip install -r requirements.txt
 
 
+Tests
+-----
+
+To run the tests:
+
+.. code:: sh
+
+    $ python setup.py test
+
+
 Configuration
 -------------
 
