@@ -23,7 +23,7 @@ from syslog2irc import (IrcChannel, format_syslog_message, irc_channel_joined,
 CURRENT_YEAR = datetime.today().year
 
 
-class SyslogMessageTestCase(TestCase):
+class SyslogMessageFormattingTestCase(TestCase):
 
     @params(
         (
