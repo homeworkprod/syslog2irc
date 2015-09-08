@@ -286,10 +286,10 @@ class Runner(object):
     def request_shutdown(self, sender):
         self.shutdown = True
 
-    def run(self):
+    def run(self, seconds_to_sleep=0.5):
         """Run the main loop until shutdown is requested."""
         while not self.shutdown:
-            sleep(0.5)
+            sleep(seconds_to_sleep)
 
         print('Shutting down ...')
 
