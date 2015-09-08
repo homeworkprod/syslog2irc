@@ -320,6 +320,7 @@ class IrcBot(SingleServerIRCBot):
         self.channels_to_join = channels
 
     def get_version(self):
+        """Return this on CTCP VERSION requests."""
         return 'syslog2IRC'
 
     def on_welcome(self, conn, event):
