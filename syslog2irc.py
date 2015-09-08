@@ -278,17 +278,34 @@ def start_thread(target, name):
 # -------------------------------------------------------------------- #
 
 
-class Processor(object):
+class Runner(object):
+
+    def __init__(self):
+        self.shutdown = False
+
+    def request_shutdown(self, sender):
+        self.shutdown = True
+
+    def run(self):
+        """Run the main loop until shutdown is requested."""
+        while not self.shutdown:
+            sleep(0.5)
+
+        print('Shutting down ...')
+
+
+class Processor(Runner):
 
     def __init__(self, announcer, channel_names_to_ports):
+        super().__init__()
+
         self.announcer = announcer
         self.channel_names_to_ports = channel_names_to_ports
         self.ports_to_channel_names = defaultdict(set)
-        self.shutdown = False
 
     def connect_to_signals(self):
         irc_channel_joined.connect(self.enable_channel)
-        shutdown_requested.connect(self.handle_shutdown_requested)
+        shutdown_requested.connect(self.request_shutdown)
         syslog_message_received.connect(self.handle_syslog_message)
 
     def enable_channel(self, sender, channel=None):
@@ -299,16 +316,6 @@ class Processor(object):
 
         for port in ports:
             self.ports_to_channel_names[port].add(channel)
-
-    def handle_shutdown_requested(self, sender):
-        self.shutdown = True
-
-    def run(self):
-        """Run the main loop until shutdown is requested."""
-        while not self.shutdown:
-            sleep(0.5)
-
-        print('Shutting down ...')
 
     def handle_syslog_message(self, port, source_address=None,
             message=None):
