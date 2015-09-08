@@ -148,6 +148,6 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 
 :Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 09-Sep-2015 (original release: 12-Apr-2007)
+:Date: 09-Sep-2015
 :License: MIT, see LICENSE for details.
 :Version: 0.9.1-dev

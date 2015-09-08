@@ -37,3 +37,15 @@ Version 0.5
 -----------
 
 Released July 22, 2013
+
+
+Version 0.2–0.4
+---------------
+
+unknown
+
+
+Version 0.1
+-----------
+
+Released April 12, 2007
