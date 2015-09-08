@@ -10,10 +10,19 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import parse_irc_server_arg
+from syslog2irc import create_arg_parser, parse_irc_server_arg
 
 
 class ArgumentParserTestCase(TestCase):
+
+    @params(
+        (['--irc-server', 'irc.example.com'                    ], False),
+        (['--irc-server', 'irc.example.com', '--irc-server-ssl'], True ),
+    )
+    def test_ssl_option(self, arg_value, expected):
+        parser = create_arg_parser()
+        actual = parser.parse_args(arg_value)
+        self.assertEqual(actual.irc_server_ssl, expected)
 
     @params(
         ('localhost',      'localhost', 6667),

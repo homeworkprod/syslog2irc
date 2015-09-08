@@ -7,6 +7,7 @@ Version 0.8.1 (unreleased)
 
 - Adapted to version 0.2 of syslogmp.
 - Spread tests to separate modules.
+- Added command line option to use SSL to connect to an IRC server.
 
 
 Version 0.8 (released on 10-Aug-2015)
