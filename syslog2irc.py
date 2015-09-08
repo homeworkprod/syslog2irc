@@ -298,7 +298,7 @@ class Runner(object):
 class Processor(Runner):
 
     def __init__(self, channel_names_to_ports):
-        super().__init__()
+        super(Processor, self).__init__()
 
         self.channel_names_to_ports = channel_names_to_ports
         self.ports_to_channel_names = defaultdict(set)
