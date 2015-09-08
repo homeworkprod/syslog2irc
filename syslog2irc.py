@@ -167,11 +167,13 @@ try:
 except ImportError:
     # Python 3.x
     from socketserver import BaseRequestHandler, ThreadingUDPServer
+from ssl import wrap_socket as ssl_wrap_socket
 import sys
 from threading import Thread
 from time import sleep
 
 from blinker import signal
+import irc
 from irc.bot import ServerSpec, SingleServerIRCBot
 import syslogmp
 
@@ -302,11 +304,18 @@ class IrcChannel(namedtuple('IrcChannel', 'name password')):
 class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to IRC channels."""
 
-    def __init__(self, server_spec, nickname, realname, channels):
+    def __init__(self, server_spec, nickname, realname, channels, ssl=False):
         print('Connecting to IRC server {0.host}:{0.port:d} ...'
             .format(server_spec))
+
+        connect_params = {}
+        if ssl:
+            ssl_factory = irc.connection.Factory(wrapper=ssl_wrap_socket)
+            connect_params['connect_factory'] = ssl_factory
+
         SingleServerIRCBot.__init__(self, [server_spec], nickname,
-            realname)
+            realname, **connect_params)
+
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels
 
@@ -368,8 +377,8 @@ class IrcBot(SingleServerIRCBot):
 class IrcAnnouncer(object):
     """Announce syslog messages on IRC."""
 
-    def __init__(self, server, nickname, realname, channels):
-        self.bot = IrcBot(server, nickname, realname, channels)
+    def __init__(self, server, nickname, realname, channels, ssl=False):
+        self.bot = IrcBot(server, nickname, realname, channels, ssl=ssl)
 
     def start(self):
         start_thread(self.bot.start, 'IrcAnnouncer')
@@ -395,7 +404,7 @@ def create_announcer(args, irc_channels):
         return StdoutAnnouncer()
 
     return IrcAnnouncer(args.irc_server, args.irc_nickname,
-        args.irc_realname, irc_channels)
+        args.irc_realname, irc_channels, ssl=args.irc_server_ssl)
 
 
 # -------------------------------------------------------------------- #
@@ -474,7 +483,13 @@ def format_message_for_log(message):
 
 
 def parse_args():
-    """Setup and apply the command line arguments parser."""
+    """Parse command line arguments."""
+    parser = create_arg_parser()
+    return parser.parse_args()
+
+
+def create_arg_parser():
+    """Prepare the command line arguments parser."""
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--irc-nickname',
@@ -497,7 +512,12 @@ def parse_args():
             + ' default port: {:d}]'.format(DEFAULT_IRC_PORT),
         metavar='SERVER')
 
-    return parser.parse_args()
+    parser.add_argument('--irc-server-ssl',
+        dest='irc_server_ssl',
+        action='store_true',
+        help='use SSL to connect to the IRC server')
+
+    return parser
 
 
 def parse_irc_server_arg(value):
