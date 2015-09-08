@@ -2,6 +2,15 @@ syslog2IRC Changelog
 ====================
 
 
+Version 0.9.1
+-------------
+
+not yet released
+
+- Introduced signal to indicate an approved message. Decoupled processor
+  and announcer.
+
+
 Version 0.9
 -----------
 

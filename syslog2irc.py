@@ -68,6 +68,7 @@ SYSLOG_MESSAGE_TEXT_ENCODING = 'utf-8'
 
 syslog_message_received = signal('syslog-message-received')
 irc_channel_joined = signal('irc-channel-joined')
+message_approved = signal('message-approved')
 shutdown_requested = signal('shutdown-requested')
 
 
@@ -240,8 +241,8 @@ class IrcAnnouncer(object):
     def start(self):
         start_thread(self.bot.start, 'IrcAnnouncer')
 
-    def announce(self, channel, message):
-        self.bot.say(channel, message)
+    def announce(self, sender, channel_name=None, text=None):
+        self.bot.say(channel_name, text)
 
 
 class StdoutAnnouncer(object):
@@ -250,8 +251,8 @@ class StdoutAnnouncer(object):
     def start(self):
         pass
 
-    def announce(self, channel, message):
-        print('{}> {}'.format(channel, message))
+    def announce(self, sender, channel_name=None, text=None):
+        print('{}> {}'.format(channel_name, text))
 
 
 def create_announcer(args, irc_channels):
@@ -296,10 +297,9 @@ class Runner(object):
 
 class Processor(Runner):
 
-    def __init__(self, announcer, channel_names_to_ports):
+    def __init__(self, channel_names_to_ports):
         super().__init__()
 
-        self.announcer = announcer
         self.channel_names_to_ports = channel_names_to_ports
         self.ports_to_channel_names = defaultdict(set)
 
@@ -319,7 +319,7 @@ class Processor(Runner):
 
     def handle_syslog_message(self, port, source_address=None,
             message=None):
-        """Log and announce an incoming syslog message."""
+        """Log and process an incoming syslog message."""
         source = '{0[0]}:{0[1]:d}'.format(source_address)
 
         print('Received message from {} on port {:d} -> {}'
@@ -328,7 +328,8 @@ class Processor(Runner):
         formatted_message = format_syslog_message(message)
         irc_message = '{} {}'.format(source, formatted_message)
         for channel_name in self.ports_to_channel_names[port]:
-            self.announcer.announce(channel_name, irc_message)
+            message_approved.send(channel_name=channel_name,
+                                  text=irc_message)
 
 
 def format_message_for_log(message):
@@ -410,7 +411,9 @@ def main(routes):
     ports = routes.keys()
 
     announcer = create_announcer(args, irc_channels)
-    processor = Processor(announcer, channel_names_to_ports)
+    message_approved.connect(announcer.announce)
+
+    processor = Processor(channel_names_to_ports)
 
     # Up to this point, no signals must have been sent.
     processor.connect_to_signals()

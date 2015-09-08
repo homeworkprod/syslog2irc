@@ -43,7 +43,7 @@ class ProcessorTestCase(TestCase):
             55514: {'#example2'},
         })
 
-    def _create_processor(self, announcer=None, channel_names_to_ports=None):
-        processor = Processor(announcer, channel_names_to_ports or {})
+    def _create_processor(self, channel_names_to_ports=None):
+        processor = Processor(channel_names_to_ports or {})
         processor.connect_to_signals()
         return processor
