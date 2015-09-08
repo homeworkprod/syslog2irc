@@ -450,12 +450,23 @@ class Processor(object):
         source = '{0[0]}:{0[1]:d}'.format(source_address)
 
         print('Received message from {} on port {:d} -> {}'
-            .format(source, port, message))
+            .format(source, port, format_message_for_log(message)))
 
         formatted_message = format_syslog_message(message)
         irc_message = '{} {}'.format(source, formatted_message)
         for channel_name in self.ports_to_channel_names[port]:
             self.announcer.announce(channel_name, irc_message)
+
+
+def format_message_for_log(message):
+    facility_name = message.facility.name
+    severity_name = message.severity.name
+    timestamp_str = message.timestamp.isoformat()
+    hostname = message.hostname
+
+    return 'facility={}, severity={}, timestamp={}, hostname={}, message={}' \
+           .format(facility_name, severity_name, timestamp_str, hostname,
+                   message.message)
 
 
 # -------------------------------------------------------------------- #
