@@ -2,8 +2,8 @@ syslog2IRC Changelog
 ====================
 
 
-Version 0.8.1 (unreleased)
---------------------------
+Version 0.9 (released on 08-Sep-2015)
+-------------------------------------
 
 - Adapted to version 0.2 of syslogmp.
 - Spread tests to separate modules.
