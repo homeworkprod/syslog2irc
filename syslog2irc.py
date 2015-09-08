@@ -36,7 +36,7 @@ import syslogmp
 
 DEFAULT_IRC_PORT = ServerSpec('').port
 
-MESSAGE_TEXT_ENCODING = 'utf-8'
+SYSLOG_MESSAGE_TEXT_ENCODING = 'utf-8'
 
 
 # A note on threads (implementation detail):
@@ -89,7 +89,7 @@ def format_syslog_message(message):
 
         severity_name = message.severity.name
         # Important: The message text is a byte string.
-        message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
+        message_text = message.message.decode(SYSLOG_MESSAGE_TEXT_ENCODING)
         yield '[{}]: {}'.format(severity_name, message_text)
 
     return ''.join(_generate())
