@@ -2,6 +2,12 @@ syslog2IRC Changelog
 ====================
 
 
+Version 0.9.2
+-------------
+
+not yet released
+
+
 Version 0.9.1
 -------------
 

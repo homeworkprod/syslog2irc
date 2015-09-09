@@ -18,7 +18,7 @@ if sys.version_info[:2] < (3, 4):
 
 setup(
     name='syslog2IRC',
-    version='0.9.1',
+    version='0.9.2-dev',
     description='A proxy to forward syslog messages to IRC',
     long_description=long_description,
     url='http://homework.nwsnet.de/releases/c474/#syslog2irc',
