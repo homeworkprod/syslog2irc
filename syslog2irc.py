@@ -104,8 +104,8 @@ class SyslogRequestHandler(BaseRequestHandler):
             data = self.request[0]
             message = syslogmp.parse(data)
         except ValueError:
-            print('Invalid message received from {}:{:d}.'.format(
-                *self.client_address))
+            log('Invalid message received from {}:{:d}.',
+                *self.client_address)
             return
 
         port = self.server.get_port()
@@ -162,8 +162,7 @@ class IrcBot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to IRC channels."""
 
     def __init__(self, server_spec, nickname, realname, channels, ssl=False):
-        print('Connecting to IRC server {0.host}:{0.port:d} ...'
-            .format(server_spec))
+        log('Connecting to IRC server {0.host}:{0.port:d} ...', server_spec)
 
         connect_params = {}
         if ssl:
@@ -182,11 +181,10 @@ class IrcBot(SingleServerIRCBot):
 
     def on_welcome(self, conn, event):
         """Join channels after connect."""
-        print('Connected to {}:{:d}.'
-            .format(*conn.socket.getpeername()))
+        log('Connected to {}:{:d}.', *conn.socket.getpeername())
 
         channel_names = sorted(c.name for c in self.channels_to_join)
-        print('Joining channels: {}'.format(', '.join(channel_names)))
+        log('Channels to join: {}', ', '.join(channel_names))
 
         for channel in self.channels_to_join:
             conn.join(channel.name, channel.password or '')
@@ -199,16 +197,16 @@ class IrcBot(SingleServerIRCBot):
     def on_join(self, conn, event):
         """Successfully joined channel."""
         joined_nick = event.source.nick
-        channel = event.target
+        channel_name = event.target
 
         if joined_nick == self._nickname:
-            print('Joined IRC channel {}.'.format(channel))
-            irc_channel_joined.send(channel=channel)
+            log('Joined IRC channel: {}', channel_name)
+            irc_channel_joined.send(channel=channel_name)
 
     def on_badchannelkey(self, conn, event):
         """Channel could not be joined due to wrong password."""
-        channel = event.arguments[0]
-        print('Cannot join channel {} (bad key).'.format(channel))
+        channel_name = event.arguments[0]
+        log('Cannot join channel {} (bad key).', channel_name)
 
     def on_privmsg(self, conn, event):
         """React on private messages.
@@ -223,7 +221,7 @@ class IrcBot(SingleServerIRCBot):
 
     def shutdown(self, nickmask):
         """Shut the bot down."""
-        print('Shutdown requested on IRC by user {}.'.format(nickmask))
+        log('Shutdown requested by {}.', nickmask)
         shutdown_requested.send()
         self.die('Shutting down.')  # Joins IRC bot thread.
 
@@ -256,14 +254,14 @@ class StdoutAnnouncer(object):
         pass
 
     def announce(self, sender, channel_name=None, text=None):
-        print('{}> {}'.format(channel_name, text))
+        log('{}> {}', channel_name, text)
 
 
 def create_announcer(irc_server, irc_nickname, irc_realname,
                      irc_channels, **options):
     """Create and return an announcer according to the configuration."""
     if not irc_server:
-        print('No IRC server specified; will write to STDOUT instead.')
+        log('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
 
     return IrcAnnouncer(irc_server, irc_nickname, irc_realname,
@@ -271,7 +269,12 @@ def create_announcer(irc_server, irc_nickname, irc_realname,
 
 
 # -------------------------------------------------------------------- #
-# threads
+# utilities
+
+
+def log(message, *args, **kwargs):
+    """Log the message."""
+    print(message.format(*args, **kwargs))
 
 
 def start_thread(target, name):
@@ -297,7 +300,7 @@ class Runner(object):
         while not self.shutdown:
             sleep(seconds_to_sleep)
 
-        print('Shutting down ...')
+        log('Shutting down ...')
 
 
 class Processor(Runner):
@@ -316,8 +319,8 @@ class Processor(Runner):
     def enable_channel(self, sender, channel=None):
         ports = self.channel_names_to_ports[channel]
 
-        print('Enabled forwarding to channel {} from ports {}.'
-            .format(channel, ports))
+        log('Enabled forwarding to channel {} from ports {}.',
+            channel, ports)
 
         for port in ports:
             self.ports_to_channel_names[port].add(channel)
@@ -327,8 +330,8 @@ class Processor(Runner):
         """Log and process an incoming syslog message."""
         source = '{0[0]}:{0[1]:d}'.format(source_address)
 
-        print('Received message from {} on port {:d} -> {}'
-            .format(source, port, format_message_for_log(message)))
+        log('Received message from {} on port {:d} -> {}',
+            source, port, format_message_for_log(message))
 
         formatted_message = format_syslog_message(message)
         irc_message = '{} {}'.format(source, formatted_message)
