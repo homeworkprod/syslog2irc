@@ -255,14 +255,15 @@ class StdoutAnnouncer(object):
         print('{}> {}'.format(channel_name, text))
 
 
-def create_announcer(args, irc_channels):
+def create_announcer(irc_server, irc_nickname, irc_realname,
+                     irc_channels, **options):
     """Create and return an announcer according to the configuration."""
-    if not args.irc_server:
+    if not irc_server:
         print('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
 
-    return IrcAnnouncer(args.irc_server, args.irc_nickname,
-        args.irc_realname, irc_channels, ssl=args.irc_server_ssl)
+    return IrcAnnouncer(irc_server, irc_nickname, irc_realname,
+                        irc_channels, **options)
 
 
 # -------------------------------------------------------------------- #
@@ -410,7 +411,9 @@ def main(routes):
     channel_names_to_ports = map_channel_names_to_ports(routes)
     ports = routes.keys()
 
-    announcer = create_announcer(args, irc_channels)
+    announcer = create_announcer(args.irc_server, args.irc_nickname,
+                                 args.irc_realname, irc_channels,
+                                 ssl=args.irc_server_ssl)
     message_approved.connect(announcer.announce)
 
     processor = Processor(channel_names_to_ports)
