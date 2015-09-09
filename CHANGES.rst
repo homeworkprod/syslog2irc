@@ -5,7 +5,7 @@ syslog2IRC Changelog
 Version 0.9.1
 -------------
 
-not yet released
+Released September 9, 2015
 
 - Exposed programmatic entry point to pass arguments from Python code
   rather than the command line.

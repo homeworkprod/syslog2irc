@@ -10,7 +10,7 @@ Receive syslog messages via UDP and show them on IRC.
 :Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
 :Date: 09-Sep-2015
 :License: MIT, see LICENSE for details.
-:Version: 0.9.1-dev
+:Version: 0.9.1
 """
 
 from __future__ import print_function
