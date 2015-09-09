@@ -16,6 +16,7 @@ Receive syslog messages via UDP and show them on IRC.
 from __future__ import print_function
 import argparse
 from collections import defaultdict, namedtuple
+from datetime import datetime
 from itertools import chain
 try:
     # Python 2.x
@@ -273,8 +274,9 @@ def create_announcer(irc_server, irc_nickname, irc_realname,
 
 
 def log(message, *args, **kwargs):
-    """Log the message."""
-    print(message.format(*args, **kwargs))
+    """Log the message with a timestamp."""
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(timestamp, message.format(*args, **kwargs))
 
 
 def start_thread(target, name):

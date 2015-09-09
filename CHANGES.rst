@@ -11,7 +11,8 @@ not yet released
   rather than the command line.
 - Introduced signal to indicate an approved message. Decoupled processor
   and announcer.
-- Wrapped `print` calls in a slightly higher-level logging function.
+- Wrapped `print` calls in a slightly higher-level, timestamped logging
+  function.
 - Added and improved tests.
 
 
