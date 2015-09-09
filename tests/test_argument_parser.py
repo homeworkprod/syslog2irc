@@ -10,7 +10,7 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import parse_args
+from syslog2irc.argparser import parse_args
 
 
 class ArgumentParserTestCase(TestCase):

@@ -10,7 +10,8 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import IrcChannel, map_channel_names_to_ports
+from syslog2irc.irc import IrcChannel
+from syslog2irc.main import map_channel_names_to_ports
 
 
 class RoutingTestCase(TestCase):

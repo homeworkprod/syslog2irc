@@ -11,7 +11,8 @@ from unittest import TestCase
 
 from syslogmp import Facility, Message, Severity
 
-from syslog2irc import syslog_message_received, SyslogRequestHandler
+from syslog2irc.signals import syslog_message_received
+from syslog2irc.syslog import SyslogRequestHandler
 
 
 CURRENT_YEAR = datetime.today().year

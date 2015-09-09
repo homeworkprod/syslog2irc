@@ -10,7 +10,8 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import irc_channel_joined, Processor, shutdown_requested
+from syslog2irc.processor import Processor
+from syslog2irc.signals import irc_channel_joined, shutdown_requested
 
 
 class ProcessorTestCase(TestCase):

@@ -10,7 +10,7 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import IrcChannel
+from syslog2irc.irc import IrcChannel
 
 
 class IrcChannelTestCase(TestCase):

@@ -12,7 +12,7 @@ from unittest import TestCase
 from nose2.tools import params
 from syslogmp import Facility, Message, Severity
 
-from syslog2irc import format_syslog_message
+from syslog2irc.syslog import format_syslog_message
 
 
 class SyslogMessageFormattingTestCase(TestCase):

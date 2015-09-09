@@ -43,6 +43,7 @@ setup(
         'Topic :: System :: Networking :: Monitoring',
         'Topic :: System :: Systems Administration',
     ],
+    packages=['syslog2irc'],
     install_requires=[
         'blinker >= 1.3',
         'irc >= 8.9.1',

@@ -7,6 +7,9 @@ Version 0.9.2
 
 not yet released
 
+- Split the single module into several modules inside a namespace
+  package and a start script.
+
 
 Version 0.9.1
 -------------
