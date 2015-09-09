@@ -404,19 +404,14 @@ def map_channel_names_to_ports(routes):
     return channel_names_to_ports
 
 
-def start(routes):
-    """Start the IRC bot and the syslog listen server.
-
-    Most arguments (except for routes) are read from the command line.
-    """
-    args = parse_args()
+def start(irc_server, irc_nickname, irc_realname, routes, **options):
+    """Start the IRC bot and the syslog listen server."""
     irc_channels = frozenset(chain(*routes.values()))
     channel_names_to_ports = map_channel_names_to_ports(routes)
     ports = routes.keys()
 
-    announcer = create_announcer(args.irc_server, args.irc_nickname,
-                                 args.irc_realname, irc_channels,
-                                 ssl=args.irc_server_ssl)
+    announcer = create_announcer(irc_server, irc_nickname, irc_realname,
+                                 irc_channels, **options)
     message_approved.connect(announcer.announce)
 
     processor = Processor(channel_names_to_ports)
@@ -429,12 +424,23 @@ def start(routes):
     start_syslog_message_receivers(ports)
     announcer.start()
 
-    if not args.irc_server:
+    if not irc_server:
         # Fake channel joins.
         for channel in channel_names_to_ports.keys():
             irc_channel_joined.send(channel=channel)
 
     processor.run()
+
+
+def start_with_args(routes):
+    """Start the IRC bot and the syslog listen server.
+
+    All arguments (except for routes) are read from the command line.
+    """
+    args = parse_args()
+
+    start(args.irc_server, args.irc_nickname, args.irc_realname, routes,
+          ssl=args.irc_server_ssl)
 
 
 if __name__ == '__main__':
@@ -449,4 +455,4 @@ if __name__ == '__main__':
         55514: [irc_channel2],
     }
 
-    start(routes)
+    start_with_args(routes)
