@@ -347,10 +347,10 @@ def format_message_for_log(message):
 # command line argument parsing
 
 
-def parse_args():
+def parse_args(args=None):
     """Parse command line arguments."""
     parser = create_arg_parser()
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def create_arg_parser():
