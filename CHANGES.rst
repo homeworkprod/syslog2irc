@@ -9,6 +9,7 @@ not yet released
 
 - Introduced signal to indicate an approved message. Decoupled processor
   and announcer.
+- Added and improved tests.
 
 
 Version 0.9
