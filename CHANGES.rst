@@ -14,6 +14,8 @@ not yet released
 - Wrapped `print` calls in a slightly higher-level, timestamped logging
   function.
 - Added and improved tests.
+- Created manifest template to package all files relevant for
+  distribution.
 
 
 Version 0.9
