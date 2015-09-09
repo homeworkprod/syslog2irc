@@ -85,7 +85,7 @@ options first:
 
 .. code:: sh
 
-    $ python syslog2irc.py -h
+    $ python start-syslog2irc.py -h
 
 If no options are given, the IRC component will not be used. Instead,
 syslog messages will be written to STDOUT. This is helpful during setup
@@ -93,7 +93,7 @@ of syslog message reception. Abort execution by pressing <Control-C>.
 
 .. code:: sh
 
-    $ python syslog2irc.py
+    $ python start-syslog2irc.py
 
 Send some messages to syslog2IRC using your system's syslog message
 sender tool (`logger`, in this example):
@@ -111,7 +111,7 @@ If receiving syslog messages works, connect to an IRC server:
 
 .. code:: sh
 
-    $ python syslog2irc.py --irc-server irc.example.com
+    $ python start-syslog2irc.py --irc-server irc.example.com
 
 After a moment, you should see that syslog2IRC has connected to the
 server. The IRC bot should then enter the channel(s) you have configured
@@ -122,7 +122,7 @@ it like this (6669 in this case):
 
 .. code:: sh
 
-    $ python syslog2irc.py --irc-server irc.example.com:6669
+    $ python start-syslog2irc.py --irc-server irc.example.com:6669
 
 In order to shut down syslog2IRC, send a query message with the text
 "shutdown!" to the IRC bot. It should then quit, and syslog2IRC should
