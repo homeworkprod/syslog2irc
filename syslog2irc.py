@@ -215,13 +215,17 @@ class IrcBot(SingleServerIRCBot):
 
         Shut down, for example.
         """
-        whonick = event.source.nick
-        message = event.arguments[0]
+        nickmask = event.source
+        text = event.arguments[0]
+
         if message == 'shutdown!':
-            print('Shutdown requested on IRC by user {}.'
-                .format(whonick))
-            shutdown_requested.send()
-            self.die('Shutting down.')  # Joins IRC bot thread.
+            self.shutdown(nickmask)
+
+    def shutdown(self, nickmask):
+        """Shut the bot down."""
+        print('Shutdown requested on IRC by user {}.'.format(nickmask))
+        shutdown_requested.send()
+        self.die('Shutting down.')  # Joins IRC bot thread.
 
     def say(self, channel, message):
         """Say message on channel."""
