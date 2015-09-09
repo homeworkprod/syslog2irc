@@ -10,7 +10,7 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc import create_arg_parser, parse_irc_server_arg
+from syslog2irc import create_arg_parser
 
 
 class ArgumentParserTestCase(TestCase):
@@ -43,12 +43,12 @@ class ArgumentParserTestCase(TestCase):
         self.assertEqual(actual.irc_server_ssl, expected)
 
     @params(
-        ('localhost',      'localhost', 6667),
-        ('127.0.0.1',      '127.0.0.1', 6667),
-        ('127.0.0.1:6669', '127.0.0.1', 6669),
+        (['--irc-server', 'localhost'     ], 'localhost', 6667),
+        (['--irc-server', '127.0.0.1'     ], '127.0.0.1', 6667),
+        (['--irc-server', '127.0.0.1:6669'], '127.0.0.1', 6669),
     )
-    def test_parse_irc_server_arg(self, arg_value, expected_host, expected_port):
-        actual = parse_irc_server_arg(arg_value)
-
-        self.assertEqual(actual.host, expected_host)
-        self.assertEqual(actual.port, expected_port)
+    def test_parse_irc_server(self, arg_value, expected_host, expected_port):
+        parser = create_arg_parser()
+        actual = parser.parse_args(arg_value)
+        self.assertEqual(actual.irc_server.host, expected_host)
+        self.assertEqual(actual.irc_server.port, expected_port)
