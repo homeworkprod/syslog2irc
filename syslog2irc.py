@@ -404,8 +404,11 @@ def map_channel_names_to_ports(routes):
     return channel_names_to_ports
 
 
-def main(routes):
-    """Application entry point"""
+def start(routes):
+    """Start the IRC bot and the syslog listen server.
+
+    Most arguments (except for routes) are read from the command line.
+    """
     args = parse_args()
     irc_channels = frozenset(chain(*routes.values()))
     channel_names_to_ports = map_channel_names_to_ports(routes)
@@ -446,4 +449,4 @@ if __name__ == '__main__':
         55514: [irc_channel2],
     }
 
-    main(routes)
+    start(routes)
