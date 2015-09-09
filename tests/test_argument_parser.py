@@ -34,8 +34,8 @@ class ArgumentParserTestCase(TestCase):
         self.assertEqual(actual.irc_realname, expected)
 
     @params(
-        (['--irc-server', 'irc.example.com'                    ], False),
-        (['--irc-server', 'irc.example.com', '--irc-server-ssl'], True ),
+        ([                  ], False),
+        (['--irc-server-ssl'], True ),
     )
     def test_irc_server_ssl_option(self, arg_value, expected):
         parser = create_arg_parser()
