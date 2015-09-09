@@ -7,6 +7,8 @@ Version 0.9.1
 
 not yet released
 
+- Exposed programmatic entry point to pass arguments from Python code
+  rather than the command line.
 - Introduced signal to indicate an approved message. Decoupled processor
   and announcer.
 - Added and improved tests.
