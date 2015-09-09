@@ -34,15 +34,6 @@ class ArgumentParserTestCase(TestCase):
         self.assertEqual(actual.irc_realname, expected)
 
     @params(
-        ([                  ], False),
-        (['--irc-server-ssl'], True ),
-    )
-    def test_irc_server_ssl_option(self, arg_value, expected):
-        parser = create_arg_parser()
-        actual = parser.parse_args(arg_value)
-        self.assertEqual(actual.irc_server_ssl, expected)
-
-    @params(
         (['--irc-server', 'localhost'     ], 'localhost', 6667),
         (['--irc-server', '127.0.0.1'     ], '127.0.0.1', 6667),
         (['--irc-server', '127.0.0.1:6669'], '127.0.0.1', 6669),
@@ -52,3 +43,12 @@ class ArgumentParserTestCase(TestCase):
         actual = parser.parse_args(arg_value)
         self.assertEqual(actual.irc_server.host, expected_host)
         self.assertEqual(actual.irc_server.port, expected_port)
+
+    @params(
+        ([                  ], False),
+        (['--irc-server-ssl'], True ),
+    )
+    def test_irc_server_ssl_option(self, arg_value, expected):
+        parser = create_arg_parser()
+        actual = parser.parse_args(arg_value)
+        self.assertEqual(actual.irc_server_ssl, expected)
