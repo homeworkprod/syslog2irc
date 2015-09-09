@@ -16,6 +16,24 @@ from syslog2irc import create_arg_parser, parse_irc_server_arg
 class ArgumentParserTestCase(TestCase):
 
     @params(
+        ([                              ], 'syslog'    ),
+        (['--irc-nickname', 'AwesomeBot'], 'AwesomeBot'),
+    )
+    def test_irc_nickname(self, arg_value, expected):
+        parser = create_arg_parser()
+        actual = parser.parse_args(arg_value)
+        self.assertEqual(actual.irc_nickname, expected)
+
+    @params(
+        ([                                      ], 'syslog2IRC'        ),
+        (['--irc-realname', 'awesomest bot ever'], 'awesomest bot ever'),
+    )
+    def test_irc_realname(self, arg_value, expected):
+        parser = create_arg_parser()
+        actual = parser.parse_args(arg_value)
+        self.assertEqual(actual.irc_realname, expected)
+
+    @params(
         (['--irc-server', 'irc.example.com'                    ], False),
         (['--irc-server', 'irc.example.com', '--irc-server-ssl'], True ),
     )
