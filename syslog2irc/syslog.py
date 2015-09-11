@@ -24,7 +24,7 @@ from .signals import syslog_message_received
 from .util import log, start_thread
 
 
-SYSLOG_MESSAGE_TEXT_ENCODING = 'utf-8'
+MESSAGE_TEXT_ENCODING = 'utf-8'
 
 
 def format_message(message):
@@ -41,7 +41,7 @@ def format_message(message):
 
         severity_name = message.severity.name
         # Important: The message text is a byte string.
-        message_text = message.message.decode(SYSLOG_MESSAGE_TEXT_ENCODING)
+        message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
         yield '[{}]: {}'.format(severity_name, message_text)
 
     return ''.join(_generate())
