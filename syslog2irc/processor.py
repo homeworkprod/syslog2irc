@@ -31,14 +31,11 @@ class Processor(Runner):
 
     def handle_syslog_message(self, port, source_address=None,
             message=None):
-        """Log and process an incoming syslog message."""
-        source = '{0[0]}:{0[1]:d}'.format(source_address)
-
-        log('Received message from {} on port {:d} -> {}',
-            source, port, format_message_for_log(message))
-
+        """Process an incoming syslog message."""
+        formatted_source = '{0[0]}:{0[1]:d}'.format(source_address)
         formatted_message = format_syslog_message(message)
-        irc_message = '{} {}'.format(source, formatted_message)
+        irc_message = '{} {}'.format(formatted_source, formatted_message)
+
         for channel_name in self.router.get_channel_names_for_port(port):
             message_approved.send(channel_name=channel_name,
                                   text=irc_message)
@@ -62,14 +59,3 @@ class Router(object):
 
     def get_channel_names_for_port(self, port):
         return self.ports_to_channel_names[port]
-
-
-def format_message_for_log(message):
-    facility_name = message.facility.name
-    severity_name = message.severity.name
-    timestamp_str = message.timestamp.isoformat()
-    hostname = message.hostname
-
-    return 'facility={}, severity={}, timestamp={}, hostname={}, message={}' \
-           .format(facility_name, severity_name, timestamp_str, hostname,
-                   message.message)

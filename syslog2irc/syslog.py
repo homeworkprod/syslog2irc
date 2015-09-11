@@ -40,8 +40,13 @@ class RequestHandler(BaseRequestHandler):
             return
 
         port = self.server.get_port()
+
+        log('Received message from {0[0]}:{0[1]:d} on port {1:d} -> {2}',
+            self.client_address, port, format_message_for_log(message))
+
         syslog_message_received.send(port,
-            source_address=self.client_address, message=message)
+                                     source_address=self.client_address,
+                                     message=message)
 
 
 class ReceiveServer(ThreadingUDPServer):
@@ -75,6 +80,18 @@ def start_syslog_message_receivers(ports):
     """Start one syslog message receiving server for each port."""
     for port in ports:
         ReceiveServer.start(port)
+
+
+def format_message_for_log(message):
+    """Format a syslog message to be logged."""
+    facility_name = message.facility.name
+    severity_name = message.severity.name
+    timestamp_str = message.timestamp.isoformat()
+    hostname = message.hostname
+
+    return 'facility={}, severity={}, timestamp={}, hostname={}, message={}' \
+           .format(facility_name, severity_name, timestamp_str, hostname,
+                   message.message)
 
 
 def format_message(message):
