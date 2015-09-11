@@ -10,7 +10,7 @@ Message announcing
 :License: MIT, see LICENSE for details.
 """
 
-from .irc import IrcBot
+from .irc import Bot
 from .util import log, start_thread
 
 
@@ -18,7 +18,7 @@ class IrcAnnouncer(object):
     """Announce syslog messages on IRC."""
 
     def __init__(self, server, nickname, realname, channels, ssl=False):
-        self.bot = IrcBot(server, nickname, realname, channels, ssl=ssl)
+        self.bot = Bot(server, nickname, realname, channels, ssl=ssl)
 
     def start(self):
         start_thread(self.bot.start, 'IrcAnnouncer')

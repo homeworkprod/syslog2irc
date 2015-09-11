@@ -21,14 +21,14 @@ from .signals import irc_channel_joined, shutdown_requested
 from .util import log
 
 
-class IrcChannel(namedtuple('IrcChannel', 'name password')):
+class Channel(namedtuple('Channel', 'name password')):
     """An IRC channel with optional password."""
 
     def __new__(cls, name, password=None):
-        return super(IrcChannel, cls).__new__(cls, name, password)
+        return super(Channel, cls).__new__(cls, name, password)
 
 
-class IrcBot(SingleServerIRCBot):
+class Bot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to IRC channels."""
 
     def __init__(self, server_spec, nickname, realname, channels, ssl=False):

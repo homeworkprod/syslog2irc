@@ -47,7 +47,7 @@ Or, when syslog2IRC listens on a non-default port (here: 11514)::
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
 
 To specify which IRC channels to join and forward syslog messages to,
-create ``IrcChannel`` instances and reference them in the ``routes``
+create ``Channel`` instances and reference them in the ``routes``
 mapping.
 
 A simple routing from the default syslog port, 514, to a single IRC
@@ -55,10 +55,10 @@ channel without a password looks like this:
 
 .. code:: python
 
-    irc_channel1 = IrcChannel('#examplechannel1')
+    channel1 = Channel('#examplechannel1')
 
     routes = {
-        514: [irc_channel1],
+        514: [channel1],
     }
 
 In a more complex setup, syslog messages could be received on two ports
@@ -68,12 +68,12 @@ forwarded exclusively to the second channel.
 
 .. code:: python
 
-    irc_channel1 = IrcChannel('#examplechannel1')
-    irc_channel2 = IrcChannel('#examplechannel2', password='zePassword')
+    channel1 = Channel('#examplechannel1')
+    channel2 = Channel('#examplechannel2', password='zePassword')
 
     routes = {
-          514: [irc_channel1, irc_channel2],
-        55514: [irc_channel2],
+          514: [channel1, channel2],
+        55514: [channel2],
     }
 
 
