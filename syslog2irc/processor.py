@@ -13,7 +13,7 @@ from collections import defaultdict
 from .runner import Runner
 from .signals import irc_channel_joined, message_approved, \
     shutdown_requested, syslog_message_received
-from .syslog import format_syslog_message
+from .syslog import format_message as format_syslog_message
 from .util import log
 
 

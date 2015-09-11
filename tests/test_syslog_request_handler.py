@@ -12,7 +12,7 @@ from unittest import TestCase
 from syslogmp import Facility, Message, Severity
 
 from syslog2irc.signals import syslog_message_received
-from syslog2irc.syslog import SyslogRequestHandler
+from syslog2irc.syslog import RequestHandler
 
 
 CURRENT_YEAR = datetime.today().year
@@ -42,7 +42,7 @@ class SyslogRequestHandlerTestCase(TestCase):
         def handle_syslog_message_received(sender, **data):
             self.storeReceivedSignalData(data)
 
-        SyslogRequestHandler(request, client_address, server)
+        RequestHandler(request, client_address, server)
 
         self.assertReceivedSignalDataEqual([{
             'message': expected_message,

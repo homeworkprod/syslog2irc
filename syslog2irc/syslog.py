@@ -27,7 +27,7 @@ from .util import log, start_thread
 SYSLOG_MESSAGE_TEXT_ENCODING = 'utf-8'
 
 
-def format_syslog_message(message):
+def format_message(message):
     """Format a syslog message to be displayed."""
     def _generate():
         if message.timestamp is not None:
@@ -47,7 +47,7 @@ def format_syslog_message(message):
     return ''.join(_generate())
 
 
-class SyslogRequestHandler(BaseRequestHandler):
+class RequestHandler(BaseRequestHandler):
     """Handler for syslog messages."""
 
     def handle(self):
@@ -64,12 +64,11 @@ class SyslogRequestHandler(BaseRequestHandler):
             source_address=self.client_address, message=message)
 
 
-class SyslogReceiveServer(ThreadingUDPServer):
+class ReceiveServer(ThreadingUDPServer):
     """UDP server that waits for syslog messages."""
 
     def __init__(self, port):
-        ThreadingUDPServer.__init__(self, ('', port),
-            SyslogRequestHandler)
+        ThreadingUDPServer.__init__(self, ('', port), RequestHandler)
 
     @classmethod
     def start(cls, port):
@@ -95,4 +94,4 @@ class SyslogReceiveServer(ThreadingUDPServer):
 def start_syslog_message_receivers(ports):
     """Start one syslog message receiving server for each port."""
     for port in ports:
-        SyslogReceiveServer.start(port)
+        ReceiveServer.start(port)
