@@ -31,15 +31,15 @@ class ProcessorTestCase(TestCase):
 
         processor = self._create_processor(
             channel_names_to_ports=channel_names_to_ports)
-        self.assertEqual(processor.ports_to_channel_names, {})
+        self.assertEqual(processor.router.ports_to_channel_names, {})
 
         irc_channel_joined.send(channel='#example1')
-        self.assertEqual(processor.ports_to_channel_names, {
+        self.assertEqual(processor.router.ports_to_channel_names, {
             514: {'#example1'},
         })
 
         irc_channel_joined.send(channel='#example2')
-        self.assertEqual(processor.ports_to_channel_names, {
+        self.assertEqual(processor.router.ports_to_channel_names, {
             514: {'#example1', '#example2'},
             55514: {'#example2'},
         })
