@@ -27,26 +27,6 @@ from .util import log, start_thread
 MESSAGE_TEXT_ENCODING = 'utf-8'
 
 
-def format_message(message):
-    """Format a syslog message to be displayed."""
-    def _generate():
-        if message.timestamp is not None:
-            timestamp_format = '%Y-%m-%d %H:%M:%S'
-            formatted_timestamp = message.timestamp.strftime(
-                timestamp_format)
-            yield '[{}] '.format(formatted_timestamp)
-
-        if message.hostname is not None:
-            yield '({}) '.format(message.hostname)
-
-        severity_name = message.severity.name
-        # Important: The message text is a byte string.
-        message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
-        yield '[{}]: {}'.format(severity_name, message_text)
-
-    return ''.join(_generate())
-
-
 class RequestHandler(BaseRequestHandler):
     """Handler for syslog messages."""
 
@@ -95,3 +75,23 @@ def start_syslog_message_receivers(ports):
     """Start one syslog message receiving server for each port."""
     for port in ports:
         ReceiveServer.start(port)
+
+
+def format_message(message):
+    """Format a syslog message to be displayed."""
+    def _generate():
+        if message.timestamp is not None:
+            timestamp_format = '%Y-%m-%d %H:%M:%S'
+            formatted_timestamp = message.timestamp.strftime(
+                timestamp_format)
+            yield '[{}] '.format(formatted_timestamp)
+
+        if message.hostname is not None:
+            yield '({}) '.format(message.hostname)
+
+        severity_name = message.severity.name
+        # Important: The message text is a byte string.
+        message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
+        yield '[{}]: {}'.format(severity_name, message_text)
+
+    return ''.join(_generate())
