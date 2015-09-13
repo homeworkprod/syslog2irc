@@ -11,7 +11,7 @@ syslog2irc.processor
 from collections import defaultdict
 
 from .runner import Runner
-from .signals import irc_channel_joined, message_approved, \
+from .signals import irc_channel_joined, message_approved, message_received, \
     shutdown_requested, syslog_message_received
 from .syslog import format_message as format_syslog_message
 from .util import log
@@ -28,17 +28,27 @@ class Processor(Runner):
         irc_channel_joined.connect(self.router.enable_channel)
         shutdown_requested.connect(self.request_shutdown)
         syslog_message_received.connect(self.handle_syslog_message)
+        message_received.connect(self.handle_message)
 
     def handle_syslog_message(self, port, source_address=None,
             message=None):
         """Process an incoming syslog message."""
+        channel_names = self.router.get_channel_names_for_port(port)
+
         formatted_source = '{0[0]}:{0[1]:d}'.format(source_address)
         formatted_message = format_syslog_message(message)
-        irc_message = '{} {}'.format(formatted_source, formatted_message)
+        text = '{} {}'.format(formatted_source, formatted_message)
 
-        for channel_name in self.router.get_channel_names_for_port(port):
+        message_received.send(channel_names=channel_names,
+                              text=text,
+                              source_address=source_address)
+
+    def handle_message(self, sender, channel_names=None, text=None,
+                       source_address=None):
+        """Process an incoming message."""
+        for channel_name in channel_names:
             message_approved.send(channel_name=channel_name,
-                                  text=irc_message)
+                                  text=text)
 
 
 class Router(object):
