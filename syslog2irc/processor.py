@@ -52,7 +52,7 @@ class Processor(Runner):
 
 
 class Router(object):
-    """Map IRC channel names to syslog port numbers."""
+    """Map syslog port numbers to IRC channel names."""
 
     def __init__(self, channel_names_to_ports):
         self.channel_names_to_ports = channel_names_to_ports
