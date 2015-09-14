@@ -46,5 +46,6 @@ class Processor(Runner):
                        source_address=None):
         """Process an incoming message."""
         for channel_name in channel_names:
-            message_approved.send(channel_name=channel_name,
-                                  text=text)
+            if self.router.is_channel_enabled(channel_name):
+                message_approved.send(channel_name=channel_name,
+                                      text=text)
