@@ -8,8 +8,7 @@ syslog2irc.processor
 :License: MIT, see LICENSE for details.
 """
 
-from collections import defaultdict
-
+from .router import Router
 from .runner import Runner
 from .signals import irc_channel_joined, message_approved, message_received, \
     shutdown_requested, syslog_message_received
@@ -49,23 +48,3 @@ class Processor(Runner):
         for channel_name in channel_names:
             message_approved.send(channel_name=channel_name,
                                   text=text)
-
-
-class Router(object):
-    """Map syslog port numbers to IRC channel names."""
-
-    def __init__(self, channel_names_to_ports):
-        self.channel_names_to_ports = channel_names_to_ports
-        self.ports_to_channel_names = defaultdict(set)
-
-    def enable_channel(self, sender, channel=None):
-        ports = self.channel_names_to_ports[channel]
-
-        log('Enabled forwarding to channel {} from ports {}.',
-            channel, ports)
-
-        for port in ports:
-            self.ports_to_channel_names[port].add(channel)
-
-    def get_channel_names_for_port(self, port):
-        return self.ports_to_channel_names[port]

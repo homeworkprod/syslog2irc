@@ -8,11 +8,11 @@ syslog2irc.main
 :License: MIT, see LICENSE for details.
 """
 
-from collections import defaultdict
 from itertools import chain
 
 from .announcer import create_announcer
 from .processor import Processor
+from .router import map_channel_names_to_ports
 from .signals import irc_channel_joined, message_approved
 from .syslog import start_syslog_message_receivers
 
@@ -66,11 +66,3 @@ def start(irc_server, irc_nickname, irc_realname, routes, **options):
             irc_channel_joined.send(channel=channel)
 
     processor.run()
-
-
-def map_channel_names_to_ports(routes):
-    channel_names_to_ports = defaultdict(set)
-    for port, channels in routes.items():
-        for channel in channels:
-            channel_names_to_ports[channel.name].add(port)
-    return channel_names_to_ports
