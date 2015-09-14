@@ -8,20 +8,11 @@
 from __future__ import unicode_literals
 from unittest import TestCase
 
-from nose2.tools import params
-
 from syslog2irc.processor import Processor
-from syslog2irc.signals import irc_channel_joined, shutdown_requested
+from syslog2irc.signals import irc_channel_joined
 
 
-class ProcessorTestCase(TestCase):
-
-    def test_shutdown_flag_set_on_shutdown_signal(self):
-        processor = self._create_processor()
-        self.assertEqual(processor.shutdown, False)
-
-        shutdown_requested.send()
-        self.assertEqual(processor.shutdown, True)
+class ProcessorChannelEnablingTestCase(TestCase):
 
     def test_channel_enabling_on_join_signal(self):
         ports_to_channel_names = {
@@ -44,7 +35,7 @@ class ProcessorTestCase(TestCase):
         self.assertEqual(processor.router.is_channel_enabled('#example1'), True)
         self.assertEqual(processor.router.is_channel_enabled('#example2'), True)
 
-    def _create_processor(self, ports_to_channel_names=None):
-        processor = Processor(ports_to_channel_names or {})
+    def _create_processor(self, ports_to_channel_names):
+        processor = Processor(ports_to_channel_names)
         processor.connect_to_signals()
         return processor
