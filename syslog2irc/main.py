@@ -46,7 +46,6 @@ def start(irc_server, irc_nickname, irc_realname, routes, **options):
     irc_channels = frozenset(chain(*routes.values()))
     ports = routes.keys()
     ports_to_channel_names = replace_channels_with_channel_names(routes)
-    channel_names_to_ports = map_channel_names_to_ports(ports_to_channel_names)
 
     announcer = create_announcer(irc_server, irc_nickname, irc_realname,
                                  irc_channels, **options)
@@ -63,8 +62,12 @@ def start(irc_server, irc_nickname, irc_realname, routes, **options):
     announcer.start()
 
     if not irc_server:
-        # Fake channel joins.
-        for channel in channel_names_to_ports.keys():
-            irc_channel_joined.send(channel=channel)
+        fake_channel_joins(ports_to_channel_names)
 
     processor.run()
+
+
+def fake_channel_joins(ports_to_channel_names):
+    channel_names_to_ports = map_channel_names_to_ports(ports_to_channel_names)
+    for channel in channel_names_to_ports.keys():
+        irc_channel_joined.send(channel=channel)
