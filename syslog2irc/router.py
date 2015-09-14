@@ -32,6 +32,9 @@ class Router(object):
     def is_channel_enabled(self, channel):
         return channel in self.enabled_channels
 
+    def get_channel_names(self):
+        return frozenset(self.channel_names_to_ports.keys())
+
     def get_channel_names_for_port(self, port):
         return self.ports_to_channel_names[port]
 

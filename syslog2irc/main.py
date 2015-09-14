@@ -12,8 +12,7 @@ from itertools import chain
 
 from .announcer import create_announcer
 from .processor import Processor
-from .router import map_channel_names_to_ports, \
-    replace_channels_with_channel_names
+from .router import replace_channels_with_channel_names, Router
 from .signals import irc_channel_joined, message_approved
 from .syslog import start_syslog_message_receivers
 
@@ -51,7 +50,8 @@ def start(irc_server, irc_nickname, irc_realname, routes, **options):
                                  irc_channels, **options)
     message_approved.connect(announcer.announce)
 
-    processor = Processor(ports_to_channel_names)
+    router = Router(ports_to_channel_names)
+    processor = Processor(router)
 
     # Up to this point, no signals must have been sent.
     processor.connect_to_signals()
@@ -62,12 +62,11 @@ def start(irc_server, irc_nickname, irc_realname, routes, **options):
     announcer.start()
 
     if not irc_server:
-        fake_channel_joins(ports_to_channel_names)
+        fake_channel_joins(router)
 
     processor.run()
 
 
-def fake_channel_joins(ports_to_channel_names):
-    channel_names_to_ports = map_channel_names_to_ports(ports_to_channel_names)
-    for channel in channel_names_to_ports.keys():
-        irc_channel_joined.send(channel=channel)
+def fake_channel_joins(router):
+    for channel_name in router.get_channel_names():
+        irc_channel_joined.send(channel=channel_name)

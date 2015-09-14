@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 from unittest import TestCase
 
 from syslog2irc.processor import Processor
+from syslog2irc.router import Router
 from syslog2irc.signals import irc_channel_joined
 
 
@@ -36,6 +37,8 @@ class ProcessorChannelEnablingTestCase(TestCase):
         self.assertEqual(processor.router.is_channel_enabled('#example2'), True)
 
     def _create_processor(self, ports_to_channel_names):
-        processor = Processor(ports_to_channel_names)
+        router = Router(ports_to_channel_names)
+
+        processor = Processor(router)
         processor.connect_to_signals()
         return processor

@@ -8,7 +8,6 @@ syslog2irc.processor
 :License: MIT, see LICENSE for details.
 """
 
-from .router import Router
 from .runner import Runner
 from .signals import irc_channel_joined, message_approved, message_received, \
     shutdown_requested, syslog_message_received
@@ -18,10 +17,9 @@ from .util import log
 
 class Processor(Runner):
 
-    def __init__(self, ports_to_channel_names):
+    def __init__(self, router):
         super(Processor, self).__init__()
-
-        self.router = Router(ports_to_channel_names)
+        self.router = router
 
     def connect_to_signals(self):
         irc_channel_joined.connect(self.router.enable_channel)

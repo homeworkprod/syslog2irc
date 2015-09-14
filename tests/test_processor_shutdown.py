@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 from unittest import TestCase
 
 from syslog2irc.processor import Processor
+from syslog2irc.router import Router
 from syslog2irc.signals import shutdown_requested
 
 
@@ -22,6 +23,8 @@ class ProcessorShutdownTestCase(TestCase):
         self.assertEqual(processor.shutdown, True)
 
     def _create_processor(self):
-        processor = Processor({})
+        router = Router({})
+
+        processor = Processor(router)
         processor.connect_to_signals()
         return processor
