@@ -24,25 +24,27 @@ class ProcessorTestCase(TestCase):
         self.assertEqual(processor.shutdown, True)
 
     def test_channel_enabling_on_join_signal(self):
-        channel_names_to_ports = {
-            '#example1': {514},
-            '#example2': {514, 55514},
+        ports_to_channel_names = {
+              514: {'#example1', '#example2'},
+            55514: {'#example2'},
         }
 
-        processor = self._create_processor(
-            channel_names_to_ports=channel_names_to_ports)
+        processor = self._create_processor(ports_to_channel_names)
+
         self.assertEqual(processor.router.is_channel_enabled('#example1'), False)
         self.assertEqual(processor.router.is_channel_enabled('#example2'), False)
 
         irc_channel_joined.send(channel='#example1')
+
         self.assertEqual(processor.router.is_channel_enabled('#example1'), True)
         self.assertEqual(processor.router.is_channel_enabled('#example2'), False)
 
         irc_channel_joined.send(channel='#example2')
+
         self.assertEqual(processor.router.is_channel_enabled('#example1'), True)
         self.assertEqual(processor.router.is_channel_enabled('#example2'), True)
 
-    def _create_processor(self, channel_names_to_ports=None):
-        processor = Processor(channel_names_to_ports or {})
+    def _create_processor(self, ports_to_channel_names=None):
+        processor = Processor(ports_to_channel_names or {})
         processor.connect_to_signals()
         return processor

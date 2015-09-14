@@ -10,19 +10,15 @@ from unittest import TestCase
 
 from nose2.tools import params
 
-from syslog2irc.irc import Channel
 from syslog2irc.router import map_channel_names_to_ports
 
 
 class RoutingTestCase(TestCase):
 
-    channel1 = Channel('#example1')
-    channel2 = Channel('#example2', password='opensesame')
-
     @params(
         (
             {
-                514: [channel1],
+                514: ['#example1'],
             },
             {
                 '#example1': {514},
@@ -30,8 +26,8 @@ class RoutingTestCase(TestCase):
         ),
         (
             {
-                  514: [channel1, channel2],
-                55514: [channel2],
+                  514: ['#example1', '#example2'],
+                55514: ['#example2'],
             },
             {
                 '#example1': {514},

@@ -18,10 +18,10 @@ from .util import log
 
 class Processor(Runner):
 
-    def __init__(self, channel_names_to_ports):
+    def __init__(self, ports_to_channel_names):
         super(Processor, self).__init__()
 
-        self.router = Router(channel_names_to_ports)
+        self.router = Router(ports_to_channel_names)
 
     def connect_to_signals(self):
         irc_channel_joined.connect(self.router.enable_channel)

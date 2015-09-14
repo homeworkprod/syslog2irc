@@ -18,10 +18,10 @@ from .util import log
 class Router(object):
     """Map syslog port numbers to IRC channel names."""
 
-    def __init__(self, channel_names_to_ports):
-        self.channel_names_to_ports = channel_names_to_ports
-        self.ports_to_channel_names = \
-            map_ports_to_channel_names(channel_names_to_ports)
+    def __init__(self, ports_to_channel_names):
+        self.ports_to_channel_names = ports_to_channel_names
+        self.channel_names_to_ports = \
+            map_channel_names_to_ports(ports_to_channel_names)
         self.enabled_channels = set()
 
     def enable_channel(self, sender, channel=None):
@@ -36,17 +36,18 @@ class Router(object):
         return self.ports_to_channel_names[port]
 
 
-def map_channel_names_to_ports(routes):
+def replace_channels_with_channel_names(routes):
+    return {ports: channels_to_names(channels)
+            for ports, channels in routes.items()}
+
+
+def channels_to_names(channels):
+    return {channel.name for channel in channels}
+
+
+def map_channel_names_to_ports(ports_to_channel_names):
     channel_names_to_ports = defaultdict(set)
-    for port, channels in routes.items():
-        for channel in channels:
-            channel_names_to_ports[channel.name].add(port)
+    for port, channel_names in ports_to_channel_names.items():
+        for channel_name in channel_names:
+            channel_names_to_ports[channel_name].add(port)
     return dict(channel_names_to_ports)
-
-
-def map_ports_to_channel_names(channel_names_to_ports):
-    ports_to_channel_names = defaultdict(set)
-    for channel_name, ports in channel_names_to_ports.items():
-        for port in ports:
-            ports_to_channel_names[port].add(channel_name)
-    return dict(ports_to_channel_names)

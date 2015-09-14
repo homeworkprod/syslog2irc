@@ -12,7 +12,8 @@ from itertools import chain
 
 from .announcer import create_announcer
 from .processor import Processor
-from .router import map_channel_names_to_ports
+from .router import map_channel_names_to_ports, \
+    replace_channels_with_channel_names
 from .signals import irc_channel_joined, message_approved
 from .syslog import start_syslog_message_receivers
 
@@ -43,14 +44,15 @@ from .syslog import start_syslog_message_receivers
 def start(irc_server, irc_nickname, irc_realname, routes, **options):
     """Start the IRC bot and the syslog listen server."""
     irc_channels = frozenset(chain(*routes.values()))
-    channel_names_to_ports = map_channel_names_to_ports(routes)
     ports = routes.keys()
+    ports_to_channel_names = replace_channels_with_channel_names(routes)
+    channel_names_to_ports = map_channel_names_to_ports(ports_to_channel_names)
 
     announcer = create_announcer(irc_server, irc_nickname, irc_realname,
                                  irc_channels, **options)
     message_approved.connect(announcer.announce)
 
-    processor = Processor(channel_names_to_ports)
+    processor = Processor(ports_to_channel_names)
 
     # Up to this point, no signals must have been sent.
     processor.connect_to_signals()
