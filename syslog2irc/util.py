@@ -4,21 +4,22 @@
 syslog2irc.util
 ~~~~~~~~~~~~~~~
 
-Utilities
+Various utilities
 
 :Copyright: 2007-2015 Jochen Kupperschmidt
 :License: MIT, see LICENSE for details.
 """
 
-from __future__ import print_function
-from datetime import datetime
+import logging
 from threading import Thread
+
+
+logging.basicConfig(format='%(asctime)s | %(message)s', level=logging.INFO)
 
 
 def log(message, *args, **kwargs):
     """Log the message with a timestamp."""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(timestamp, message.format(*args, **kwargs))
+    logging.info(message.format(*args, **kwargs))
 
 
 def start_thread(target, name):
