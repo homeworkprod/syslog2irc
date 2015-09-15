@@ -15,6 +15,7 @@ from .processor import Processor
 from .router import replace_channels_with_channel_names, Router
 from .signals import irc_channel_joined, message_approved
 from .syslog import start_syslog_message_receivers
+from .util import log
 
 
 # A note on threads (implementation detail):
@@ -42,29 +43,32 @@ from .syslog import start_syslog_message_receivers
 
 def start(irc_server, irc_nickname, irc_realname, routes, **options):
     """Start the IRC bot and the syslog listen server."""
-    irc_channels = frozenset(chain(*routes.values()))
-    ports = routes.keys()
-    ports_to_channel_names = replace_channels_with_channel_names(routes)
+    try:
+        irc_channels = frozenset(chain(*routes.values()))
+        ports = routes.keys()
+        ports_to_channel_names = replace_channels_with_channel_names(routes)
 
-    announcer = create_announcer(irc_server, irc_nickname, irc_realname,
-                                 irc_channels, **options)
-    message_approved.connect(announcer.announce)
+        announcer = create_announcer(irc_server, irc_nickname, irc_realname,
+                                     irc_channels, **options)
+        message_approved.connect(announcer.announce)
 
-    router = Router(ports_to_channel_names)
-    processor = Processor(router)
+        router = Router(ports_to_channel_names)
+        processor = Processor(router)
 
-    # Up to this point, no signals must have been sent.
-    processor.connect_to_signals()
+        # Up to this point, no signals must have been sent.
+        processor.connect_to_signals()
 
-    # Signals are allowed be sent from here on.
+        # Signals are allowed be sent from here on.
 
-    start_syslog_message_receivers(ports)
-    announcer.start()
+        start_syslog_message_receivers(ports)
+        announcer.start()
 
-    if not irc_server:
-        fake_channel_joins(router)
+        if not irc_server:
+            fake_channel_joins(router)
 
-    processor.run()
+        processor.run()
+    except KeyboardInterrupt:
+        log('<Ctrl-C> pressed, aborting.')
 
 
 def fake_channel_joins(router):
