@@ -76,6 +76,23 @@ forwarded exclusively to the second channel.
         55514: [channel2],
     }
 
+For convenience, for example while testing, the bot can be configured to
+shut down if a certain text is sent to it as a private message. Just
+provide a callable that accepts nickmask and text as positional
+arguments and returns a boolean value.
+
+.. code:: python
+
+    def is_shutdown_requested(nickmask, text):
+        """Determine if this is a valid shutdown request."""
+        return text == 'shutdown!'
+
+    start_with_args(routes, shutdown_predicate=is_shutdown_requested)
+
+Be aware that checking against nickmask and text is not very secure as
+they can be faked and guessed, respectively. You might not want to
+enable this in a production environment.
+
 
 Usage
 -----

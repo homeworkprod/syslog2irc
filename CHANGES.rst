@@ -9,6 +9,8 @@ not yet released
 
 - Split the single module into several modules inside a namespace
   package and a start script.
+- Shutdown requests per IRC private message can be validated by a custom
+  callable, and are disabled by default.
 
 
 Version 0.9.1
