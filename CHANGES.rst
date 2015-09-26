@@ -36,7 +36,8 @@ Released September 8, 2015
 
 - Adapted to version 0.2 of syslogmp.
 - Spread tests to separate modules.
-- Added command line option to use SSL to connect to an IRC server.
+- Added support to connect to IRC servers via SSL (suggested by Jonas
+  Alexandersson).
 
 
 Version 0.8
