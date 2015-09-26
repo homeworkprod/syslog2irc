@@ -11,6 +11,7 @@ not yet released
   package and a start script.
 - Shutdown requests per IRC private message can be validated by a custom
   callable, and are disabled by default.
+- Support Python 3.5.
 
 
 Version 0.9.1
