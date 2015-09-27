@@ -12,7 +12,7 @@ from unittest import TestCase
 from nose2.tools import params
 from syslogmp import Facility, Message, Severity
 
-from syslog2irc.syslog import format_message
+from syslog2irc.processor import format_syslog_message
 
 
 class SyslogMessageFormattingTestCase(TestCase):
@@ -56,6 +56,6 @@ class SyslogMessageFormattingTestCase(TestCase):
         """Test string representation of a syslog message."""
         message = Message(facility, severity, timestamp, hostname, message)
 
-        actual = format_message(message)
+        actual = format_syslog_message(message)
 
         self.assertEqual(actual, expected)

@@ -24,9 +24,6 @@ from .signals import syslog_message_received
 from .util import log, start_thread
 
 
-MESSAGE_TEXT_ENCODING = 'utf-8'
-
-
 class RequestHandler(BaseRequestHandler):
     """Handler for syslog messages."""
 
@@ -92,23 +89,3 @@ def format_message_for_log(message):
     return 'facility={}, severity={}, timestamp={}, hostname={}, message={}' \
            .format(facility_name, severity_name, timestamp_str, hostname,
                    message.message)
-
-
-def format_message(message):
-    """Format a syslog message to be displayed."""
-    def _generate():
-        if message.timestamp is not None:
-            timestamp_format = '%Y-%m-%d %H:%M:%S'
-            formatted_timestamp = message.timestamp.strftime(
-                timestamp_format)
-            yield '[{}] '.format(formatted_timestamp)
-
-        if message.hostname is not None:
-            yield '({}) '.format(message.hostname)
-
-        severity_name = message.severity.name
-        # Important: The message text is a byte string.
-        message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
-        yield '[{}]: {}'.format(severity_name, message_text)
-
-    return ''.join(_generate())
