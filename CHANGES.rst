@@ -9,6 +9,7 @@ not yet released
 
 - Split the single module into several modules inside a namespace
   package and a start script.
+- A custom formatter for syslog messages can be specified.
 - Shutdown requests per IRC private message can be validated by a custom
   callable, and are disabled by default.
 - Support Python 3.5.

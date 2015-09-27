@@ -19,9 +19,14 @@ MESSAGE_TEXT_ENCODING = 'utf-8'
 
 class Processor(Runner):
 
-    def __init__(self, router):
+    def __init__(self, router, syslog_message_formatter=None):
         super(Processor, self).__init__()
         self.router = router
+
+        if syslog_message_formatter is not None:
+            self.syslog_message_formatter = syslog_message_formatter
+        else:
+            self.syslog_message_formatter = format_syslog_message
 
     def connect_to_signals(self):
         irc_channel_joined.connect(self.router.enable_channel)
@@ -35,7 +40,7 @@ class Processor(Runner):
         channel_names = self.router.get_channel_names_for_port(port)
 
         formatted_source = '{0[0]}:{0[1]:d}'.format(source_address)
-        formatted_message = format_syslog_message(message)
+        formatted_message = self.syslog_message_formatter(message)
         text = '{} {}'.format(formatted_source, formatted_message)
 
         message_received.send(channel_names=channel_names,
