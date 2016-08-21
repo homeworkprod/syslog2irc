@@ -32,14 +32,16 @@ class ArgumentParserTestCase(TestCase):
         self.assertEqual(actual.irc_realname, expected)
 
     @params(
-        (['--irc-server', 'localhost'     ], 'localhost', 6667),
-        (['--irc-server', '127.0.0.1'     ], '127.0.0.1', 6667),
-        (['--irc-server', '127.0.0.1:6669'], '127.0.0.1', 6669),
+        (['--irc-server', 'localhost'                  ], 'localhost', 6667, None          ),
+        (['--irc-server', '127.0.0.1'                  ], '127.0.0.1', 6667, None          ),
+        (['--irc-server', '127.0.0.1:6669'             ], '127.0.0.1', 6669, None          ),
+        (['--irc-server', '127.0.0.1:6669:testpassword'], '127.0.0.1', 6669, 'testpassword'),
     )
-    def test_parse_irc_server(self, arg_value, expected_host, expected_port):
+    def test_parse_irc_server(self, arg_value, expected_host, expected_port, expected_password):
         actual = parse_args(arg_value)
         self.assertEqual(actual.irc_server.host, expected_host)
         self.assertEqual(actual.irc_server.port, expected_port)
+        self.assertEqual(actual.irc_server.password, expected_password)
 
     @params(
         ([                  ], False),

@@ -44,8 +44,10 @@ def create_arg_parser():
     parser.add_argument('--irc-server',
         dest='irc_server',
         type=parse_irc_server_arg,
-        help='IRC server (host and, optionally, port) to connect to'
-            + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
+        help='IRC server (host and, optionally, port and password)'
+            + ' to connect to'
+            + ' [e.g. "irc.example.com", "irc.example.com:6669"'
+            + ' or "irc.example.com:6669:password;"'
             + ' default port: {:d}]'.format(DEFAULT_IRC_PORT),
         metavar='SERVER')
 
@@ -59,7 +61,7 @@ def create_arg_parser():
 
 def parse_irc_server_arg(value):
     """Parse a hostname with optional port."""
-    fragments = value.split(':', 1)
+    fragments = value.split(':', 2)
     if len(fragments) > 1:
         fragments[1] = int(fragments[1])
     return ServerSpec(*fragments)
