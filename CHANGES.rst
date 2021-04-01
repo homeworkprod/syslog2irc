@@ -22,6 +22,8 @@ not yet released
 
 - Require blinker version 1.4.
 
+- Require syslogmp version 0.3.
+
 
 Version 0.9.1
 -------------

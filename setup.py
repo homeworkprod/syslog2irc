@@ -39,6 +39,6 @@ setup(
     install_requires=[
         'blinker==1.4',
         'irc >= 8.9.1',
-        'syslogmp >= 0.2',
+        'syslogmp==0.3',
     ],
 )
