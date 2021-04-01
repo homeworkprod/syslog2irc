@@ -9,6 +9,8 @@ not yet released
 
 - Removed support for Python 2.
 
+- Added support for Python 3.5, 3.6, 3.7, 3.8, and 3.9.
+
 - Split the single module into several modules inside a namespace
   package and a start script.
 
@@ -16,8 +18,6 @@ not yet released
 
 - Shutdown requests per IRC private message can be validated by a custom
   callable, and are disabled by default.
-
-- Support Python 3.5.
 
 
 Version 0.9.1
