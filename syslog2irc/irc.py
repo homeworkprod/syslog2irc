@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 syslog2irc.irc
 ~~~~~~~~~~~~~~
@@ -10,7 +8,6 @@ Internet Relay Chat
 :License: MIT, see LICENSE for details.
 """
 
-from __future__ import absolute_import
 from collections import namedtuple
 from ssl import wrap_socket as ssl_wrap_socket
 

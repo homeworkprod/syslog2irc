@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 syslog2irc.argparser
 ~~~~~~~~~~~~~~~~~~~~
@@ -10,7 +8,6 @@ Command line argument parsing
 :License: MIT, see LICENSE for details.
 """
 
-from __future__ import absolute_import
 from argparse import ArgumentParser
 
 from irc.bot import ServerSpec

@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 """
 :Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
 :License: MIT, see LICENSE for details.
 """
 
-from __future__ import unicode_literals
 from datetime import datetime
 from unittest import TestCase
 

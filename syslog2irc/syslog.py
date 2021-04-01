@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 syslog2irc.syslog
 ~~~~~~~~~~~~~~~~~
@@ -10,12 +8,7 @@ BSD syslog message reception and handling
 :License: MIT, see LICENSE for details.
 """
 
-try:
-    # Python 2.x
-    from SocketServer import BaseRequestHandler, ThreadingUDPServer
-except ImportError:
-    # Python 3.x
-    from socketserver import BaseRequestHandler, ThreadingUDPServer
+from socketserver import BaseRequestHandler, ThreadingUDPServer
 import sys
 
 import syslogmp

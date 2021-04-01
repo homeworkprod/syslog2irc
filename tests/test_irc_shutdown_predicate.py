@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 """
 :Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
 :License: MIT, see LICENSE for details.
 """
 
-from __future__ import unicode_literals
 from unittest import TestCase
 
 from irc.bot import ServerSpec

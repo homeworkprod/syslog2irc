@@ -7,6 +7,8 @@ Version 0.10
 
 not yet released
 
+- Removed support for Python 2.
+
 - Split the single module into several modules inside a namespace
   package and a start script.
 
