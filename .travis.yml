@@ -3,10 +3,5 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-sudo: false
-before_install:
-  - pip install codecov
 script:
   - "python setup.py test"
-after_success:
-  - codecov
