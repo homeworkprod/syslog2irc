@@ -20,6 +20,8 @@ not yet released
 - Shutdown requests per IRC private message can be validated by a custom
   callable, and are disabled by default.
 
+- Require blinker version 1.4.
+
 
 Version 0.9.1
 -------------

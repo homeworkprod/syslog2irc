@@ -37,7 +37,7 @@ setup(
     ],
     packages=['syslog2irc'],
     install_requires=[
-        'blinker >= 1.3',
+        'blinker==1.4',
         'irc >= 8.9.1',
         'syslogmp >= 0.2',
     ],
