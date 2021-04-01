@@ -22,6 +22,8 @@ not yet released
 
 - Require blinker version 1.4.
 
+- Require irc version 19.0.1.
+
 - Require syslogmp version 0.3.
 
 
