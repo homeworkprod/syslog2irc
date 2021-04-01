@@ -8,12 +8,6 @@ with codecs.open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
 
 
-# Require the 'enum34' package on Python versions before 3.4.
-version_dependent_install_requires = []
-if sys.version_info[:2] < (3, 4):
-    version_dependent_install_requires.append('enum34')
-
-
 setup(
     name='syslog2IRC',
     version='0.9.2-dev',
@@ -30,9 +24,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
@@ -49,5 +40,5 @@ setup(
         'blinker >= 1.3',
         'irc >= 8.9.1',
         'syslogmp >= 0.2',
-    ] + version_dependent_install_requires,
+    ],
 )
