@@ -4,17 +4,16 @@
 """
 
 from datetime import datetime
-from unittest import TestCase
 
-from nose2.tools import params
+import pytest
 from syslogmp import Facility, Message, Severity
 
 from syslog2irc.processor import format_syslog_message
 
 
-class SyslogMessageFormattingTestCase(TestCase):
-
-    @params(
+@pytest.mark.parametrize(
+    'facility, severity, timestamp, hostname, message, expected',
+    [
         (
             Facility.user,
             Severity.informational,
@@ -47,12 +46,11 @@ class SyslogMessageFormattingTestCase(TestCase):
             b'WTF? S.O.S.!',
             '[2008-10-18 17:34:07] (mainframe) [emergency]: WTF? S.O.S.!',
         ),
-    )
-    def test_format_message(self, facility, severity, timestamp,
-            hostname, message, expected):
-        """Test string representation of a syslog message."""
-        message = Message(facility, severity, timestamp, hostname, message)
-
-        actual = format_syslog_message(message)
-
-        self.assertEqual(actual, expected)
+    ],
+)
+def test_format_message(
+    facility, severity, timestamp, hostname, message, expected
+):
+    """Test string representation of a syslog message."""
+    message = Message(facility, severity, timestamp, hostname, message)
+    assert format_syslog_message(message) == expected

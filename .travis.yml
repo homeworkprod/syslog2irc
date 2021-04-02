@@ -7,4 +7,4 @@ python:
 install:
   - "pip install -r requirements.txt -r requirements-test.txt"
 script:
-  - "nose2"
+  - "pytest"

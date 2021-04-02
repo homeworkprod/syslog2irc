@@ -3,19 +3,17 @@
 :License: MIT, see LICENSE for details.
 """
 
-from unittest import TestCase
-
 from irc.bot import ServerSpec
 from irc.client import Event, NickMask
-from nose2.tools import params
+import pytest
 
 from syslog2irc.irc import Bot
 from syslog2irc.signals import shutdown_requested
 
 
-class IrcShutdownPredicateTestCase(TestCase):
-
-    @params(
+@pytest.mark.parametrize(
+    'shutdown_predicate, text, expected',
+    [
         (None                                                         , 'anything' , False),
         (lambda nickmask, text: nickmask.nick == 'UserNick'           , 'anything' , True ),
         (lambda nickmask, text: nickmask.nick == 'OtherNick'          , 'anything' , False),
@@ -23,19 +21,20 @@ class IrcShutdownPredicateTestCase(TestCase):
         (lambda nickmask, text: nickmask.host.endswith('.example.net'), 'anything' , False),
         (lambda nickmask, text: text == 'shutdown!'                   , 'shutdown!', True ),
         (lambda nickmask, text: text == 'shutdown!'                   , 'something', False),
-    )
-    def test_shutdown_predicate(self, shutdown_predicate, text, expected):
-        self.shutdown_signal_received = False
+    ],
+)
+def test_shutdown_predicate(shutdown_predicate, text, expected):
+    shutdown_signal_received = set()
 
-        bot = create_bot(shutdown_predicate)
+    bot = create_bot(shutdown_predicate)
 
-        @shutdown_requested.connect
-        def handle_shutdown_requested(sender):
-            self.shutdown_signal_received = True
+    @shutdown_requested.connect
+    def handle_shutdown_requested(sender):
+        shutdown_signal_received.add(True)
 
-        send_privmsg(bot, text)
+    send_privmsg(bot, text)
 
-        self.assertEqual(self.shutdown_signal_received, expected)
+    assert (True in shutdown_signal_received) == expected
 
 
 def create_bot(shutdown_predicate):
