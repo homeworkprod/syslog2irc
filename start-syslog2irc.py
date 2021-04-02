@@ -7,9 +7,7 @@ syslog2IRC
 Receive syslog messages via UDP and show them on IRC.
 
 :Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
-:Date: 09-Sep-2015
 :License: MIT, see LICENSE for details.
-:Version: 0.9.2-dev
 """
 
 from syslog2irc.argparser import parse_args
