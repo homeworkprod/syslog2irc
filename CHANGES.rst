@@ -24,7 +24,7 @@ not yet released
 
 - Require irc version 19.0.1.
 
-- Require syslogmp version 0.3.
+- Require syslogmp version 0.4.
 
 
 Version 0.9.1
