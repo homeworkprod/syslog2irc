@@ -10,7 +10,7 @@ not yet released
 - Removed support for unsupported Python versions 2.7, 3.3, 3.4, and
   3.5.
 
-- Added support for Python 3.6, 3.7, 3.8, and 3.9.
+- Added support for Python 3.7, 3.8, and 3.9.
 
 - Split the single module into several modules inside a namespace
   package and a start script.
