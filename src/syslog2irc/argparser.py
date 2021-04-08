@@ -26,30 +26,38 @@ def create_arg_parser():
     """Prepare the command line arguments parser."""
     parser = ArgumentParser()
 
-    parser.add_argument('--irc-nickname',
+    parser.add_argument(
+        '--irc-nickname',
         dest='irc_nickname',
         default='syslog',
         help='the IRC nickname the bot should use',
-        metavar='NICKNAME')
+        metavar='NICKNAME',
+    )
 
-    parser.add_argument('--irc-realname',
+    parser.add_argument(
+        '--irc-realname',
         dest='irc_realname',
         default='syslog2IRC',
         help='the IRC realname the bot should use',
-        metavar='REALNAME')
+        metavar='REALNAME',
+    )
 
-    parser.add_argument('--irc-server',
+    parser.add_argument(
+        '--irc-server',
         dest='irc_server',
         type=parse_irc_server_arg,
         help='IRC server (host and, optionally, port) to connect to'
-            + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
-            + ' default port: {:d}]'.format(DEFAULT_IRC_PORT),
-        metavar='SERVER')
+        + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
+        + ' default port: {:d}]'.format(DEFAULT_IRC_PORT),
+        metavar='SERVER',
+    )
 
-    parser.add_argument('--irc-server-ssl',
+    parser.add_argument(
+        '--irc-server-ssl',
         dest='irc_server_ssl',
         action='store_true',
-        help='use SSL to connect to the IRC server')
+        help='use SSL to connect to the IRC server',
+    )
 
     return parser
 

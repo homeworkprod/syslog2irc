@@ -25,18 +25,21 @@ class RequestHandler(BaseRequestHandler):
             data = self.request[0]
             message = syslogmp.parse(data)
         except ValueError:
-            log('Invalid message received from {}:{:d}.',
-                *self.client_address)
+            log('Invalid message received from {}:{:d}.', *self.client_address)
             return
 
         port = self.server.get_port()
 
-        log('Received message from {0[0]}:{0[1]:d} on port {1:d} -> {2}',
-            self.client_address, port, format_message_for_log(message))
+        log(
+            'Received message from {0[0]}:{0[1]:d} on port {1:d} -> {2}',
+            self.client_address,
+            port,
+            format_message_for_log(message),
+        )
 
-        syslog_message_received.send(port,
-                                     source_address=self.client_address,
-                                     message=message)
+        syslog_message_received.send(
+            port, source_address=self.client_address, message=message
+        )
 
 
 class ReceiveServer(ThreadingUDPServer):
@@ -51,12 +54,12 @@ class ReceiveServer(ThreadingUDPServer):
         try:
             receiver = cls(port)
         except Exception as e:
-            sys.stderr.write('Error {0.errno:d}: {0.strerror}\n'
-                .format(e))
+            sys.stderr.write('Error {0.errno:d}: {0.strerror}\n'.format(e))
             sys.stderr.write(
                 'Probably no permission to open port {}. '
                 'Try to specify a port number above 1,024 (or even '
-                '4,096) and up to 65,535.\n'.format(port))
+                '4,096) and up to 65,535.\n'.format(port)
+            )
             sys.exit(1)
 
         thread_name = '{}-port{:d}'.format(cls.__name__, port)
@@ -79,6 +82,6 @@ def format_message_for_log(message):
     timestamp_str = message.timestamp.isoformat()
     hostname = message.hostname
 
-    return 'facility={}, severity={}, timestamp={}, hostname={}, message={}' \
-           .format(facility_name, severity_name, timestamp_str, hostname,
-                   message.message)
+    return 'facility={}, severity={}, timestamp={}, hostname={}, message={}'.format(
+        facility_name, severity_name, timestamp_str, hostname, message.message
+    )

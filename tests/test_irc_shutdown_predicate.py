@@ -42,8 +42,13 @@ def create_bot(shutdown_predicate):
     nickname = 'BotNick'
     realname = 'BotName'
     channels = []
-    bot = Bot(server, nickname, realname, channels,
-              shutdown_predicate=shutdown_predicate)
+    bot = Bot(
+        server,
+        nickname,
+        realname,
+        channels,
+        shutdown_predicate=shutdown_predicate,
+    )
 
     # Prevent `SystemExit`.
     bot.die = lambda message: None

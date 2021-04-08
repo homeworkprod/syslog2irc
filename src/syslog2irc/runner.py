@@ -14,7 +14,6 @@ from .util import log
 
 
 class Runner(object):
-
     def __init__(self):
         self.shutdown = False
 

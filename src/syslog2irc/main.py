@@ -46,8 +46,9 @@ def start(irc_server, irc_nickname, irc_realname, routes, **options):
         ports = routes.keys()
         ports_to_channel_names = replace_channels_with_channel_names(routes)
 
-        announcer = create_announcer(irc_server, irc_nickname, irc_realname,
-                                     irc_channels, **options)
+        announcer = create_announcer(
+            irc_server, irc_nickname, irc_realname, irc_channels, **options
+        )
         message_approved.connect(announcer.announce)
 
         router = Router(ports_to_channel_names)

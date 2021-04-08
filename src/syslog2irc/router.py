@@ -18,8 +18,9 @@ class Router(object):
 
     def __init__(self, ports_to_channel_names):
         self.ports_to_channel_names = ports_to_channel_names
-        self.channel_names_to_ports = \
-            map_channel_names_to_ports(ports_to_channel_names)
+        self.channel_names_to_ports = map_channel_names_to_ports(
+            ports_to_channel_names
+        )
         self.enabled_channels = set()
 
     def enable_channel(self, sender, channel=None):
@@ -38,8 +39,9 @@ class Router(object):
 
 
 def replace_channels_with_channel_names(routes):
-    return {ports: channels_to_names(channels)
-            for ports, channels in routes.items()}
+    return {
+        ports: channels_to_names(channels) for ports, channels in routes.items()
+    }
 
 
 def channels_to_names(channels):

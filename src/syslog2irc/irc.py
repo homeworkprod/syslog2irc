@@ -28,8 +28,15 @@ class Channel(namedtuple('Channel', 'name password')):
 class Bot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to IRC channels."""
 
-    def __init__(self, server_spec, nickname, realname, channels, ssl=False,
-                 shutdown_predicate=None):
+    def __init__(
+        self,
+        server_spec,
+        nickname,
+        realname,
+        channels,
+        ssl=False,
+        shutdown_predicate=None,
+    ):
         log('Connecting to IRC server {0.host}:{0.port:d} ...', server_spec)
 
         connect_params = {}
@@ -37,8 +44,9 @@ class Bot(SingleServerIRCBot):
             ssl_factory = Factory(wrapper=ssl_wrap_socket)
             connect_params['connect_factory'] = ssl_factory
 
-        SingleServerIRCBot.__init__(self, [server_spec], nickname,
-            realname, **connect_params)
+        SingleServerIRCBot.__init__(
+            self, [server_spec], nickname, realname, **connect_params
+        )
 
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels
@@ -83,8 +91,9 @@ class Bot(SingleServerIRCBot):
         nickmask = event.source
         text = event.arguments[0]
 
-        if self.shutdown_predicate is not None \
-                and self.shutdown_predicate(nickmask, text):
+        if self.shutdown_predicate is not None and self.shutdown_predicate(
+            nickmask, text
+        ):
             self.shutdown(nickmask)
 
     def shutdown(self, nickmask):
