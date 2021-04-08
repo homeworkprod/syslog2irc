@@ -1,3 +1,10 @@
+[build-system]
+requires = [
+    "setuptools >= 51.1.2",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
 [tool.pytest.ini_options]
 addopts = "-vv"
 testpaths = ["tests"]
