@@ -12,7 +12,7 @@ from .irc import Bot
 from .util import log, start_thread
 
 
-class IrcAnnouncer(object):
+class IrcAnnouncer:
     """Announce syslog messages on IRC."""
 
     def __init__(self, server, nickname, realname, channels, **options):
@@ -25,7 +25,7 @@ class IrcAnnouncer(object):
         self.bot.say(channel_name, text)
 
 
-class StdoutAnnouncer(object):
+class StdoutAnnouncer:
     """Announce syslog messages on STDOUT."""
 
     def start(self):

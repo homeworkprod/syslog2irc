@@ -13,7 +13,7 @@ from collections import defaultdict
 from .util import log
 
 
-class Router(object):
+class Router:
     """Map syslog port numbers to IRC channel names."""
 
     def __init__(self, ports_to_channel_names):

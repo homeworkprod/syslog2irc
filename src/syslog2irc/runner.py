@@ -13,7 +13,7 @@ from time import sleep
 from .util import log
 
 
-class Runner(object):
+class Runner:
     def __init__(self):
         self.shutdown = False
 
