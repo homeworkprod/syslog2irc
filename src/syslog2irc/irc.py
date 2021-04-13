@@ -15,7 +15,7 @@ from typing import Optional
 from irc.bot import ServerSpec, SingleServerIRCBot
 from irc.connection import Factory
 
-from .signals import irc_channel_joined, shutdown_requested
+from .signals import irc_channel_joined
 from .util import log
 
 
@@ -39,14 +39,7 @@ class IrcChannel:
 class Bot(SingleServerIRCBot):
     """An IRC bot to forward syslog messages to IRC channels."""
 
-    def __init__(
-        self,
-        server,
-        nickname,
-        realname,
-        channels,
-        shutdown_predicate=None,
-    ):
+    def __init__(self, server, nickname, realname, channels):
         log('Connecting to IRC server {0.host}:{0.port:d} ...', server)
 
         server_spec = ServerSpec(server.host, server.port)
@@ -57,8 +50,6 @@ class Bot(SingleServerIRCBot):
 
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels
-
-        self.shutdown_predicate = shutdown_predicate
 
     def get_version(self):
         """Return this on CTCP VERSION requests."""
@@ -92,22 +83,6 @@ class Bot(SingleServerIRCBot):
         """Channel could not be joined due to wrong password."""
         channel_name = event.arguments[0]
         log('Cannot join channel {} (bad key).', channel_name)
-
-    def on_privmsg(self, conn, event):
-        """React on private messages."""
-        nickmask = event.source
-        text = event.arguments[0]
-
-        if self.shutdown_predicate is not None and self.shutdown_predicate(
-            nickmask, text
-        ):
-            self.shutdown(nickmask)
-
-    def shutdown(self, nickmask):
-        """Shut the bot down."""
-        log('Shutdown requested by {}.', nickmask)
-        shutdown_requested.send()
-        self.die('Shutting down.')  # Joins IRC bot thread.
 
     def say(self, channel, message):
         """Say message on channel."""

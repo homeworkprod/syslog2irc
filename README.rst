@@ -66,23 +66,6 @@ forwarded exclusively to the second channel.
         55514: [channel2],
     }
 
-For convenience, for example while testing, the bot can be configured to
-shut down if a certain text is sent to it as a private message. Just
-provide a callable that accepts nickmask and text as positional
-arguments and returns a boolean value.
-
-.. code:: python
-
-    def is_shutdown_requested(nickmask, text):
-        """Determine if this is a valid shutdown request."""
-        return text == 'shutdown!'
-
-    start_with_args(routes, shutdown_predicate=is_shutdown_requested)
-
-Be aware that checking against nickmask and text is not very secure as
-they can be faked and guessed, respectively. You might not want to
-enable this in a production environment.
-
 
 Usage
 -----
@@ -130,10 +113,6 @@ it like this (6669 in this case):
 .. code:: sh
 
     $ python start-syslog2irc.py --irc-server irc.example.com:6669
-
-In order to shut down syslog2IRC, send a query message with the text
-"shutdown!" to the IRC bot. It should then quit, and syslog2IRC should
-exit.
 
 
 Further Reading

@@ -17,8 +17,7 @@ not yet released
 
 - A custom formatter for syslog messages can be specified.
 
-- Shutdown requests per IRC private message can be validated by a custom
-  callable, and are disabled by default.
+- Removed handler to request shutdown via IRC private message.
 
 - Require blinker version 1.4.
 
