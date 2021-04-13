@@ -5,15 +5,15 @@
 
 import pytest
 
-from syslog2irc.irc import Channel
+from syslog2irc.irc import IrcChannel
 
 
 @pytest.mark.parametrize(
     'channel, expected_name, expected_password',
     [
-        (Channel('#example'),                         '#example',      None    ),
-        (Channel('#example', password=None),          '#example',      None    ),
-        (Channel('#headquarters', password='secret'), '#headquarters', 'secret'),
+        (IrcChannel('#example'),                         '#example',      None    ),
+        (IrcChannel('#example', password=None),          '#example',      None    ),
+        (IrcChannel('#headquarters', password='secret'), '#headquarters', 'secret'),
     ],
 )
 def test_irc_channel_creation(channel, expected_name, expected_password):

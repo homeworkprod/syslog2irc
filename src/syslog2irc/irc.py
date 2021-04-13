@@ -20,7 +20,7 @@ from .util import log
 
 
 @dataclass(frozen=True)
-class Channel:
+class IrcChannel:
     """An IRC channel with optional password."""
 
     name: str
