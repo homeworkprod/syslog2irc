@@ -22,8 +22,7 @@ def start_with_args(routes, **options):
     """
     args = parse_args()
 
-    start(args.irc_server, args.irc_nickname, args.irc_realname, routes,
-          ssl=args.irc_server_ssl, **options)
+    start(args.irc_server, args.irc_nickname, args.irc_realname, routes, **options)
 
 
 if __name__ == '__main__':

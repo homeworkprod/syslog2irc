@@ -12,11 +12,20 @@ from dataclasses import dataclass
 from ssl import wrap_socket as ssl_wrap_socket
 from typing import Optional
 
-from irc.bot import SingleServerIRCBot
+from irc.bot import ServerSpec, SingleServerIRCBot
 from irc.connection import Factory
 
 from .signals import irc_channel_joined, shutdown_requested
 from .util import log
+
+
+@dataclass(frozen=True)
+class IrcServer:
+    """An IRC server."""
+
+    host: str
+    port: int = 6667
+    ssl: bool = False
 
 
 @dataclass(frozen=True)
@@ -32,17 +41,18 @@ class Bot(SingleServerIRCBot):
 
     def __init__(
         self,
-        server_spec,
+        server,
         nickname,
         realname,
         channels,
-        ssl=False,
         shutdown_predicate=None,
     ):
-        log('Connecting to IRC server {0.host}:{0.port:d} ...', server_spec)
+        log('Connecting to IRC server {0.host}:{0.port:d} ...', server)
+
+        server_spec = ServerSpec(server.host, server.port)
 
         connect_params = {}
-        if ssl:
+        if server.ssl:
             ssl_factory = Factory(wrapper=ssl_wrap_socket)
             connect_params['connect_factory'] = ssl_factory
 

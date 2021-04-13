@@ -9,17 +9,26 @@ Command line argument parsing
 """
 
 from argparse import ArgumentParser
+import dataclasses
 
-from irc.bot import ServerSpec
+from .irc import IrcServer
 
 
-DEFAULT_IRC_PORT = ServerSpec('').port
+DEFAULT_IRC_PORT = IrcServer('').port
 
 
 def parse_args(args=None):
     """Parse command line arguments."""
     parser = create_arg_parser()
-    return parser.parse_args(args)
+    parsed = parser.parse_args(args)
+
+    irc_server = parsed.irc_server
+    if irc_server is not None:
+        parsed.irc_server = dataclasses.replace(
+            irc_server, ssl=parsed.irc_server_ssl
+        )
+
+    return parsed
 
 
 def create_arg_parser():
@@ -67,4 +76,4 @@ def parse_irc_server_arg(value):
     fragments = value.split(':', 1)
     if len(fragments) > 1:
         fragments[1] = int(fragments[1])
-    return ServerSpec(*fragments)
+    return IrcServer(*fragments)

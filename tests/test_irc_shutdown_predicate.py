@@ -3,11 +3,10 @@
 :License: MIT, see LICENSE for details.
 """
 
-from irc.bot import ServerSpec
 from irc.client import Event, NickMask
 import pytest
 
-from syslog2irc.irc import Bot
+from syslog2irc.irc import Bot, IrcServer
 from syslog2irc.signals import shutdown_requested
 
 
@@ -38,7 +37,7 @@ def test_shutdown_predicate(shutdown_predicate, text, expected):
 
 
 def create_bot(shutdown_predicate):
-    server = ServerSpec('irc.example.org')
+    server = IrcServer('irc.example.org')
     nickname = 'BotNick'
     realname = 'BotName'
     channels = []
