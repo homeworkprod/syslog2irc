@@ -50,14 +50,9 @@ class Bot(SingleServerIRCBot):
         log('Connecting to IRC server {0.host}:{0.port:d} ...', server)
 
         server_spec = ServerSpec(server.host, server.port)
-
-        connect_params = {}
-        if server.ssl:
-            ssl_factory = Factory(wrapper=ssl_wrap_socket)
-            connect_params['connect_factory'] = ssl_factory
-
+        factory = Factory(wrapper=ssl_wrap_socket) if server.ssl else Factory()
         SingleServerIRCBot.__init__(
-            self, [server_spec], nickname, realname, **connect_params
+            self, [server_spec], nickname, realname, connect_factory=factory
         )
 
         # Note: `self.channels` already exists in super class.
