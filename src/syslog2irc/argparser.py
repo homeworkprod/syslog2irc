@@ -57,7 +57,7 @@ def create_arg_parser():
         type=parse_irc_server_arg,
         help='IRC server (host and, optionally, port) to connect to'
         + ' [e.g. "irc.example.com" or "irc.example.com:6669";'
-        + ' default port: {:d}]'.format(DEFAULT_IRC_PORT),
+        + f' default port: {DEFAULT_IRC_PORT:d}]',
         metavar='SERVER',
     )
 

@@ -54,15 +54,15 @@ class ReceiveServer(ThreadingUDPServer):
         try:
             receiver = cls(port)
         except Exception as e:
-            sys.stderr.write('Error {0.errno:d}: {0.strerror}\n'.format(e))
+            sys.stderr.write(f'Error {e.errno:d}: {e.strerror}\n')
             sys.stderr.write(
-                'Probably no permission to open port {}. '
+                f'Probably no permission to open port {port:d}. '
                 'Try to specify a port number above 1,024 (or even '
-                '4,096) and up to 65,535.\n'.format(port)
+                '4,096) and up to 65,535.\n'
             )
             sys.exit(1)
 
-        thread_name = '{}-port{:d}'.format(cls.__name__, port)
+        thread_name = f'{cls.__name__}-port{port:d}'
         start_thread(receiver.serve_forever, thread_name)
 
     def get_port(self):
@@ -82,6 +82,10 @@ def format_message_for_log(message):
     timestamp_str = message.timestamp.isoformat()
     hostname = message.hostname
 
-    return 'facility={}, severity={}, timestamp={}, hostname={}, message={}'.format(
-        facility_name, severity_name, timestamp_str, hostname, message.message
+    return (
+        f'facility={facility_name}, '
+        f'severity={severity_name}, '
+        f'timestamp={timestamp_str}, '
+        f'hostname={hostname}, '
+        f'message={message.message}'
     )

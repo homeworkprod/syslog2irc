@@ -39,9 +39,9 @@ class Processor:
         """Process an incoming syslog message."""
         channel_names = self.router.get_channel_names_for_port(port)
 
-        formatted_source = '{0[0]}:{0[1]:d}'.format(source_address)
+        formatted_source = f'{source_address[0]}:{source_address[1]:d}'
         formatted_message = self.syslog_message_formatter(message)
-        text = '{} {}'.format(formatted_source, formatted_message)
+        text = f'{formatted_source} {formatted_message}'
 
         message_received.send(
             channel_names=channel_names,
@@ -75,14 +75,14 @@ def format_syslog_message(message):
         if message.timestamp is not None:
             timestamp_format = '%Y-%m-%d %H:%M:%S'
             formatted_timestamp = message.timestamp.strftime(timestamp_format)
-            yield '[{}] '.format(formatted_timestamp)
+            yield f'[{formatted_timestamp}] '
 
         if message.hostname is not None:
-            yield '({}) '.format(message.hostname)
+            yield f'({message.hostname}) '
 
         severity_name = message.severity.name
         # Important: The message text is a byte string.
         message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
-        yield '[{}]: {}'.format(severity_name, message_text)
+        yield f'[{severity_name}]: {message_text}'
 
     return ''.join(_generate())
