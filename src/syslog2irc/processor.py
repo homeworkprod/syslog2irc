@@ -6,12 +6,12 @@ syslog2irc.processor
 :License: MIT, see LICENSE for details.
 """
 
-from .runner import Runner
+from time import sleep
+
 from .signals import (
     irc_channel_joined,
     message_approved,
     message_received,
-    shutdown_requested,
     syslog_message_received,
 )
 from .util import log
@@ -20,7 +20,7 @@ from .util import log
 MESSAGE_TEXT_ENCODING = 'utf-8'
 
 
-class Processor(Runner):
+class Processor:
     def __init__(self, router, syslog_message_formatter=None):
         super(Processor, self).__init__()
         self.router = router
@@ -32,7 +32,6 @@ class Processor(Runner):
 
     def connect_to_signals(self):
         irc_channel_joined.connect(self.router.enable_channel)
-        shutdown_requested.connect(self.request_shutdown)
         syslog_message_received.connect(self.handle_syslog_message)
         message_received.connect(self.handle_message)
 
@@ -57,6 +56,13 @@ class Processor(Runner):
         for channel_name in channel_names:
             if self.router.is_channel_enabled(channel_name):
                 message_approved.send(channel_name=channel_name, text=text)
+
+    def run(self, seconds_to_sleep=0.5):
+        """Run the main loop."""
+        while True:
+            sleep(seconds_to_sleep)
+
+        log('Shutting down ...')
 
 
 def format_syslog_message(message):
