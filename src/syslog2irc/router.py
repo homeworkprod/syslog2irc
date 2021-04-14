@@ -4,7 +4,7 @@ syslog2irc.router
 
 Routing of syslog messages to IRC channels by the port they arrive on.
 
-:Copyright: 2007-2015 Jochen Kupperschmidt
+:Copyright: 2007-2021 Jochen Kupperschmidt
 :License: MIT, see LICENSE for details.
 """
 

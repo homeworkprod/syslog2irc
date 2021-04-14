@@ -133,5 +133,5 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 .. _RFC 5424: http://tools.ietf.org/html/rfc5424
 
 
-:Copyright: 2007-2015 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
+:Copyright: 2007-2021 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
 :License: MIT, see LICENSE for details.

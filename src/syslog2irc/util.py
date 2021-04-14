@@ -4,7 +4,7 @@ syslog2irc.util
 
 Various utilities
 
-:Copyright: 2007-2015 Jochen Kupperschmidt
+:Copyright: 2007-2021 Jochen Kupperschmidt
 :License: MIT, see LICENSE for details.
 """
 

@@ -2,7 +2,7 @@
 syslog2irc.processor
 ~~~~~~~~~~~~~~~~~~~~
 
-:Copyright: 2007-2015 Jochen Kupperschmidt
+:Copyright: 2007-2021 Jochen Kupperschmidt
 :License: MIT, see LICENSE for details.
 """
 
