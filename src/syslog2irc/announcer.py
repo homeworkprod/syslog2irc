@@ -35,10 +35,12 @@ class StdoutAnnouncer:
         log('{}> {}', channel_name, text)
 
 
-def create_announcer(irc_server, irc_nickname, irc_realname, irc_channels):
+def create_announcer(config):
     """Create and return an announcer according to the configuration."""
-    if not irc_server:
+    if config.server is None:
         log('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
 
-    return IrcAnnouncer(irc_server, irc_nickname, irc_realname, irc_channels)
+    return IrcAnnouncer(
+        config.server, config.nickname, config.realname, config.channels
+    )

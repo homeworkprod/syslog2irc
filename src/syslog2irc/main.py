@@ -6,8 +6,6 @@ syslog2irc.main
 :License: MIT, see LICENSE for details.
 """
 
-from itertools import chain
-
 from .announcer import create_announcer
 from .processor import Processor
 from .router import replace_channels_with_channel_names, Router
@@ -39,16 +37,13 @@ from .util import log
 # part of Python's standard library.
 
 
-def start(irc_server, irc_nickname, irc_realname, routes):
+def start(irc_config, routes):
     """Start the IRC bot and the syslog listen server."""
     try:
-        irc_channels = frozenset(chain(*routes.values()))
         ports = routes.keys()
         ports_to_channel_names = replace_channels_with_channel_names(routes)
 
-        announcer = create_announcer(
-            irc_server, irc_nickname, irc_realname, irc_channels
-        )
+        announcer = create_announcer(irc_config)
         message_approved.connect(announcer.announce)
 
         router = Router(ports_to_channel_names)

@@ -10,7 +10,7 @@ Internet Relay Chat
 
 from dataclasses import dataclass
 from ssl import wrap_socket as ssl_wrap_socket
-from typing import Optional
+from typing import List, Optional
 
 from irc.bot import ServerSpec, SingleServerIRCBot
 from irc.connection import Factory
@@ -34,6 +34,16 @@ class IrcChannel:
 
     name: str
     password: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class IrcConfig:
+    """An IRC bot configuration."""
+
+    server: Optional[IrcServer]
+    nickname: str
+    realname: str
+    channels: List[IrcChannel]
 
 
 class Bot(SingleServerIRCBot):
