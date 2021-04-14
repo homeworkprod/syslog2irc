@@ -15,14 +15,14 @@ from syslog2irc.irc import IrcChannel
 from syslog2irc.main import start
 
 
-def start_with_args(routes, **options):
+def start_with_args(routes):
     """Start the IRC bot and the syslog listen server.
 
     All arguments (except for routes) are read from the command line.
     """
     args = parse_args()
 
-    start(args.irc_server, args.irc_nickname, args.irc_realname, routes, **options)
+    start(args.irc_server, args.irc_nickname, args.irc_realname, routes)
 
 
 if __name__ == '__main__':

@@ -39,7 +39,7 @@ from .util import log
 # part of Python's standard library.
 
 
-def start(irc_server, irc_nickname, irc_realname, routes, **options):
+def start(irc_server, irc_nickname, irc_realname, routes):
     """Start the IRC bot and the syslog listen server."""
     try:
         irc_channels = frozenset(chain(*routes.values()))
@@ -47,7 +47,7 @@ def start(irc_server, irc_nickname, irc_realname, routes, **options):
         ports_to_channel_names = replace_channels_with_channel_names(routes)
 
         announcer = create_announcer(
-            irc_server, irc_nickname, irc_realname, irc_channels, **options
+            irc_server, irc_nickname, irc_realname, irc_channels
         )
         message_approved.connect(announcer.announce)
 

@@ -15,8 +15,8 @@ from .util import log, start_thread
 class IrcAnnouncer:
     """Announce syslog messages on IRC."""
 
-    def __init__(self, server, nickname, realname, channels, **options):
-        self.bot = Bot(server, nickname, realname, channels, **options)
+    def __init__(self, server, nickname, realname, channels):
+        self.bot = Bot(server, nickname, realname, channels)
 
     def start(self):
         start_thread(self.bot.start, 'IrcAnnouncer')
@@ -35,14 +35,10 @@ class StdoutAnnouncer:
         log('{}> {}', channel_name, text)
 
 
-def create_announcer(
-    irc_server, irc_nickname, irc_realname, irc_channels, **options
-):
+def create_announcer(irc_server, irc_nickname, irc_realname, irc_channels):
     """Create and return an announcer according to the configuration."""
     if not irc_server:
         log('No IRC server specified; will write to STDOUT instead.')
         return StdoutAnnouncer()
 
-    return IrcAnnouncer(
-        irc_server, irc_nickname, irc_realname, irc_channels, **options
-    )
+    return IrcAnnouncer(irc_server, irc_nickname, irc_realname, irc_channels)
