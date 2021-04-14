@@ -59,8 +59,11 @@ class Processor:
 
     def run(self, seconds_to_sleep=0.5):
         """Run the main loop."""
-        while True:
-            sleep(seconds_to_sleep)
+        try:
+            while True:
+                sleep(seconds_to_sleep)
+        except KeyboardInterrupt:
+            pass
 
         log('Shutting down ...')
 
