@@ -15,11 +15,12 @@ from .irc import IrcConfig
 
 def assemble_irc_config(args, routes):
     """Assemble IRC configuration from command line arguments and routes."""
-    channels = list(chain(*routes.values()))
+    unique_channels = set(chain(*routes.values()))
+    ordered_channels = list(sorted(unique_channels, key=lambda c: c.name))
 
     return IrcConfig(
         server=args.irc_server,
         nickname=args.irc_nickname,
         realname=args.irc_realname,
-        channels=channels,
+        channels=ordered_channels,
     )
