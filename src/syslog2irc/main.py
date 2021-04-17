@@ -57,7 +57,7 @@ def start(irc_config, routes):
         start_syslog_message_receivers(ports)
         announcer.start()
 
-        if not irc_server:
+        if not irc_config.server:
             fake_channel_joins(router)
 
         processor.run()
