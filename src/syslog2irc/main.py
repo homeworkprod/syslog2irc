@@ -58,13 +58,13 @@ def start(irc_config, routes):
         announcer.start()
 
         if not irc_config.server:
-            fake_channel_joins(router)
+            fake_channel_joins(irc_config.channels)
 
         processor.run()
     except KeyboardInterrupt:
         log('<Ctrl-C> pressed, aborting.')
 
 
-def fake_channel_joins(router):
-    for channel_name in router.get_channel_names():
-        irc_channel_joined.send(channel=channel_name)
+def fake_channel_joins(channels):
+    for channel in channels:
+        irc_channel_joined.send(channel=channel.name)
