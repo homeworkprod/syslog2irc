@@ -23,10 +23,14 @@ class Router:
         )
         self.enabled_channels = set()
 
-    def enable_channel(self, sender, channel=None):
-        self.enabled_channels.add(channel)
-        ports = self.channel_names_to_ports[channel]
-        log('Enabled forwarding to channel {} from ports {}.', channel, ports)
+    def enable_channel(self, sender, channel_name=None):
+        self.enabled_channels.add(channel_name)
+        ports = self.channel_names_to_ports[channel_name]
+        log(
+            'Enabled forwarding to channel {} from ports {}.',
+            channel_name,
+            ports,
+        )
 
     def is_channel_enabled(self, channel):
         return channel in self.enabled_channels

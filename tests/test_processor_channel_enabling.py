@@ -19,12 +19,12 @@ def test_channel_enabling_on_join_signal():
     assert not processor.router.is_channel_enabled('#example1')
     assert not processor.router.is_channel_enabled('#example2')
 
-    irc_channel_joined.send(channel='#example1')
+    irc_channel_joined.send(channel_name='#example1')
 
     assert processor.router.is_channel_enabled('#example1')
     assert not processor.router.is_channel_enabled('#example2')
 
-    irc_channel_joined.send(channel='#example2')
+    irc_channel_joined.send(channel_name='#example2')
 
     assert processor.router.is_channel_enabled('#example1')
     assert processor.router.is_channel_enabled('#example2')

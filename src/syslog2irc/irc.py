@@ -91,7 +91,7 @@ class Bot(SingleServerIRCBot):
 
         if joined_nick == self._nickname:
             log('Joined IRC channel: {}', channel_name)
-            irc_channel_joined.send(channel=channel_name)
+            irc_channel_joined.send(channel_name=channel_name)
 
     def on_badchannelkey(self, conn, event):
         """Channel could not be joined due to wrong password."""
@@ -112,7 +112,7 @@ class DummyBot:
     def start(self):
         # Fake channel joins.
         for channel in self.channels:
-            irc_channel_joined.send(channel=channel.name)
+            irc_channel_joined.send(channel_name=channel.name)
 
     def say(self, sender, *, channel_name=None, text=None):
         log('{}> {}', channel_name, text)
