@@ -9,7 +9,7 @@ Message announcing
 """
 
 from .irc import Bot, DummyBot
-from .util import log, start_thread
+from .util import log
 
 
 class IrcAnnouncer:
@@ -19,7 +19,7 @@ class IrcAnnouncer:
         self.bot = Bot(server, nickname, realname, channels)
 
     def start(self):
-        start_thread(self.bot.start, 'IrcAnnouncer')
+        self.bot.start()
 
     def announce(self, sender, channel_name=None, text=None):
         self.bot.say(channel_name, text)

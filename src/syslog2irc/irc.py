@@ -16,7 +16,7 @@ from irc.bot import ServerSpec, SingleServerIRCBot
 from irc.connection import Factory
 
 from .signals import irc_channel_joined
-from .util import log
+from .util import log, start_thread
 
 
 @dataclass(frozen=True)
@@ -61,6 +61,10 @@ class Bot(SingleServerIRCBot):
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels
 
+    def start(self):
+        """Connect to the server, in a separate thread."""
+        start_thread(super().start, self.__class__.__name__)
+
     def get_version(self):
         """Return this on CTCP VERSION requests."""
         return 'syslog2IRC'
@@ -94,9 +98,9 @@ class Bot(SingleServerIRCBot):
         channel_name = event.arguments[0]
         log('Cannot join channel {} (bad key).', channel_name)
 
-    def say(self, channel, text):
+    def say(self, channel_name, text):
         """Say message on channel."""
-        self.connection.privmsg(channel, text)
+        self.connection.privmsg(channel_name, text)
 
 
 class DummyBot:
