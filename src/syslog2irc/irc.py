@@ -98,12 +98,14 @@ class Bot(SingleServerIRCBot):
         channel_name = event.arguments[0]
         log('Cannot join channel {} (bad key).', channel_name)
 
-    def say(self, channel_name, text):
+    def say(self, sender, *, channel_name=None, text=None):
         """Say message on channel."""
         self.connection.privmsg(channel_name, text)
 
 
 class DummyBot:
+    """A fake bot that writes messages to STDOUT."""
+
     def __init__(self, channels):
         self.channels = channels
 
@@ -112,5 +114,14 @@ class DummyBot:
         for channel in self.channels:
             irc_channel_joined.send(channel=channel.name)
 
-    def say(self, channel_name, text):
+    def say(self, sender, *, channel_name=None, text=None):
         log('{}> {}', channel_name, text)
+
+
+def create_bot(config):
+    """Create and return an IRC bot according to the configuration."""
+    if config.server is None:
+        log('No IRC server specified; will write to STDOUT instead.')
+        return DummyBot(config.channels)
+
+    return Bot(config.server, config.nickname, config.realname, config.channels)

@@ -6,7 +6,7 @@ syslog2irc.main
 :License: MIT, see LICENSE for details.
 """
 
-from .announcer import create_announcer
+from .irc import create_bot
 from .processor import Processor
 from .router import replace_channels_with_channel_names, Router
 from .signals import message_approved
@@ -30,8 +30,9 @@ from .util import log
 # the main loop to stop. As the syslog message receiver thread is the
 # only one left, but runs as a daemon, the application exits.
 #
-# The STDOUT announcer, on the other hand, does not run in a thread. The
-# user has to manually interrupt the application to exit.
+# The dummy IRC bot that writes to STDOUT, on the other hand, does not
+# run in a thread. The user has to manually interrupt the application to
+# exit.
 #
 # For details, see the documentation on the `threading` module that is
 # part of Python's standard library.
@@ -43,8 +44,8 @@ def start(irc_config, routes):
         ports = routes.keys()
         ports_to_channel_names = replace_channels_with_channel_names(routes)
 
-        announcer = create_announcer(irc_config)
-        message_approved.connect(announcer.announce)
+        irc_bot = create_bot(irc_config)
+        message_approved.connect(irc_bot.say)
 
         router = Router(ports_to_channel_names)
         processor = Processor(router)
@@ -55,7 +56,7 @@ def start(irc_config, routes):
         # Signals are allowed be sent from here on.
 
         start_syslog_message_receivers(ports)
-        announcer.start()
+        irc_bot.start()
 
         processor.run()
     except KeyboardInterrupt:
