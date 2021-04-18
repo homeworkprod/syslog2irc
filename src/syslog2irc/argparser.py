@@ -8,8 +8,9 @@ Command line argument parsing
 :License: MIT, see LICENSE for details.
 """
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import dataclasses
+from typing import List, Optional
 
 from .irc import IrcServer
 
@@ -17,7 +18,7 @@ from .irc import IrcServer
 DEFAULT_IRC_PORT = IrcServer('').port
 
 
-def parse_args(args=None):
+def parse_args(args: Optional[List[str]] = None) -> Namespace:
     """Parse command line arguments."""
     parser = create_arg_parser()
     parsed = parser.parse_args(args)
@@ -31,7 +32,7 @@ def parse_args(args=None):
     return parsed
 
 
-def create_arg_parser():
+def create_arg_parser() -> ArgumentParser:
     """Prepare the command line arguments parser."""
     parser = ArgumentParser()
 
@@ -71,7 +72,7 @@ def create_arg_parser():
     return parser
 
 
-def parse_irc_server_arg(value):
+def parse_irc_server_arg(value: str) -> IrcServer:
     """Parse a hostname with optional port."""
     fragments = value.split(':', 1)
     host = fragments[0]

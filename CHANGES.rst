@@ -15,6 +15,8 @@ not yet released
 - Split the single module into several modules inside a namespace
   package and a start script.
 
+- Added type hints.
+
 - A custom formatter for syslog messages can be specified.
 
 - Removed handler to request shutdown via IRC private message.

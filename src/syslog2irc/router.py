@@ -9,21 +9,25 @@ Routing of syslog messages to IRC channels by the port they arrive on.
 """
 
 from collections import defaultdict
+from typing import Any, Dict, Iterable, List, Optional, Set
 
+from .irc import IrcChannel
 from .util import log
 
 
 class Router:
     """Map syslog port numbers to IRC channel names."""
 
-    def __init__(self, ports_to_channel_names):
+    def __init__(self, ports_to_channel_names: Dict[int, Set[str]]) -> None:
         self.ports_to_channel_names = ports_to_channel_names
         self.channel_names_to_ports = map_channel_names_to_ports(
             ports_to_channel_names
         )
-        self.enabled_channels = set()
+        self.enabled_channels: Set[str] = set()
 
-    def enable_channel(self, sender, channel_name=None):
+    def enable_channel(
+        self, sender: Any, *, channel_name: Optional[str] = None
+    ) -> None:
         self.enabled_channels.add(channel_name)
         ports = self.channel_names_to_ports[channel_name]
         log(
@@ -32,24 +36,28 @@ class Router:
             ports,
         )
 
-    def is_channel_enabled(self, channel):
+    def is_channel_enabled(self, channel: str) -> bool:
         return channel in self.enabled_channels
 
-    def get_channel_names_for_port(self, port):
+    def get_channel_names_for_port(self, port: int) -> Set[str]:
         return self.ports_to_channel_names[port]
 
 
-def replace_channels_with_channel_names(routes):
+def replace_channels_with_channel_names(
+    routes: Dict[int, List[IrcChannel]]
+) -> Dict[int, Set[str]]:
     return {
-        ports: channels_to_names(channels) for ports, channels in routes.items()
+        port: channels_to_names(channels) for port, channels in routes.items()
     }
 
 
-def channels_to_names(channels):
+def channels_to_names(channels: Iterable[IrcChannel]) -> Set[str]:
     return {channel.name for channel in channels}
 
 
-def map_channel_names_to_ports(ports_to_channel_names):
+def map_channel_names_to_ports(
+    ports_to_channel_names: Dict[int, Set[str]]
+) -> Dict[str, Set[int]]:
     channel_names_to_ports = defaultdict(set)
     for port, channel_names in ports_to_channel_names.items():
         for channel_name in channel_names:

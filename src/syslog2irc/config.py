@@ -8,12 +8,16 @@ Configuration loading
 :License: MIT, see LICENSE for details.
 """
 
+from argparse import Namespace
 from itertools import chain
+from typing import Dict, List
 
-from .irc import IrcConfig
+from .irc import IrcChannel, IrcConfig
 
 
-def assemble_irc_config(args, routes):
+def assemble_irc_config(
+    args: Namespace, routes: Dict[int, List[IrcChannel]]
+) -> IrcConfig:
     """Assemble IRC configuration from command line arguments and routes."""
     unique_channels = set(chain(*routes.values()))
     ordered_channels = list(sorted(unique_channels, key=lambda c: c.name))

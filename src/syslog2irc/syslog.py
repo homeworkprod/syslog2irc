@@ -11,8 +11,10 @@ BSD syslog message reception and handling
 from functools import partial
 from socketserver import BaseRequestHandler, ThreadingUDPServer
 import sys
+from typing import Iterable
 
 import syslogmp
+from syslogmp import Message as SyslogMessage
 
 from .signals import syslog_message_received
 from .util import log, start_thread
@@ -21,11 +23,11 @@ from .util import log, start_thread
 class RequestHandler(BaseRequestHandler):
     """Handler for syslog messages."""
 
-    def __init__(self, port, *args, **kwargs):
+    def __init__(self, port: int, *args, **kwargs) -> None:
         self.port = port
         super().__init__(*args, **kwargs)
 
-    def handle(self):
+    def handle(self) -> None:
         try:
             data = self.request[0]
             message = syslogmp.parse(data)
@@ -45,14 +47,14 @@ class RequestHandler(BaseRequestHandler):
         )
 
 
-def create_server(port):
+def create_server(port: int) -> ThreadingUDPServer:
     """Create a threading UDP server to receive syslog messages."""
     address = ('', port)
     handler_class = partial(RequestHandler, port)
     return ThreadingUDPServer(address, handler_class)
 
 
-def start_server(port):
+def start_server(port: int) -> None:
     """Start a server, in a separate thread."""
     try:
         server = create_server(port)
@@ -70,13 +72,13 @@ def start_server(port):
     log('Listening for syslog messages on {}:{:d}.', *server.server_address)
 
 
-def start_syslog_message_receivers(ports):
+def start_syslog_message_receivers(ports: Iterable[int]) -> None:
     """Start one syslog message receiving server for each port."""
     for port in ports:
         start_server(port)
 
 
-def format_message_for_log(message):
+def format_message_for_log(message: SyslogMessage) -> str:
     """Format a syslog message to be logged."""
     facility_name = message.facility.name
     severity_name = message.severity.name
