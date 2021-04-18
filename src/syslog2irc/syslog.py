@@ -26,7 +26,7 @@ class RequestHandler(BaseRequestHandler):
             message = syslogmp.parse(data)
         except ValueError:
             log('Invalid message received from {}:{:d}.', *self.client_address)
-            return
+            return None
 
         port = self.server.get_port()
 
