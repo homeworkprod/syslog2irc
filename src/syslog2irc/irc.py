@@ -77,6 +77,7 @@ class Bot(SingleServerIRCBot):
         log('Channels to join: {}', ', '.join(channel_names))
 
         for channel in self.channels_to_join:
+            log('Joining channel {} ...', channel.name)
             conn.join(channel.name, channel.password or '')
 
     def on_nicknameinuse(self, conn, event):

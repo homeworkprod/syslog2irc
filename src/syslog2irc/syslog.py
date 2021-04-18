@@ -67,6 +67,7 @@ def start_server(port):
 
     thread_name = f'{server.__class__.__name__}-port{port:d}'
     start_thread(server.serve_forever, thread_name)
+    log('Listening for syslog messages on {}:{:d}.', *server.server_address)
 
 
 def start_syslog_message_receivers(ports):
