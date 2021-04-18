@@ -47,7 +47,7 @@ class IrcConfig:
 
 
 class Bot(SingleServerIRCBot):
-    """An IRC bot to forward syslog messages to IRC channels."""
+    """An IRC bot to forward messages to IRC channels."""
 
     def __init__(self, server, nickname, realname, channels):
         log('Connecting to IRC server {0.host}:{0.port:d} ...', server)
@@ -94,6 +94,19 @@ class Bot(SingleServerIRCBot):
         channel_name = event.arguments[0]
         log('Cannot join channel {} (bad key).', channel_name)
 
-    def say(self, channel, message):
+    def say(self, channel, text):
         """Say message on channel."""
-        self.connection.privmsg(channel, message)
+        self.connection.privmsg(channel, text)
+
+
+class DummyBot:
+    def __init__(self, channels):
+        self.channels = channels
+
+    def start(self):
+        # Fake channel joins.
+        for channel in self.channels:
+            irc_channel_joined.send(channel=channel.name)
+
+    def say(self, channel_name, text):
+        log('{}> {}', channel_name, text)

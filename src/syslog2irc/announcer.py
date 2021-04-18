@@ -8,7 +8,7 @@ Message announcing
 :License: MIT, see LICENSE for details.
 """
 
-from .irc import Bot
+from .irc import Bot, DummyBot
 from .util import log, start_thread
 
 
@@ -28,18 +28,21 @@ class IrcAnnouncer:
 class StdoutAnnouncer:
     """Announce syslog messages on STDOUT."""
 
+    def __init__(self, channels):
+        self.bot = DummyBot(channels)
+
     def start(self):
-        pass
+        self.bot.start()
 
     def announce(self, sender, channel_name=None, text=None):
-        log('{}> {}', channel_name, text)
+        self.bot.say(channel_name, text)
 
 
 def create_announcer(config):
     """Create and return an announcer according to the configuration."""
     if config.server is None:
         log('No IRC server specified; will write to STDOUT instead.')
-        return StdoutAnnouncer()
+        return StdoutAnnouncer(config.channels)
 
     return IrcAnnouncer(
         config.server, config.nickname, config.realname, config.channels

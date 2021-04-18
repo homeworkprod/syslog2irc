@@ -9,7 +9,7 @@ syslog2irc.main
 from .announcer import create_announcer
 from .processor import Processor
 from .router import replace_channels_with_channel_names, Router
-from .signals import irc_channel_joined, message_approved
+from .signals import message_approved
 from .syslog import start_syslog_message_receivers
 from .util import log
 
@@ -57,14 +57,6 @@ def start(irc_config, routes):
         start_syslog_message_receivers(ports)
         announcer.start()
 
-        if not irc_config.server:
-            fake_channel_joins(irc_config.channels)
-
         processor.run()
     except KeyboardInterrupt:
         log('<Ctrl-C> pressed, aborting.')
-
-
-def fake_channel_joins(channels):
-    for channel in channels:
-        irc_channel_joined.send(channel=channel.name)
