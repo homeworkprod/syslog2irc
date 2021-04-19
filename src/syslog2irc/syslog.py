@@ -48,31 +48,31 @@ class ReceiveServer(ThreadingUDPServer):
     def __init__(self, port):
         ThreadingUDPServer.__init__(self, ('', port), RequestHandler)
 
-    @classmethod
-    def start(cls, port):
-        """Start in a separate thread."""
-        try:
-            receiver = cls(port)
-        except OSError as e:
-            sys.stderr.write(f'Error {e.errno:d}: {e.strerror}\n')
-            sys.stderr.write(
-                f'Probably no permission to open port {port:d}. '
-                'Try to specify a port number above 1,024 (or even '
-                '4,096) and up to 65,535.\n'
-            )
-            sys.exit(1)
-
-        thread_name = f'{cls.__name__}-port{port:d}'
-        start_thread(receiver.serve_forever, thread_name)
-
     def get_port(self):
         return self.server_address[1]
+
+
+def start_server(port):
+    """Start a server, in a separate thread."""
+    try:
+        server = ReceiveServer(port)
+    except OSError as e:
+        sys.stderr.write(f'Error {e.errno:d}: {e.strerror}\n')
+        sys.stderr.write(
+            f'Probably no permission to open port {port:d}. '
+            'Try to specify a port number above 1,024 (or even '
+            '4,096) and up to 65,535.\n'
+        )
+        sys.exit(1)
+
+    thread_name = f'{server.__class__.__name__}-port{port:d}'
+    start_thread(server.serve_forever, thread_name)
 
 
 def start_syslog_message_receivers(ports):
     """Start one syslog message receiving server for each port."""
     for port in ports:
-        ReceiveServer.start(port)
+        start_server(port)
 
 
 def format_message_for_log(message):
