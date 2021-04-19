@@ -22,6 +22,5 @@ def log(message, *args, **kwargs):
 
 def start_thread(target, name):
     """Create, configure, and start a new thread."""
-    t = Thread(target=target, name=name)
-    t.daemon = True
+    t = Thread(target=target, name=name, daemon=True)
     t.start()
