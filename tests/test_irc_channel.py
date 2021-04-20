@@ -1,5 +1,5 @@
 """
-:Copyright: 2007-2021 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
+:Copyright: 2007-2021 Jochen Kupperschmidt
 :License: MIT, see LICENSE for details.
 """
 
