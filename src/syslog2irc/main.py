@@ -34,21 +34,18 @@ def start(config: Config) -> None:
     ports = {route.port for route in config.routes}
     ports_to_channel_names = map_ports_to_channel_names(config.routes)
 
-    try:
-        irc_bot = create_bot(config.irc)
-        message_approved.connect(irc_bot.say)
+    irc_bot = create_bot(config.irc)
+    message_approved.connect(irc_bot.say)
 
-        router = Router(ports_to_channel_names)
-        processor = Processor(router)
+    router = Router(ports_to_channel_names)
+    processor = Processor(router)
 
-        # Up to this point, no signals must have been sent.
-        processor.connect_to_signals()
+    # Up to this point, no signals must have been sent.
+    processor.connect_to_signals()
 
-        # Signals are allowed be sent from here on.
+    # Signals are allowed be sent from here on.
 
-        start_syslog_message_receivers(ports)
-        irc_bot.start()
+    start_syslog_message_receivers(ports)
+    irc_bot.start()
 
-        processor.run()
-    except KeyboardInterrupt:
-        log('<Ctrl-C> pressed, aborting.')
+    processor.run()
