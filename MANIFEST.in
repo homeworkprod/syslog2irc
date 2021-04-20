@@ -1,7 +1,6 @@
 include CHANGES.rst
-include LICENSE
-include README.rst
 include requirements.txt
 include requirements-test.txt
-include *.py
-recursive-include tests *.py
+include start-syslog2irc.py
+graft tests
+global-exclude *.pyc
