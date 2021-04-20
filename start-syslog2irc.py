@@ -10,7 +10,7 @@ Receive syslog messages via UDP and show them on IRC.
 :License: MIT, see LICENSE for details.
 """
 
-from typing import Dict, List
+from typing import Dict, Set
 
 from syslog2irc.argparser import parse_args
 from syslog2irc.config import assemble_irc_config
@@ -18,7 +18,7 @@ from syslog2irc.irc import IrcChannel
 from syslog2irc.main import start
 
 
-def start_with_args(routes: Dict[int, List[IrcChannel]]) -> None:
+def start_with_args(routes: Dict[int, Set[IrcChannel]]) -> None:
     """Start the IRC bot and the syslog listen server.
 
     All arguments (except for routes) are read from the command line.
@@ -37,8 +37,8 @@ if __name__ == '__main__':
     # routing for syslog messages from the ports on which they are
     # received to the IRC channels they should be announced on
     routes = {
-          514: [channel1, channel2],
-        55514: [channel2],
+          514: {channel1, channel2},
+        55514: {channel2},
     }
 
     start_with_args(routes)

@@ -6,7 +6,7 @@ syslog2irc.main
 :License: MIT, see LICENSE for details.
 """
 
-from typing import Dict, List
+from typing import Dict, Set
 
 from .irc import create_bot, IrcChannel, IrcConfig
 from .processor import Processor
@@ -40,7 +40,7 @@ from .util import log
 # part of Python's standard library.
 
 
-def start(irc_config: IrcConfig, routes: Dict[int, List[IrcChannel]]) -> None:
+def start(irc_config: IrcConfig, routes: Dict[int, Set[IrcChannel]]) -> None:
     """Start the IRC bot and the syslog listen server."""
     try:
         ports = routes.keys()

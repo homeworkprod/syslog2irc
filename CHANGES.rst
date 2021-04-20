@@ -17,6 +17,8 @@ not yet released
 
 - Added type hints.
 
+- Expect channels in routing configuration to be in sets, not lists.
+
 - A custom formatter for syslog messages can be specified.
 
 - Removed handler to request shutdown via IRC private message.

@@ -48,7 +48,7 @@ channel without a password looks like this:
     channel1 = IrcChannel('#examplechannel1')
 
     routes = {
-        514: [channel1],
+        514: {channel1},
     }
 
 In a more complex setup, syslog messages could be received on two ports
@@ -62,8 +62,8 @@ forwarded exclusively to the second channel.
     channel2 = IrcChannel('#examplechannel2', password='zePassword')
 
     routes = {
-          514: [channel1, channel2],
-        55514: [channel2],
+          514: {channel1, channel2},
+        55514: {channel2},
     }
 
 
