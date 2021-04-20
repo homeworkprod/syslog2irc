@@ -136,6 +136,10 @@ class DummyBot:
     ) -> None:
         log('{}> {}', channel_name, text)
 
+    def disconnect(self, msg: str) -> None:
+        # Mimics `irc.bot.SingleServerIRCBot.disconnect`.
+        log('Shutting down bot ...')
+
 
 def _sort_channels_by_name(channels: Set[IrcChannel]) -> List[IrcChannel]:
     return list(sorted(channels, key=lambda c: c.name))

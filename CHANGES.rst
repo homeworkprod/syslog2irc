@@ -21,6 +21,8 @@ not yet released
 
 - A custom formatter for syslog messages can be specified.
 
+- Made bot properly disconnect from IRC with a quit message on shutdown.
+
 - Removed handler to request shutdown via IRC private message.
 
 - Require blinker version 1.4.

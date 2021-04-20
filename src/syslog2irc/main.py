@@ -49,3 +49,5 @@ def start(config: Config) -> None:
     irc_bot.start()
 
     processor.run()
+
+    irc_bot.disconnect('Bye.')  # Joins bot thread.
