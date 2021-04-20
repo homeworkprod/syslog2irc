@@ -125,13 +125,13 @@ obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 
 .. _irc:      https://bitbucket.org/jaraco/irc
-.. _blinker:  http://pythonhosted.org/blinker/
-.. _syslogmp: http://homework.nwsnet.de/releases/76d6/#syslogmp
+.. _blinker:  https://pythonhosted.org/blinker/
+.. _syslogmp: https://homework.nwsnet.de/releases/76d6/#syslogmp
 .. _pip:      http://www.pip-installer.org/
-.. _IANA:     http://www.iana.org/
-.. _RFC 3164: http://tools.ietf.org/html/rfc3164
-.. _RFC 5424: http://tools.ietf.org/html/rfc5424
+.. _IANA:     https://www.iana.org/
+.. _RFC 3164: https://tools.ietf.org/html/rfc3164
+.. _RFC 5424: https://tools.ietf.org/html/rfc5424
 
 
-:Copyright: 2007-2021 `Jochen Kupperschmidt <http://homework.nwsnet.de/>`_
+:Copyright: 2007-2021 `Jochen Kupperschmidt <https://homework.nwsnet.de/>`_
 :License: MIT, see LICENSE for details.
