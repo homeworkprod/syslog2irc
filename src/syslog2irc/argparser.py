@@ -74,6 +74,9 @@ def create_arg_parser():
 def parse_irc_server_arg(value):
     """Parse a hostname with optional port."""
     fragments = value.split(':', 1)
+    host = fragments[0]
     if len(fragments) > 1:
-        fragments[1] = int(fragments[1])
-    return IrcServer(*fragments)
+        port = int(fragments[1])
+        return IrcServer(host, port)
+    else:
+        return IrcServer(host)
