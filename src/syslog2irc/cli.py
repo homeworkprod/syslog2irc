@@ -1,6 +1,6 @@
 """
-syslog2irc.argparser
-~~~~~~~~~~~~~~~~~~~~
+syslog2irc.cli
+~~~~~~~~~~~~~~
 
 Command line argument parsing
 

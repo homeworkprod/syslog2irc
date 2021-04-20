@@ -5,7 +5,7 @@
 
 import pytest
 
-from syslog2irc.argparser import parse_args
+from syslog2irc.cli import parse_args
 
 
 @pytest.mark.parametrize(

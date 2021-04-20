@@ -12,7 +12,7 @@ Receive syslog messages via UDP and show them on IRC.
 
 from typing import Dict, Set
 
-from syslog2irc.argparser import parse_args
+from syslog2irc.cli import parse_args
 from syslog2irc.config import parse_config
 from syslog2irc.irc import IrcChannel
 from syslog2irc.main import start
