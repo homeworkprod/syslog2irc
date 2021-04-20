@@ -1,11 +1,11 @@
-syslog2IRC Changelog
-====================
+Changelog
+=========
 
 
 Version 0.10
 ------------
 
-not yet released
+Released 2021-04-20
 
 - Removed support for unsupported Python versions 2.7, 3.3, 3.4, and
   3.5.
@@ -13,7 +13,7 @@ not yet released
 - Added support for Python 3.7, 3.8, and 3.9.
 
 - Split the single module into several modules inside a namespace
-  package and a start script.
+  package and a start script. Refactored a lot.
 
 - Added type hints.
 
