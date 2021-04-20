@@ -26,9 +26,9 @@ def test_handle():
     # Example 5 from RFC 3164.
     data = b'<0>Oct 22 10:52:12 scapegoat 1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!'
 
+    port = 514
+    client_address = ('127.0.0.1', port)
     request = [data]
-    client_address = ('127.0.0.1', 514)
-    server = FakeServer(514)
 
     received_signal_data = []
 
@@ -36,7 +36,7 @@ def test_handle():
     def handle_syslog_message_received(sender, **data):
         received_signal_data.append(data)
 
-    RequestHandler(request, client_address, server)
+    RequestHandler(port, request, client_address, server=None)
 
     assert received_signal_data == [
         {
@@ -44,11 +44,3 @@ def test_handle():
             'source_address': client_address,
         }
     ]
-
-
-class FakeServer:
-    def __init__(self, port):
-        self.port = port
-
-    def get_port(self):
-        return self.port

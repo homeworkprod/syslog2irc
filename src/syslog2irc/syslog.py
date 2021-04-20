@@ -8,6 +8,7 @@ BSD syslog message reception and handling
 :License: MIT, see LICENSE for details.
 """
 
+from functools import partial
 from socketserver import BaseRequestHandler, ThreadingUDPServer
 import sys
 
@@ -20,6 +21,10 @@ from .util import log, start_thread
 class RequestHandler(BaseRequestHandler):
     """Handler for syslog messages."""
 
+    def __init__(self, port, *args, **kwargs):
+        self.port = port
+        super().__init__(*args, **kwargs)
+
     def handle(self):
         try:
             data = self.request[0]
@@ -28,34 +33,29 @@ class RequestHandler(BaseRequestHandler):
             log('Invalid message received from {}:{:d}.', *self.client_address)
             return None
 
-        port = self.server.get_port()
-
         log(
             'Received message from {0[0]}:{0[1]:d} on port {1:d} -> {2}',
             self.client_address,
-            port,
+            self.port,
             format_message_for_log(message),
         )
 
         syslog_message_received.send(
-            port, source_address=self.client_address, message=message
+            self.port, source_address=self.client_address, message=message
         )
 
 
-class ReceiveServer(ThreadingUDPServer):
-    """UDP server that waits for syslog messages."""
-
-    def __init__(self, port):
-        ThreadingUDPServer.__init__(self, ('', port), RequestHandler)
-
-    def get_port(self):
-        return self.server_address[1]
+def create_server(port):
+    """Create a threading UDP server to receive syslog messages."""
+    address = ('', port)
+    handler_class = partial(RequestHandler, port)
+    return ThreadingUDPServer(address, handler_class)
 
 
 def start_server(port):
     """Start a server, in a separate thread."""
     try:
-        server = ReceiveServer(port)
+        server = create_server(port)
     except OSError as e:
         sys.stderr.write(f'Error {e.errno:d}: {e.strerror}\n')
         sys.stderr.write(
