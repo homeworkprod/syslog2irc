@@ -2,6 +2,12 @@ Changelog
 =========
 
 
+Version 0.11
+------------
+
+Unreleased
+
+
 Version 0.10
 ------------
 
