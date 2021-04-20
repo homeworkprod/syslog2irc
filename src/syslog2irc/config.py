@@ -10,16 +10,28 @@ Configuration loading
 
 from argparse import Namespace
 from itertools import chain
-from typing import Dict, Set
+from typing import Dict, Iterator, Set
 
 from .irc import IrcChannel, IrcConfig
+from .router import Route
+
+
+def parse_routes(routes_dict: Dict[int, Set[IrcChannel]]) -> Set[Route]:
+    """Parse a routing config into separate routes."""
+
+    def iterate() -> Iterator[Route]:
+        for port, irc_channels in routes_dict.items():
+            for irc_channel in irc_channels:
+                yield Route(port=port, irc_channel_name=irc_channel.name)
+
+    return set(iterate())
 
 
 def assemble_irc_config(
-    args: Namespace, routes: Dict[int, Set[IrcChannel]]
+    args: Namespace, routes_dict: Dict[int, Set[IrcChannel]]
 ) -> IrcConfig:
-    """Assemble IRC configuration from command line arguments and routes."""
-    channels = set(chain(*routes.values()))
+    """Assemble IRC configuration from command line arguments and routing config."""
+    channels = set(chain(*routes_dict.values()))
 
     return IrcConfig(
         server=args.irc_server,

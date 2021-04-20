@@ -13,18 +13,19 @@ Receive syslog messages via UDP and show them on IRC.
 from typing import Dict, Set
 
 from syslog2irc.argparser import parse_args
-from syslog2irc.config import assemble_irc_config
+from syslog2irc.config import assemble_irc_config, parse_routes
 from syslog2irc.irc import IrcChannel
 from syslog2irc.main import start
 
 
-def start_with_args(routes: Dict[int, Set[IrcChannel]]) -> None:
+def start_with_args(routes_dict: Dict[int, Set[IrcChannel]]) -> None:
     """Start the IRC bot and the syslog listen server.
 
     All arguments (except for routes) are read from the command line.
     """
     args = parse_args()
-    irc_config = assemble_irc_config(args, routes)
+    routes = parse_routes(routes_dict)
+    irc_config = assemble_irc_config(args, routes_dict)
 
     start(irc_config, routes)
 

@@ -9,10 +9,19 @@ Routing of syslog messages to IRC channels by the port they arrive on.
 """
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Any, Dict, Iterable, Optional, Set
 
 from .irc import IrcChannel
 from .util import log
+
+
+@dataclass(frozen=True)
+class Route:
+    """A route from a syslog message receiver port to an IRC channel."""
+
+    port: int
+    irc_channel_name: str
 
 
 class Router:
@@ -43,12 +52,11 @@ class Router:
         return self.ports_to_channel_names[port]
 
 
-def replace_channels_with_channel_names(
-    routes: Dict[int, Set[IrcChannel]]
-) -> Dict[int, Set[str]]:
-    return {
-        port: channels_to_names(channels) for port, channels in routes.items()
-    }
+def map_ports_to_channel_names(routes: Set[Route]) -> Dict[int, Set[str]]:
+    ports_to_channel_names = defaultdict(set)
+    for route in routes:
+        ports_to_channel_names[route.port].add(route.irc_channel_name)
+    return dict(ports_to_channel_names)
 
 
 def channels_to_names(channels: Iterable[IrcChannel]) -> Set[str]:
