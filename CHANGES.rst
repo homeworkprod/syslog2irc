@@ -7,6 +7,8 @@ Version 0.11
 
 Unreleased
 
+- Added command line option ``--version`` to show syslog2IRC's version.
+
 
 Version 0.10
 ------------

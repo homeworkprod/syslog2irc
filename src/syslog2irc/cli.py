@@ -12,6 +12,7 @@ from argparse import ArgumentParser, Namespace
 import dataclasses
 from typing import List, Optional
 
+from . import VERSION
 from .irc import IrcServer
 
 
@@ -67,6 +68,12 @@ def create_arg_parser() -> ArgumentParser:
         dest='irc_server_ssl',
         action='store_true',
         help='use SSL to connect to the IRC server',
+    )
+
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'syslog2IRC {VERSION}',
     )
 
     return parser
