@@ -9,6 +9,7 @@ Configuration loading
 """
 
 from argparse import Namespace
+from dataclasses import dataclass
 from itertools import chain
 from typing import Dict, Iterator, Set
 
@@ -16,7 +17,23 @@ from .irc import IrcChannel, IrcConfig
 from .router import Route
 
 
-def parse_routes(routes_dict: Dict[int, Set[IrcChannel]]) -> Set[Route]:
+@dataclass(frozen=True)
+class Config:
+    irc: IrcConfig
+    routes: Set[Route]
+
+
+def parse_config(
+    args: Namespace, routes_dict: Dict[int, Set[IrcChannel]]
+) -> Config:
+    """Parse configuration."""
+    irc_config = _assemble_irc_config(args, routes_dict)
+    routes = _parse_routes(routes_dict)
+
+    return Config(irc=irc_config, routes=routes)
+
+
+def _parse_routes(routes_dict: Dict[int, Set[IrcChannel]]) -> Set[Route]:
     """Parse a routing config into separate routes."""
 
     def iterate() -> Iterator[Route]:
@@ -27,7 +44,7 @@ def parse_routes(routes_dict: Dict[int, Set[IrcChannel]]) -> Set[Route]:
     return set(iterate())
 
 
-def assemble_irc_config(
+def _assemble_irc_config(
     args: Namespace, routes_dict: Dict[int, Set[IrcChannel]]
 ) -> IrcConfig:
     """Assemble IRC configuration from command line arguments and routing config."""
