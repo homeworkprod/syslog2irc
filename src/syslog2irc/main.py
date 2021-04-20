@@ -17,26 +17,16 @@ from .util import log
 
 # A note on threads (implementation detail):
 #
-# This tool uses threads. Besides the main thread, there are two
-# additional threads: one for the syslog message receiver and one for
-# the IRC bot. Both are configured to be daemon threads.
+# This application uses threads. Besides the main thread there is one
+# thread for *each* syslog message receiver (which itself is a
+# `ThreadingUDPServer`!) and one thread for the (actual) IRC bot. (The
+# dummy bot does not run in a separate thread.)
+
+# Those threads are configured to be daemon threads. A Python
+# application exits if no more non-daemon threads are running.
 #
-# A Python application exits if no more non-daemon threads are running.
-#
-# In order to exit syslog2IRC when shutdown is requested on IRC, the IRC
-# bot will call `die()`, which will join the IRC bot thread. The main
-# thread and the (daemonized) syslog message receiver thread remain.
-#
-# Additionally, a dedicated signal is sent that sets a flag that causes
-# the main loop to stop. As the syslog message receiver thread is the
-# only one left, but runs as a daemon, the application exits.
-#
-# The dummy IRC bot that writes to STDOUT, on the other hand, does not
-# run in a thread. The user has to manually interrupt the application to
-# exit.
-#
-# For details, see the documentation on the `threading` module that is
-# part of Python's standard library.
+# For details, consult the documentation on the `threading` module that
+# is part of Python's standard library.
 
 
 def start(config: Config) -> None:
