@@ -2,6 +2,7 @@
 host = "irc.server.example"
 port = 6667
 ssl = false
+password = "t0ps3cr3t"
 
 [irc.bot]
 nickname = "syslog"

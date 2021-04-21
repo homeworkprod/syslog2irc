@@ -15,6 +15,7 @@ TOML_CONFIG = '''\
 host = "irc.acme.test"
 port = 6669
 ssl = true
+password = "EverythingReally!"
 
 [irc.bot]
 nickname = "syslogger"
@@ -44,6 +45,7 @@ def test_load_config():
             host='irc.acme.test',
             port=6669,
             ssl=True,
+            password='EverythingReally!',
         ),
         nickname='syslogger',
         realname='Monsieur Syslog',
@@ -82,6 +84,7 @@ def test_load_config_with_defaults():
             host='irc.organization.test',
             port=6667,
             ssl=False,
+            password=None,
         ),
         nickname='monitor',
         realname='syslog',

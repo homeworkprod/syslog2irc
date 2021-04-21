@@ -26,6 +26,7 @@ class IrcServer:
     host: str
     port: int = 6667
     ssl: bool = False
+    password: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -58,7 +59,7 @@ class Bot(SingleServerIRCBot):
     ) -> None:
         log('Connecting to IRC server {0.host}:{0.port:d} ...', server)
 
-        server_spec = ServerSpec(server.host, server.port)
+        server_spec = ServerSpec(server.host, server.port, server.password)
         factory = Factory(wrapper=ssl_wrap_socket) if server.ssl else Factory()
         SingleServerIRCBot.__init__(
             self, [server_spec], nickname, realname, connect_factory=factory

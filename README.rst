@@ -52,6 +52,7 @@ An example configuration file, ``config.toml``, in TOML_ format:
     host = "irc.server.example"
     port = 6667
     ssl = false
+    password = "t0ps3cr3t"
 
     [irc.bot]
     nickname = "syslog"
