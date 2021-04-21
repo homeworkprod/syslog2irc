@@ -20,6 +20,11 @@ Unreleased
 
 - Added support for IRC server password.
 
+- Added support for a rate limit for the IRC connection, i.e. the
+  maximum number of messages per second to send. This can prevent the
+  bot from getting kicked (or even banned) from a channel because of
+  flooding.
+
 - Added ``Dockerfile``.
 
 - Added command line option ``--version`` to show syslog2IRC's version.

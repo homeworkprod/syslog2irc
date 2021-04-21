@@ -27,6 +27,7 @@ class IrcServer:
     port: int = 6667
     ssl: bool = False
     password: Optional[str] = None
+    rate_limit: Optional[float] = None
 
 
 @dataclass(frozen=True)
@@ -64,6 +65,15 @@ class Bot(SingleServerIRCBot):
         SingleServerIRCBot.__init__(
             self, [server_spec], nickname, realname, connect_factory=factory
         )
+
+        if server.rate_limit is not None:
+            log(
+                'IRC send rate limit set to {:.2f} messages per second.',
+                server.rate_limit,
+            )
+            self.connection.set_rate_limit(server.rate_limit)
+        else:
+            log('No IRC send rate limit set.')
 
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels

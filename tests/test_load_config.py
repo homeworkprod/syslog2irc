@@ -16,6 +16,7 @@ host = "irc.acme.test"
 port = 6669
 ssl = true
 password = "EverythingReally!"
+rate_limit = 0.5
 
 [irc.bot]
 nickname = "syslogger"
@@ -46,6 +47,7 @@ def test_load_config():
             port=6669,
             ssl=True,
             password='EverythingReally!',
+            rate_limit=0.5,
         ),
         nickname='syslogger',
         realname='Monsieur Syslog',
@@ -85,6 +87,7 @@ def test_load_config_with_defaults():
             port=6667,
             ssl=False,
             password=None,
+            rate_limit=None,
         ),
         nickname='monitor',
         realname='syslog',

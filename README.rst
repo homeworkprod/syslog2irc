@@ -53,6 +53,7 @@ An example configuration file, ``config.toml``, in TOML_ format:
     port = 6667                  # optional
     ssl = false                  # optional
     password = "t0ps3cr3t"       # optional
+    rate_limit = 0.5             # optional; limit of messages per second
 
     [irc.bot]
     nickname = "syslog"
