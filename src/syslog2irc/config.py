@@ -23,6 +23,10 @@ DEFAULT_IRC_SERVER_PORT = 6667
 DEFAULT_IRC_REALNAME = 'syslog'
 
 
+class ConfigurationError(Exception):
+    """Indicates a configuration error."""
+
+
 @dataclass(frozen=True)
 class Config:
     irc: IrcConfig
@@ -34,7 +38,7 @@ def load_config(path: Path) -> Config:
     data = rtoml.load(path)
 
     irc_config = _get_irc_config(data)
-    routes = _get_routes(data)
+    routes = _get_routes(data, irc_config.channels)
 
     return Config(irc=irc_config, routes=routes)
 
@@ -80,14 +84,24 @@ def _get_irc_channels(data_irc: Any) -> Iterator[IrcChannel]:
         yield IrcChannel(name, password)
 
 
-def _get_routes(data: Dict[str, Any]) -> Set[Route]:
+def _get_routes(
+    data: Dict[str, Any], irc_channels: Set[IrcChannel]
+) -> Set[Route]:
     data_routes = data.get('routes', {})
     if not data_routes:
         log('Warning: No routes have been configured.')
 
+    known_irc_channel_names = {c.name for c in irc_channels}
+
     def iterate() -> Iterator[Route]:
         for port, irc_channel_names in data_routes.items():
             for irc_channel_name in irc_channel_names:
+                if irc_channel_name not in known_irc_channel_names:
+                    raise ConfigurationError(
+                        f'Route target IRC channel "{irc_channel_name}" '
+                        'is not configured to be joined.'
+                    )
+
                 yield Route(port=int(port), irc_channel_name=irc_channel_name)
 
     return set(iterate())
