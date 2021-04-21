@@ -82,6 +82,8 @@ def _get_irc_channels(data_irc: Any) -> Iterator[IrcChannel]:
 
 def _get_routes(data: Dict[str, Any]) -> Set[Route]:
     data_routes = data.get('routes', {})
+    if not data_routes:
+        log('Warning: No routes have been configured.')
 
     def iterate() -> Iterator[Route]:
         for port, irc_channel_names in data_routes.items():
