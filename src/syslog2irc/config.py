@@ -8,7 +8,6 @@ Configuration loading
 :License: MIT, see LICENSE for details.
 """
 
-import dataclasses
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Set
@@ -29,13 +28,9 @@ class Config:
     routes: Set[Route]
 
 
-def parse_config(
-    path: Path, channels: Set[IrcChannel], routes_dict: Dict[int, Set[str]]
-) -> Config:
+def parse_config(path: Path, routes_dict: Dict[int, Set[str]]) -> Config:
     """Parse configuration."""
     irc_config = _load_config(path)
-    irc_config = dataclasses.replace(irc_config, channels=channels)
-
     routes = _parse_routes(routes_dict)
 
     return Config(irc=irc_config, routes=routes)
@@ -56,7 +51,7 @@ def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:
     server = _get_irc_server(data_irc)
     nickname = data_irc['bot']['nickname']
     realname = data_irc['bot'].get('realname', DEFAULT_IRC_REALNAME)
-    channels = set()
+    channels = set(_get_irc_channels(data_irc))
 
     return IrcConfig(
         server=server,
@@ -79,6 +74,13 @@ def _get_irc_server(data_irc: Any) -> Optional[IrcServer]:
     ssl = data_server.get('ssl', False)
 
     return IrcServer(host=host, port=port, ssl=ssl)
+
+
+def _get_irc_channels(data_irc: Any) -> Iterator[IrcChannel]:
+    for channel in data_irc.get('channels', []):
+        name = channel['name']
+        password = channel.get('password')
+        yield IrcChannel(name, password)
 
 
 def _parse_routes(routes_dict: Dict[int, Set[str]]) -> Set[Route]:

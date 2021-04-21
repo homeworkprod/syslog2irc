@@ -6,3 +6,9 @@ ssl = false
 [irc.bot]
 nickname = "syslog"
 realname = "syslog"
+
+[irc]
+channels = [
+  { name = "#examplechannel1" },
+  { name = "#examplechannel2", password = "zePassword" },
+]
