@@ -10,6 +10,7 @@ Command line argument parsing
 
 from argparse import ArgumentParser, Namespace
 import dataclasses
+from pathlib import Path
 from typing import List, Optional
 
 from . import VERSION
@@ -74,6 +75,11 @@ def create_arg_parser() -> ArgumentParser:
         '--version',
         action='version',
         version=f'syslog2IRC {VERSION}',
+    )
+
+    parser.add_argument(
+        'config_filename',
+        type=Path,
     )
 
     return parser

@@ -16,6 +16,7 @@ from syslog2irc.cli import parse_args
     ],
 )
 def test_irc_nickname(arg_value, expected):
+    arg_value.append('config.toml')
     actual = parse_args(arg_value)
     assert actual.irc_nickname == expected
 
@@ -28,6 +29,7 @@ def test_irc_nickname(arg_value, expected):
     ],
 )
 def test_irc_realname(arg_value, expected):
+    arg_value.append('config.toml')
     actual = parse_args(arg_value)
     assert actual.irc_realname == expected
 
@@ -41,6 +43,7 @@ def test_irc_realname(arg_value, expected):
     ],
 )
 def test_parse_irc_server(arg_value, expected_host, expected_port):
+    arg_value.append('config.toml')
     actual = parse_args(arg_value)
     assert actual.irc_server.host == expected_host
     assert actual.irc_server.port == expected_port
@@ -54,5 +57,6 @@ def test_parse_irc_server(arg_value, expected_host, expected_port):
     ],
 )
 def test_irc_server_ssl_option(arg_value, expected):
+    arg_value.append('config.toml')
     actual = parse_args(arg_value)
     assert actual.irc_server_ssl == expected

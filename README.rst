@@ -26,6 +26,10 @@ The required packages can be installed via pip_:
 Configuration
 -------------
 
+
+syslog
+++++++
+
 Setup your ``syslog.conf`` or ``rsyslog.conf`` (commonly found in
 ``/etc``) to send syslog messages to syslog2IRC on the default syslog
 port (514, UDP, as assigned by IANA_)::
@@ -35,6 +39,16 @@ port (514, UDP, as assigned by IANA_)::
 Or, when syslog2IRC listens on a non-default port (here: 11514)::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
+
+
+syslog2IRC
+++++++++++
+
+An example configuration file, ``config.toml``, in TOML_ format:
+
+.. code:: toml
+
+.. _TOML: https://toml.io/
 
 To specify which IRC channels to join and forward syslog messages to,
 create ``IrcChannel`` instances and reference them in the ``routes``
@@ -83,7 +97,7 @@ of syslog message reception. Abort execution by pressing <Control-C>.
 
 .. code:: sh
 
-    $ python start-syslog2irc.py
+    $ python start-syslog2irc.py config.toml
 
 Send some messages to syslog2IRC using your system's syslog message
 sender tool (`logger`, in this example):
@@ -101,7 +115,7 @@ If receiving syslog messages works, connect to an IRC server:
 
 .. code:: sh
 
-    $ python start-syslog2irc.py --irc-server irc.example.com
+    $ python start-syslog2irc.py --irc-server irc.example.com config.toml
 
 After a moment, you should see that syslog2IRC has connected to the
 server. The IRC bot should then enter the channel(s) you have configured
@@ -112,7 +126,7 @@ it like this (6669 in this case):
 
 .. code:: sh
 
-    $ python start-syslog2irc.py --irc-server irc.example.com:6669
+    $ python start-syslog2irc.py --irc-server irc.example.com:6669 config.toml
 
 
 Further Reading

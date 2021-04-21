@@ -11,7 +11,10 @@ Configuration loading
 from argparse import Namespace
 from dataclasses import dataclass
 from itertools import chain
-from typing import Dict, Iterator, Set
+from pathlib import Path
+from typing import Any, Dict, Iterator, Set
+
+import rtoml
 
 from .irc import IrcChannel, IrcConfig
 from .router import Route
@@ -27,10 +30,19 @@ def parse_config(
     args: Namespace, routes_dict: Dict[int, Set[IrcChannel]]
 ) -> Config:
     """Parse configuration."""
+    config_filename = args.config_filename
+    config_data = _load_config(config_filename)
+
     irc_config = _assemble_irc_config(args, routes_dict)
     routes = _parse_routes(routes_dict)
 
     return Config(irc=irc_config, routes=routes)
+
+
+def _load_config(path: Path) -> Dict[str, Any]:
+    """Load configuration from file."""
+    data = rtoml.load(path)
+    return data
 
 
 def _parse_routes(routes_dict: Dict[int, Set[IrcChannel]]) -> Set[Route]:

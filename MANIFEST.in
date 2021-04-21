@@ -1,4 +1,5 @@
 include CHANGES.rst
+include config_example.toml
 include requirements.txt
 include requirements-test.txt
 include start-syslog2irc.py
