@@ -10,9 +10,8 @@ Routing of syslog messages to IRC channels by the port they arrive on.
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, Optional, Set
+from typing import Any, Dict, Optional, Set
 
-from .irc import IrcChannel
 from .util import log
 
 
@@ -57,10 +56,6 @@ def map_ports_to_channel_names(routes: Set[Route]) -> Dict[int, Set[str]]:
     for route in routes:
         ports_to_channel_names[route.port].add(route.irc_channel_name)
     return dict(ports_to_channel_names)
-
-
-def channels_to_names(channels: Iterable[IrcChannel]) -> Set[str]:
-    return {channel.name for channel in channels}
 
 
 def map_channel_names_to_ports(
