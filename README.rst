@@ -49,14 +49,14 @@ An example configuration file, ``config.toml``, in TOML_ format:
 .. code:: toml
 
     [irc.server]
-    host = "irc.server.example"
-    port = 6667
-    ssl = false
-    password = "t0ps3cr3t"
+    host = "irc.server.example"  # optional
+    port = 6667                  # optional
+    ssl = false                  # optional
+    password = "t0ps3cr3t"       # optional
 
     [irc.bot]
     nickname = "syslog"
-    realname = "syslog"
+    realname = "syslog"          # optional
 
     [irc]
     channels = [
