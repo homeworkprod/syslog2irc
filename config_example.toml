@@ -12,3 +12,9 @@ channels = [
   { name = "#examplechannel1" },
   { name = "#examplechannel2", password = "zePassword" },
 ]
+
+[routes]
+# routing for syslog messages from the ports on which they are
+# received to the IRC channels they should be announced on
+514 = [ '#examplechannel1', '#examplechannel2' ]
+55514 = [ '#examplechannel2' ]

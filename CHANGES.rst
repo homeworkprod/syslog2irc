@@ -10,7 +10,8 @@ Unreleased
 - Introduced configuration file. Removed the CLI arguments that have
   been replaced by it.
 
-- Moved configuration of IRC channels to join to configuration file.
+- Moved configuration of IRC channels to join and ports-to-channels
+  routes to configuration file.
 
 - Added command line option ``--version`` to show syslog2IRC's version.
 

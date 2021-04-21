@@ -63,31 +63,32 @@ An example configuration file, ``config.toml``, in TOML_ format:
       { name = "#examplechannel2", password = "zePassword" },
     ]
 
+    [routes]
+    # routing for syslog messages from the ports on which they are
+    # received to the IRC channels they should be announced on
+    514 = [ '#examplechannel1' ]
+    55514 = [ '#examplechannel2' ]
+
 .. _TOML: https://toml.io/
 
-To specify how incoming syslog messages should be routed from the port
-they arrived on to IRC channels, define the ``routes`` mapping.
-
 A simple routing from the default syslog port, 514, to a single IRC
-channel without a password looks like this:
+channel would look like this:
 
-.. code:: python
+.. code:: toml
 
-    routes = {
-        514: {'#examplechannel1'},
-    }
+    [routes]
+    514 = [ '#examplechannel1' ]
 
 In a more complex setup, syslog messages could be received on two ports
-(514 and 55514), with those received on the first port being forwarded
-to two IRC channels, and those received on the letter port being
-forwarded exclusively to the second channel.
+(514 and 55514 in this example), with those received on the first port
+being forwarded to two IRC channels, and those received on the latter
+port being forwarded exclusively to the second channel.
 
-.. code:: python
+.. code:: toml
 
-    routes = {
-          514: {'#examplechannel1', '#examplechannel2'},
-        55514: {'#examplechannel2'},
-    }
+    [routes]
+    514 = [ '#examplechannel1', '#examplechannel2' ]
+    55514 = [ '#examplechannel2' ]
 
 
 IRC Dummy Mode

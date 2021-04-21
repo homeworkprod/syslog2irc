@@ -29,21 +29,14 @@ class Config:
     routes: Set[Route]
 
 
-def parse_config(path: Path, routes_dict: Dict[int, Set[str]]) -> Config:
-    """Parse configuration."""
-    irc_config = _load_config(path)
-    routes = _parse_routes(routes_dict)
-
-    return Config(irc=irc_config, routes=routes)
-
-
-def _load_config(path: Path) -> IrcConfig:
+def load_config(path: Path) -> Config:
     """Load configuration from file."""
     data = rtoml.load(path)
 
     irc_config = _get_irc_config(data)
+    routes = _get_routes(data)
 
-    return irc_config
+    return Config(irc=irc_config, routes=routes)
 
 
 def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:
@@ -87,12 +80,12 @@ def _get_irc_channels(data_irc: Any) -> Iterator[IrcChannel]:
         yield IrcChannel(name, password)
 
 
-def _parse_routes(routes_dict: Dict[int, Set[str]]) -> Set[Route]:
-    """Parse a routing config into separate routes."""
+def _get_routes(data: Dict[str, Any]) -> Set[Route]:
+    data_routes = data.get('routes', {})
 
     def iterate() -> Iterator[Route]:
-        for port, irc_channel_names in routes_dict.items():
+        for port, irc_channel_names in data_routes.items():
             for irc_channel_name in irc_channel_names:
-                yield Route(port=port, irc_channel_name=irc_channel_name)
+                yield Route(port=int(port), irc_channel_name=irc_channel_name)
 
     return set(iterate())
