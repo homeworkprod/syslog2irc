@@ -5,7 +5,7 @@ Changelog
 Version 0.11
 ------------
 
-Unreleased
+Released 2021-04-21
 
 - Introduced configuration file. Removed the CLI arguments that have
   been replaced by it.
