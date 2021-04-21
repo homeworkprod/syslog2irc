@@ -1,0 +1,8 @@
+[irc.server]
+host = "irc.server.example"
+port = 6667
+ssl = false
+
+[irc.bot]
+nickname = "syslog"
+realname = "syslog"

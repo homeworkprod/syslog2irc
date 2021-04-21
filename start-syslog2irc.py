@@ -19,12 +19,9 @@ from syslog2irc.main import start
 
 
 def start_with_args(routes_dict: Dict[int, Set[IrcChannel]]) -> None:
-    """Start the IRC bot and the syslog listen server.
-
-    All arguments (except for routes) are read from the command line.
-    """
+    """Start the IRC bot and the syslog listen server."""
     args = parse_args()
-    config = parse_config(args, routes_dict)
+    config = parse_config(args.config_filename, routes_dict)
 
     start(config)
 

@@ -48,6 +48,15 @@ An example configuration file, ``config.toml``, in TOML_ format:
 
 .. code:: toml
 
+    [irc.server]
+    host = "irc.server.example"
+    port = 6667
+    ssl = false
+
+    [irc.bot]
+    nickname = "syslog"
+    realname = "syslog"
+
 .. _TOML: https://toml.io/
 
 To specify which IRC channels to join and forward syslog messages to,
@@ -81,19 +90,24 @@ forwarded exclusively to the second channel.
     }
 
 
+IRC Dummy Mode
+--------------
+
+If no value for ``irc.server.host`` is set (the property is missing or
+commented out), syslog2IRC will not attempt to connect to an IRC server
+and start in IRC dummy mode.
+
+In this mode, it will still receive syslog messages, but it will write
+them to STDOUT. This can be helpful during setup of syslog message
+reception.
+
+Abort execution by pressing <Control-C>.
+
+
 Usage
 -----
 
-You might want to familiarize yourself with the available command line
-options first:
-
-.. code:: sh
-
-    $ python start-syslog2irc.py -h
-
-If no options are given, the IRC component will not be used. Instead,
-syslog messages will be written to STDOUT. This is helpful during setup
-of syslog message reception. Abort execution by pressing <Control-C>.
+Start syslog2IRC with a configuration file:
 
 .. code:: sh
 
@@ -111,22 +125,16 @@ Note that each message will appear twice on the console syslog2IRC was
 started because the handler itself will write it there anyway (so you
 have a log on what would be sent to IRC).
 
-If receiving syslog messages works, connect to an IRC server:
+If receiving syslog messages works, specify an IRC server in the
+configuration file, then start as above:
 
 .. code:: sh
 
-    $ python start-syslog2irc.py --irc-server irc.example.com config.toml
+    $ python start-syslog2irc.py config.toml
 
 After a moment, you should see that syslog2IRC has connected to the
 server. The IRC bot should then enter the channel(s) you have configured
 (see Configuration_).
-
-To use another port on the IRC server than the default (6667), specify
-it like this (6669 in this case):
-
-.. code:: sh
-
-    $ python start-syslog2irc.py --irc-server irc.example.com:6669 config.toml
 
 
 Further Reading

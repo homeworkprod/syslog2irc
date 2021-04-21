@@ -7,7 +7,8 @@ Version 0.11
 
 Unreleased
 
-- Introduced configuration file.
+- Introduced configuration file. Removed the CLI arguments that have
+  been replaced by it.
 
 - Added command line option ``--version`` to show syslog2IRC's version.
 
