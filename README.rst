@@ -16,11 +16,11 @@ Requirements
 Installation
 ------------
 
-The required packages can be installed via pip_:
+syslog2IRC and its dependencies can be installed via pip_:
 
 .. code:: sh
 
-    $ pip install -r requirements.txt
+    $ pip install syslog2irc
 
 
 Configuration
@@ -112,7 +112,7 @@ Start syslog2IRC with a configuration file:
 
 .. code:: sh
 
-    $ python start-syslog2irc.py config.toml
+    $ syslog2irc config.toml
 
 Send some messages to syslog2IRC using your system's syslog message
 sender tool (`logger`, in this example):
@@ -126,15 +126,16 @@ Note that each message will appear twice on the console syslog2IRC was
 started because the handler itself will write it there anyway (so you
 have a log on what would be sent to IRC).
 
-If receiving syslog messages works, specify an IRC server in the
-configuration file, then start as above:
+If receiving syslog messages works and you have been using IRC dummy
+mode so far, specify an IRC server in the configuration file, then start
+as above:
 
 .. code:: sh
 
-    $ python start-syslog2irc.py config.toml
+    $ syslog2irc config.toml
 
-After a moment, you should see that syslog2IRC has connected to the
-server. The IRC bot should then enter the channel(s) you have configured
+After a moment, you should see that syslog2IRC has connected to the IRC
+server. The bot should then enter the channel(s) you have configured
 (see Configuration_).
 
 

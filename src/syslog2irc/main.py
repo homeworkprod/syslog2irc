@@ -2,11 +2,14 @@
 syslog2irc.main
 ~~~~~~~~~~~~~~~
 
+Application entry point
+
 :Copyright: 2007-2021 Jochen Kupperschmidt
 :License: MIT, see LICENSE for details.
 """
 
-from .config import Config
+from .cli import parse_args
+from .config import Config, load_config
 from .irc import create_bot
 from .processor import Processor
 from .router import map_ports_to_channel_names, Router
@@ -29,7 +32,7 @@ from .syslog import start_syslog_message_receivers
 
 
 def start(config: Config) -> None:
-    """Start the IRC bot and the syslog listen server."""
+    """Start the IRC bot and the syslog listen server(s)."""
     ports = {route.port for route in config.routes}
     ports_to_channel_names = map_ports_to_channel_names(config.routes)
 
@@ -50,3 +53,14 @@ def start(config: Config) -> None:
     processor.run()
 
     irc_bot.disconnect('Bye.')  # Joins bot thread.
+
+
+def main() -> None:
+    """Parse arguments, load configuration, and start the application."""
+    args = parse_args()
+    config = load_config(args.config_filename)
+    start(config)
+
+
+if __name__ == '__main__':
+    main()

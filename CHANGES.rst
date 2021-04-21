@@ -13,6 +13,11 @@ Unreleased
 - Moved configuration of IRC channels to join and ports-to-channels
   routes to configuration file.
 
+- Provided an actual ``syslog2irc`` command.
+
+- Published the package to the Python Package Index to allow installing
+  from there.
+
 - Added command line option ``--version`` to show syslog2IRC's version.
 
 
