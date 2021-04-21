@@ -18,6 +18,8 @@ Unreleased
 - Published the package to the Python Package Index to allow installing
   from there.
 
+- Added ``Dockerfile``.
+
 - Added command line option ``--version`` to show syslog2IRC's version.
 
 
