@@ -12,7 +12,6 @@ from .processor import Processor
 from .router import map_ports_to_channel_names, Router
 from .signals import message_approved
 from .syslog import start_syslog_message_receivers
-from .util import log
 
 
 # A note on threads (implementation detail):
