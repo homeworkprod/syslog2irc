@@ -16,6 +16,7 @@ import rtoml
 
 from .irc import IrcChannel, IrcConfig, IrcServer
 from .router import Route
+from .util import log
 
 
 DEFAULT_IRC_SERVER_PORT = 6667
@@ -52,6 +53,9 @@ def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:
     nickname = data_irc['bot']['nickname']
     realname = data_irc['bot'].get('realname', DEFAULT_IRC_REALNAME)
     channels = set(_get_irc_channels(data_irc))
+
+    if not channels:
+        log('Warning: No IRC channels to join have been configured.')
 
     return IrcConfig(
         server=server,
