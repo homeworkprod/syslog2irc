@@ -60,18 +60,20 @@ An example configuration file, ``config.toml``, in TOML_ format:
 .. _TOML: https://toml.io/
 
 To specify which IRC channels to join and forward syslog messages to,
-create ``IrcChannel`` instances and reference them in the ``routes``
-mapping.
+create ``IrcChannel`` instances, then reference them via the channel
+names in the ``routes`` mapping.
 
 A simple routing from the default syslog port, 514, to a single IRC
 channel without a password looks like this:
 
 .. code:: python
 
-    channel1 = IrcChannel('#examplechannel1')
+    channels = {
+        IrcChannel('#examplechannel1'),
+    }
 
     routes = {
-        514: {channel1},
+        514: {'#examplechannel1'},
     }
 
 In a more complex setup, syslog messages could be received on two ports
@@ -81,12 +83,14 @@ forwarded exclusively to the second channel.
 
 .. code:: python
 
-    channel1 = IrcChannel('#examplechannel1')
-    channel2 = IrcChannel('#examplechannel2', password='zePassword')
+    channels = {
+        IrcChannel('#examplechannel1'),
+        IrcChannel('#examplechannel2', password='zePassword'),
+    }
 
     routes = {
-          514: {channel1, channel2},
-        55514: {channel2},
+          514: {'#examplechannel1', '#examplechannel2'},
+        55514: {'#examplechannel2'},
     }
 
 

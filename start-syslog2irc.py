@@ -18,24 +18,28 @@ from syslog2irc.irc import IrcChannel
 from syslog2irc.main import start
 
 
-def start_with_args(routes_dict: Dict[int, Set[IrcChannel]]) -> None:
+def start_with_args(
+    channels: Set[IrcChannel], routes_dict: Dict[int, Set[str]]
+) -> None:
     """Start the IRC bot and the syslog listen server."""
     args = parse_args()
-    config = parse_config(args.config_filename, routes_dict)
+    config = parse_config(args.config_filename, channels, routes_dict)
 
     start(config)
 
 
 if __name__ == '__main__':
     # IRC channels to join
-    channel1 = IrcChannel('#examplechannel1')
-    channel2 = IrcChannel('#examplechannel2', password='zePassword')
+    channels = {
+        IrcChannel('#examplechannel1'),
+        IrcChannel('#examplechannel2', password='zePassword'),
+    }
 
     # routing for syslog messages from the ports on which they are
     # received to the IRC channels they should be announced on
     routes = {
-          514: {channel1, channel2},
-        55514: {channel2},
+          514: {'#examplechannel1', '#examplechannel2'},
+        55514: {'#examplechannel2'},
     }
 
-    start_with_args(routes)
+    start_with_args(channels, routes)

@@ -10,7 +10,6 @@ Configuration loading
 
 import dataclasses
 from dataclasses import dataclass
-from itertools import chain
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Set
 
@@ -30,10 +29,12 @@ class Config:
     routes: Set[Route]
 
 
-def parse_config(path: Path, routes_dict: Dict[int, Set[IrcChannel]]) -> Config:
+def parse_config(
+    path: Path, channels: Set[IrcChannel], routes_dict: Dict[int, Set[str]]
+) -> Config:
     """Parse configuration."""
     irc_config = _load_config(path)
-    irc_config = _assemble_irc_config(irc_config, routes_dict)
+    irc_config = dataclasses.replace(irc_config, channels=channels)
 
     routes = _parse_routes(routes_dict)
 
@@ -80,20 +81,12 @@ def _get_irc_server(data_irc: Any) -> Optional[IrcServer]:
     return IrcServer(host=host, port=port, ssl=ssl)
 
 
-def _parse_routes(routes_dict: Dict[int, Set[IrcChannel]]) -> Set[Route]:
+def _parse_routes(routes_dict: Dict[int, Set[str]]) -> Set[Route]:
     """Parse a routing config into separate routes."""
 
     def iterate() -> Iterator[Route]:
-        for port, irc_channels in routes_dict.items():
-            for irc_channel in irc_channels:
-                yield Route(port=port, irc_channel_name=irc_channel.name)
+        for port, irc_channel_names in routes_dict.items():
+            for irc_channel_name in irc_channel_names:
+                yield Route(port=port, irc_channel_name=irc_channel_name)
 
     return set(iterate())
-
-
-def _assemble_irc_config(
-    irc_config: IrcConfig, routes_dict: Dict[int, Set[IrcChannel]]
-) -> IrcConfig:
-    """Complete IRC configuration with channels from routing config."""
-    channels = set(chain(*routes_dict.values()))
-    return dataclasses.replace(irc_config, channels=channels)
