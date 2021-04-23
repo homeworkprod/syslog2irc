@@ -1,3 +1,4 @@
+include assets/syslog2irc_logo.svg
 include CHANGES.rst
 include config_example.toml
 include Dockerfile

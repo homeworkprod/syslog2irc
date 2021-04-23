@@ -2,6 +2,11 @@
 syslog2IRC
 ==========
 
+.. image:: https://raw.githubusercontent.com/homeworkprod/syslog2irc/main/assets/syslog2irc_logo.svg
+   :alt: syslog2IRC logo
+   :height: 80
+   :width: 310
+
 Forward syslog messages to IRC
 
 
