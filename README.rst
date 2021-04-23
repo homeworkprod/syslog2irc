@@ -2,7 +2,7 @@
 syslog2IRC
 ==========
 
-Receive syslog messages via UDP and show them on IRC.
+Forward syslog messages to IRC
 
 
 Requirements
