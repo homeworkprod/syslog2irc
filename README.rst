@@ -1,3 +1,4 @@
+==========
 syslog2IRC
 ==========
 
@@ -5,14 +6,14 @@ Receive syslog messages via UDP and show them on IRC.
 
 
 Requirements
-------------
+============
 
 - Python 3.7+
 - Dependencies: blinker_, irc_, rtoml_, syslogmp_
 
 
 Installation
-------------
+============
 
 syslog2IRC and its dependencies can be installed via pip_:
 
@@ -22,11 +23,11 @@ syslog2IRC and its dependencies can be installed via pip_:
 
 
 Configuration
--------------
+=============
 
 
 syslog
-++++++
+------
 
 Setup your ``syslog.conf`` or ``rsyslog.conf`` (commonly found in
 ``/etc``) to send syslog messages to syslog2IRC on the default syslog
@@ -40,7 +41,7 @@ Or, when syslog2IRC listens on a non-default port (here: 11514)::
 
 
 syslog2IRC
-++++++++++
+----------
 
 An example configuration file, ``config.toml``, in TOML_ format:
 
@@ -92,7 +93,7 @@ port being forwarded exclusively to the second channel.
 
 
 IRC Dummy Mode
---------------
+==============
 
 If no value for ``irc.server.host`` is set (the property is missing or
 commented out), syslog2IRC will not attempt to connect to an IRC server
@@ -106,7 +107,7 @@ Abort execution by pressing <Control-C>.
 
 
 Usage
------
+=====
 
 Start syslog2IRC with a configuration file:
 
@@ -140,7 +141,7 @@ server. The bot should then enter the channel(s) you have configured
 
 
 Further Reading
----------------
+===============
 
 For more information, see `RFC 3164`_, "The BSD syslog Protocol".
 
