@@ -8,9 +8,7 @@ Requirements
 ------------
 
 - Python 3.7+
-- irc_
-- blinker_
-- syslogmp_
+- Dependencies: blinker_, irc_, rtoml_, syslogmp_
 
 
 Installation
@@ -150,8 +148,9 @@ Please note that there is `RFC 5424`_, "The Syslog Protocol", which
 obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
 
-.. _irc:      https://bitbucket.org/jaraco/irc
 .. _blinker:  https://pythonhosted.org/blinker/
+.. _irc:      https://bitbucket.org/jaraco/irc
+.. _rtoml:    https://github.com/samuelcolvin/rtoml
 .. _syslogmp: https://homework.nwsnet.de/releases/76d6/#syslogmp
 .. _pip:      http://www.pip-installer.org/
 .. _IANA:     https://www.iana.org/
