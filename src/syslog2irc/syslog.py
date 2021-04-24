@@ -89,15 +89,10 @@ def start_syslog_message_receivers(ports: Iterable[int]) -> None:
 
 def format_message_for_log(message: SyslogMessage) -> str:
     """Format a syslog message to be logged."""
-    facility_name = message.facility.name
-    severity_name = message.severity.name
-    timestamp_str = message.timestamp.isoformat()
-    hostname = message.hostname
-
     return (
-        f'facility={facility_name}, '
-        f'severity={severity_name}, '
-        f'timestamp={timestamp_str}, '
-        f'hostname={hostname}, '
+        f'facility={message.facility.name}, '
+        f'severity={message.severity.name}, '
+        f'timestamp={message.timestamp.isoformat()}, '
+        f'hostname={message.hostname}, '
         f'message={message.message}'
     )
