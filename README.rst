@@ -10,6 +10,32 @@ syslog2IRC
 Forward syslog messages to IRC
 
 
+Code Status
+===========
+
+|badge_travis-ci_build|
+|badge_scrutinizer-ci_coverage|
+|badge_scrutinizer-ci_quality-score|
+|badge_code-climate_maintainability|
+
+
+.. |badge_travis-ci_build| image:: https://travis-ci.org/homeworkprod/syslog2irc.svg?branch=main
+   :alt: Build Status
+   :target: https://travis-ci.org/homeworkprod/syslog2irc
+
+.. |badge_scrutinizer-ci_coverage| image:: https://scrutinizer-ci.com/g/homeworkprod/syslog2irc/badges/coverage.png?b=main
+   :alt: Scrutinizer Code Coverage
+   :target: https://scrutinizer-ci.com/g/homeworkprod/syslog2irc/?branch=main
+
+.. |badge_scrutinizer-ci_quality-score| image:: https://scrutinizer-ci.com/g/homeworkprod/syslog2irc/badges/quality-score.png?b=main
+   :alt: Scrutinizer Code Quality
+   :target: https://scrutinizer-ci.com/g/homeworkprod/syslog2irc/?branch=main
+
+.. |badge_code-climate_maintainability| image:: https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg
+   :alt: Code Climate
+   :target: https://codeclimate.com/github/homeworkprod/syslog2irc
+
+
 Requirements
 ============
 
