@@ -31,7 +31,7 @@ Code Status
    :alt: Scrutinizer Code Quality
    :target: https://scrutinizer-ci.com/g/homeworkprod/syslog2irc/?branch=main
 
-.. |badge_code-climate_maintainability| image:: https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg
+.. |badge_code-climate_maintainability| image:: https://api.codeclimate.com/v1/badges/7fc3553f7a7cf6502560/maintainability
    :alt: Code Climate
    :target: https://codeclimate.com/github/homeworkprod/syslog2irc
 
