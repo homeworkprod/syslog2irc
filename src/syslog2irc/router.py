@@ -38,8 +38,15 @@ class Router:
     def enable_channel(
         self, sender: Any, *, channel_name: Optional[str] = None
     ) -> None:
+        ports = self.channel_names_to_ports.get(channel_name, set())
+        if not ports:
+            logger.warning(
+                'No ports routed to channel %s, will not forward to it.',
+                channel_name,
+            )
+            return
+
         self.enabled_channels.add(channel_name)
-        ports = self.channel_names_to_ports[channel_name]
         logger.info(
             'Enabled forwarding to channel %s from port(s) %s.',
             channel_name,

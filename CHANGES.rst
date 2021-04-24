@@ -10,6 +10,9 @@ Unreleased
 - Switched to using Python's logging mechanism directly, with different
   log levels. Removed function ``util.log``.
 
+- Prevented enabling of a joined IRC channel to receive messages if no
+  ports are routed to it.
+
 
 Version 0.11
 ------------
