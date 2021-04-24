@@ -7,6 +7,9 @@ Version 0.12
 
 Unreleased
 
+- Switched to using Python's logging mechanism directly, with different
+  log levels. Removed function ``util.log``.
+
 
 Version 0.11
 ------------

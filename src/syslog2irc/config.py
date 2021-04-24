@@ -9,6 +9,7 @@ Configuration loading
 """
 
 from dataclasses import dataclass
+import logging
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Set
 
@@ -16,11 +17,13 @@ import rtoml
 
 from .irc import IrcChannel, IrcConfig, IrcServer
 from .router import Route
-from .util import log
 
 
 DEFAULT_IRC_SERVER_PORT = 6667
 DEFAULT_IRC_REALNAME = 'syslog'
+
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigurationError(Exception):
@@ -52,7 +55,7 @@ def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:
     channels = set(_get_irc_channels(data_irc))
 
     if not channels:
-        log('Warning: No IRC channels to join have been configured.')
+        logger.warning('No IRC channels to join have been configured.')
 
     return IrcConfig(
         server=server,
@@ -94,7 +97,7 @@ def _get_routes(
 ) -> Set[Route]:
     data_routes = data.get('routes', {})
     if not data_routes:
-        log('Warning: No routes have been configured.')
+        logger.warning('No routes have been configured.')
 
     known_irc_channel_names = {c.name for c in irc_channels}
 

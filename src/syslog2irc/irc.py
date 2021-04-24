@@ -9,6 +9,7 @@ Internet Relay Chat
 """
 
 from dataclasses import dataclass
+import logging
 from ssl import wrap_socket as ssl_wrap_socket
 from typing import Any, List, Optional, Set, Union
 
@@ -16,7 +17,10 @@ from irc.bot import ServerSpec, SingleServerIRCBot
 from irc.connection import Factory
 
 from .signals import irc_channel_joined
-from .util import log, start_thread
+from .util import start_thread
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -58,7 +62,9 @@ class Bot(SingleServerIRCBot):
         realname: str,
         channels: Set[IrcChannel],
     ) -> None:
-        log('Connecting to IRC server {0.host}:{0.port:d} ...', server)
+        logger.info(
+            'Connecting to IRC server %s:%d ...', server.host, server.port
+        )
 
         server_spec = ServerSpec(server.host, server.port, server.password)
         factory = Factory(wrapper=ssl_wrap_socket) if server.ssl else Factory()
@@ -67,13 +73,13 @@ class Bot(SingleServerIRCBot):
         )
 
         if server.rate_limit is not None:
-            log(
-                'IRC send rate limit set to {:.2f} messages per second.',
+            logger.info(
+                'IRC send rate limit set to %.2f messages per second.',
                 server.rate_limit,
             )
             self.connection.set_rate_limit(server.rate_limit)
         else:
-            log('No IRC send rate limit set.')
+            logger.info('No IRC send rate limit set.')
 
         # Note: `self.channels` already exists in super class.
         self.channels_to_join = channels
@@ -88,13 +94,13 @@ class Bot(SingleServerIRCBot):
 
     def on_welcome(self, conn, event) -> None:
         """Join channels after connect."""
-        log('Connected to {}:{:d}.', *conn.socket.getpeername())
+        logger.info('Connected to %s:%d.', *conn.socket.getpeername())
 
         channels = _sort_channels_by_name(self.channels_to_join)
-        log('Channels to join: {}', ', '.join(c.name for c in channels))
+        logger.info('Channels to join: %s', ', '.join(c.name for c in channels))
 
         for channel in channels:
-            log('Joining channel {} ...', channel.name)
+            logger.info('Joining channel %s ...', channel.name)
             conn.join(channel.name, channel.password or '')
 
     def on_nicknameinuse(self, conn, event) -> None:
@@ -108,13 +114,13 @@ class Bot(SingleServerIRCBot):
         channel_name = event.target
 
         if joined_nick == self._nickname:
-            log('Joined IRC channel: {}', channel_name)
+            logger.info('Joined IRC channel: %s', channel_name)
             irc_channel_joined.send(channel_name=channel_name)
 
     def on_badchannelkey(self, conn, event) -> None:
         """Channel could not be joined due to wrong password."""
         channel_name = event.arguments[0]
-        log('Cannot join channel {} (bad key).', channel_name)
+        logger.info('Cannot join channel %s (bad key).', channel_name)
 
     def say(
         self,
@@ -145,11 +151,11 @@ class DummyBot:
         channel_name: Optional[str] = None,
         text: Optional[str] = None,
     ) -> None:
-        log('{}> {}', channel_name, text)
+        logger.info('%s> %s', channel_name, text)
 
     def disconnect(self, msg: str) -> None:
         # Mimics `irc.bot.SingleServerIRCBot.disconnect`.
-        log('Shutting down bot ...')
+        logger.info('Shutting down bot ...')
 
 
 def _sort_channels_by_name(channels: Set[IrcChannel]) -> List[IrcChannel]:
@@ -159,7 +165,7 @@ def _sort_channels_by_name(channels: Set[IrcChannel]) -> List[IrcChannel]:
 def create_bot(config: IrcConfig) -> Union[Bot, DummyBot]:
     """Create and return an IRC bot according to the configuration."""
     if config.server is None:
-        log('No IRC server specified; will write to STDOUT instead.')
+        logger.info('No IRC server specified; will write to STDOUT instead.')
         return DummyBot(config.channels)
 
     return Bot(config.server, config.nickname, config.realname, config.channels)

@@ -10,9 +10,11 @@ Routing of syslog messages to IRC channels by the port they arrive on.
 
 from collections import defaultdict
 from dataclasses import dataclass
+import logging
 from typing import Any, Dict, Optional, Set
 
-from .util import log
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -38,8 +40,8 @@ class Router:
     ) -> None:
         self.enabled_channels.add(channel_name)
         ports = self.channel_names_to_ports[channel_name]
-        log(
-            'Enabled forwarding to channel {} from ports {}.',
+        logger.info(
+            'Enabled forwarding to channel %s from ports %s.',
             channel_name,
             ports,
         )

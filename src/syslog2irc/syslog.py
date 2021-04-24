@@ -9,6 +9,7 @@ BSD syslog message reception and handling
 """
 
 from functools import partial
+import logging
 from socketserver import BaseRequestHandler, ThreadingUDPServer
 import sys
 from typing import Iterable
@@ -17,7 +18,10 @@ import syslogmp
 from syslogmp import Message as SyslogMessage
 
 from .signals import syslog_message_received
-from .util import log, start_thread
+from .util import start_thread
+
+
+logger = logging.getLogger(__name__)
 
 
 class RequestHandler(BaseRequestHandler):
@@ -32,12 +36,15 @@ class RequestHandler(BaseRequestHandler):
             data = self.request[0]
             message = syslogmp.parse(data)
         except ValueError:
-            log('Invalid message received from {}:{:d}.', *self.client_address)
+            logger.info(
+                'Invalid message received from %s:%d.', *self.client_address
+            )
             return None
 
-        log(
-            'Received message from {0[0]}:{0[1]:d} on port {1:d} -> {2}',
-            self.client_address,
+        logger.debug(
+            'Received message from %s:%d on port %d -> %s',
+            self.client_address[0],
+            self.client_address[1],
             self.port,
             format_message_for_log(message),
         )
@@ -69,7 +76,9 @@ def start_server(port: int) -> None:
 
     thread_name = f'{server.__class__.__name__}-port{port:d}'
     start_thread(server.serve_forever, thread_name)
-    log('Listening for syslog messages on {}:{:d}.', *server.server_address)
+    logger.info(
+        'Listening for syslog messages on %s:%d.', *server.server_address
+    )
 
 
 def start_syslog_message_receivers(ports: Iterable[int]) -> None:

@@ -6,6 +6,7 @@ syslog2irc.processor
 :License: MIT, see LICENSE for details.
 """
 
+import logging
 from time import sleep
 from typing import Any, Callable, Iterator, Optional, Set, Tuple
 
@@ -18,10 +19,12 @@ from .signals import (
     message_received,
     syslog_message_received,
 )
-from .util import log
 
 
 MESSAGE_TEXT_ENCODING = 'utf-8'
+
+
+logger = logging.getLogger(__name__)
 
 
 class Processor:
@@ -85,7 +88,7 @@ class Processor:
         except KeyboardInterrupt:
             pass
 
-        log('Shutting down ...')
+        logger.info('Shutting down ...')
 
 
 def format_syslog_message(message: SyslogMessage) -> str:

@@ -8,6 +8,8 @@ Application entry point
 :License: MIT, see LICENSE for details.
 """
 
+import logging
+
 from .cli import parse_args
 from .config import Config, load_config
 from .irc import create_bot
@@ -15,6 +17,7 @@ from .processor import Processor
 from .router import map_ports_to_channel_names, Router
 from .signals import message_approved
 from .syslog import start_syslog_message_receivers
+from .util import configure_logging
 
 
 # A note on threads (implementation detail):
@@ -58,6 +61,7 @@ def start(config: Config) -> None:
 def main() -> None:
     """Parse arguments, load configuration, and start the application."""
     args = parse_args()
+    configure_logging()
     config = load_config(args.config_filename)
     start(config)
 
