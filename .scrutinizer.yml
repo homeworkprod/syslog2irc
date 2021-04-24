@@ -1,0 +1,22 @@
+build:
+  environment:
+    python: 3.7.9
+  dependencies:
+    override:
+      - "pip install -r requirements.txt -r requirements-test.txt && pip install -e ."
+  nodes:
+    analysis:
+      tests:
+        override:
+          - py-scrutinizer-run
+    coverage:
+      tests:
+        override:
+          - command: 'pytest --cov=syslog2irc'
+            coverage:
+              file: '.coverage'
+              format: 'py-cc'
+
+checks:
+  python:
+    duplicate_code: false
