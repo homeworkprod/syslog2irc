@@ -41,9 +41,9 @@ class Router:
         self.enabled_channels.add(channel_name)
         ports = self.channel_names_to_ports[channel_name]
         logger.info(
-            'Enabled forwarding to channel %s from ports %s.',
+            'Enabled forwarding to channel %s from port(s) %s.',
             channel_name,
-            ports,
+            ', '.join(map(str, sorted(ports))),
         )
 
     def is_channel_enabled(self, channel: str) -> bool:
