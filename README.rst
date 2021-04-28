@@ -74,7 +74,34 @@ Or, when syslog2IRC listens on a non-default port (here: 11514)::
 syslog2IRC
 ----------
 
-An example configuration file, ``config.toml``, in TOML_ format:
+Configuration is done as a file in TOML_ format.
+
+A simple configuration to route from the default syslog port, 514, to a
+single IRC channel looks like this:
+
+.. code:: toml
+
+    [irc.server]
+    host = "irc.server.example"
+
+    [irc.bot]
+    nickname = "syslog"
+
+    [irc]
+    channels = [
+      { name = "#syslog" },
+    ]
+
+    [routes]
+    514 = [ '#syslog' ]
+
+In a more complex setup, syslog messages could be received on multiple
+ports (514 and 55514 in this example), with those received on the first
+port being forwarded to two IRC channels, and those received on the
+latter port being forwarded exclusively to the second channel.
+
+Here is a full example of an advanced configuration with all optional
+properties being specified:
 
 .. code:: toml
 
@@ -101,29 +128,10 @@ An example configuration file, ``config.toml``, in TOML_ format:
     [routes]
     # routing for syslog messages from the ports on which they are
     # received to the IRC channels they should be announced on
-    514 = [ '#examplechannel1' ]
+    514 = [ '#examplechannel1', '#examplechannel2' ]
     55514 = [ '#examplechannel2' ]
 
 .. _TOML: https://toml.io/
-
-A simple routing from the default syslog port, 514, to a single IRC
-channel would look like this:
-
-.. code:: toml
-
-    [routes]
-    514 = [ '#examplechannel1' ]
-
-In a more complex setup, syslog messages could be received on two ports
-(514 and 55514 in this example), with those received on the first port
-being forwarded to two IRC channels, and those received on the latter
-port being forwarded exclusively to the second channel.
-
-.. code:: toml
-
-    [routes]
-    514 = [ '#examplechannel1', '#examplechannel2' ]
-    55514 = [ '#examplechannel2' ]
 
 
 IRC Dummy Mode
