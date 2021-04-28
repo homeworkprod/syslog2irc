@@ -98,6 +98,10 @@ class Bot(SingleServerIRCBot):
             'Connected to IRC server %s:%d.', *conn.socket.getpeername()
         )
 
+        self._join_channels(conn)
+
+    def _join_channels(self, conn):
+        """Join the configured channels."""
         channels = _sort_channels_by_name(self.channels_to_join)
         logger.info('Channels to join: %s', ', '.join(c.name for c in channels))
 
