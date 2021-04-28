@@ -23,6 +23,9 @@ nickname = "syslogger"
 realname = "Monsieur Syslog"
 
 [irc]
+commands = [
+  "MODE syslogger +i",
+]
 channels = [
     { name = "#monitoring" },
     { name = "#network" },
@@ -51,6 +54,9 @@ def test_load_config():
         ),
         nickname='syslogger',
         realname='Monsieur Syslog',
+        commands=[
+            'MODE syslogger +i',
+        ],
         channels={
             IrcChannel('#monitoring'),
             IrcChannel('#network'),
@@ -91,6 +97,7 @@ def test_load_config_with_defaults():
         ),
         nickname='monitor',
         realname='syslog',
+        commands=[],
         channels=set(),
     )
 

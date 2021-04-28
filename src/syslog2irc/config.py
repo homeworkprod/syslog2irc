@@ -52,6 +52,7 @@ def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:
     server = _get_irc_server(data_irc)
     nickname = data_irc['bot']['nickname']
     realname = data_irc['bot'].get('realname', DEFAULT_IRC_REALNAME)
+    commands = data_irc.get('commands', [])
     channels = set(_get_irc_channels(data_irc))
 
     if not channels:
@@ -61,6 +62,7 @@ def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:
         server=server,
         nickname=nickname,
         realname=realname,
+        commands=commands,
         channels=channels,
     )
 

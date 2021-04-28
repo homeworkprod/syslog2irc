@@ -17,6 +17,7 @@ def config():
         server=None,
         nickname='nick',
         realname='Nick',
+        commands=[],
         channels=channels,
     )
 

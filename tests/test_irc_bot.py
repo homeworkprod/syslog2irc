@@ -20,6 +20,7 @@ def config():
         server=server,
         nickname='nick',
         realname='Nick',
+        commands=[],
         channels=channels,
     )
 

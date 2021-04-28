@@ -20,6 +20,7 @@ def test_create_bot(server, expected_type):
         server=server,
         nickname='nick',
         realname='Nick',
+        commands=[],
         channels=set(),
     )
 

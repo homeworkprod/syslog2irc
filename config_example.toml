@@ -10,6 +10,9 @@ nickname = "syslog"
 realname = "syslog"
 
 [irc]
+commands = [
+  "MODE syslog +i",
+]
 channels = [
   { name = "#examplechannel1" },
   { name = "#examplechannel2", password = "zePassword" },

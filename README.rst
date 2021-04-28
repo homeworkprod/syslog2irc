@@ -90,6 +90,9 @@ An example configuration file, ``config.toml``, in TOML_ format:
     realname = "syslog"          # optional
 
     [irc]
+    commands = [                 # optional
+      "MODE syslog +i",
+    ]
     channels = [
       { name = "#examplechannel1" },
       { name = "#examplechannel2", password = "zePassword" },

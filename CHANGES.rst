@@ -10,6 +10,9 @@ Unreleased
 - Switched to using Python's logging mechanism directly, with different
   log levels. Removed function ``util.log``.
 
+- Added support for custom IRC commands to send after connecting
+  (authentication, cloaking, flood protection, etc.).
+
 - Prevent enabling of a joined IRC channel to receive messages if no
   ports are routed to it.
 
