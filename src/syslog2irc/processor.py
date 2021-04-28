@@ -104,8 +104,15 @@ def format_syslog_message(message: SyslogMessage) -> str:
             yield f'({message.hostname}) '
 
         severity_name = message.severity.name
+
         # Important: The message text is a byte string.
         message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
+
+        # Remove leading and trailing newlines. Those would result in
+        # additional lines on IRC with the usual metadata but with an
+        # empty message text.
+        message_text = message_text.strip('\n')
+
         yield f'[{severity_name}]: {message_text}'
 
     return ''.join(_generate())

@@ -46,6 +46,15 @@ from syslog2irc.processor import format_syslog_message
             b'WTF? S.O.S.!',
             '[2008-10-18 17:34:07] (mainframe) [emergency]: WTF? S.O.S.!',
         ),
+        (
+            # Strip leading and trailing newlines.
+            Facility.user,
+            Severity.informational,
+            None,
+            None,
+            b'\nIgnore my surroundings.\n',
+            '[informational]: Ignore my surroundings.',
+        ),
     ],
 )
 def test_format_message(

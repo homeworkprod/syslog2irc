@@ -10,8 +10,11 @@ Unreleased
 - Switched to using Python's logging mechanism directly, with different
   log levels. Removed function ``util.log``.
 
-- Prevented enabling of a joined IRC channel to receive messages if no
+- Prevent enabling of a joined IRC channel to receive messages if no
   ports are routed to it.
+
+- Remove leading and trailing newlines from message text to prevent
+  additional lines on IRC (patch provided by Jonas Alexandersson).
 
 
 Version 0.11
