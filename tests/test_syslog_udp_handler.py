@@ -9,13 +9,13 @@ from syslogmp import Facility, Message, Severity
 
 from syslog2irc.network import Port, TransportProtocol
 from syslog2irc.signals import syslog_message_received
-from syslog2irc.syslog import RequestHandler
+from syslog2irc.syslog import UDPHandler
 
 
 CURRENT_YEAR = datetime.today().year
 
 
-def test_handle():
+def test_udp_handler():
     expected_message = Message(
         Facility.kernel,
         Severity.emergency,
@@ -37,7 +37,7 @@ def test_handle():
     def handle_syslog_message_received(sender, **data):
         received_signal_data.append(data)
 
-    RequestHandler(port, request, client_address, server=None)
+    UDPHandler(port, request, client_address, server=None)
 
     assert received_signal_data == [
         {
