@@ -104,7 +104,7 @@ def _get_routes(
     known_irc_channel_names = {c.name for c in irc_channels}
 
     def iterate() -> Iterator[Route]:
-        for port, irc_channel_names in data_routes.items():
+        for syslog_port, irc_channel_names in data_routes.items():
             for irc_channel_name in irc_channel_names:
                 if irc_channel_name not in known_irc_channel_names:
                     raise ConfigurationError(
@@ -112,6 +112,9 @@ def _get_routes(
                         'is not configured to be joined.'
                     )
 
-                yield Route(port=int(port), irc_channel_name=irc_channel_name)
+                yield Route(
+                    syslog_port=int(syslog_port),
+                    irc_channel_name=irc_channel_name,
+                )
 
     return set(iterate())

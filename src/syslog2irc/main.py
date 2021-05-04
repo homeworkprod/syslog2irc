@@ -36,7 +36,7 @@ from .util import configure_logging
 
 def start(config: Config) -> None:
     """Start the IRC bot and the syslog listen server(s)."""
-    ports = {route.port for route in config.routes}
+    ports = {route.syslog_port for route in config.routes}
     ports_to_channel_names = map_ports_to_channel_names(config.routes)
 
     irc_bot = create_bot(config.irc)

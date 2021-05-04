@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class Route:
     """A route from a syslog message receiver port to an IRC channel."""
 
-    port: int
+    syslog_port: int
     irc_channel_name: str
 
 
@@ -64,7 +64,7 @@ class Router:
 def map_ports_to_channel_names(routes: Set[Route]) -> Dict[int, Set[str]]:
     ports_to_channel_names = defaultdict(set)
     for route in routes:
-        ports_to_channel_names[route.port].add(route.irc_channel_name)
+        ports_to_channel_names[route.syslog_port].add(route.irc_channel_name)
     return dict(ports_to_channel_names)
 
 
