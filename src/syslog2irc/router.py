@@ -41,14 +41,15 @@ class Router:
         ports = self.channel_names_to_ports.get(channel_name, set())
         if not ports:
             logger.warning(
-                'No ports routed to channel %s, will not forward to it.',
+                'No syslog ports routed to IRC channel %s, '
+                'will not forward to it.',
                 channel_name,
             )
             return
 
         self.enabled_channels.add(channel_name)
         logger.info(
-            'Enabled forwarding to channel %s from port(s) %s.',
+            'Enabled forwarding to IRC channel %s from syslog port(s) %s.',
             channel_name,
             ', '.join(map(str, sorted(ports))),
         )
