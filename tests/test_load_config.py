@@ -7,6 +7,7 @@ from io import StringIO
 
 from syslog2irc.config import load_config
 from syslog2irc.irc import IrcChannel, IrcConfig, IrcServer
+from syslog2irc.network import Port, TransportProtocol
 from syslog2irc.router import Route
 
 
@@ -33,9 +34,9 @@ channels = [
 ]
 
 [routes]
-514 = [ "#monitoring" ]
-10514 = [ "#monitoring", "#network" ]
-11514 = [ "#monitoring", "#serverfarm" ]
+"514/udp" = [ "#monitoring" ]
+"10514/udp" = [ "#monitoring", "#network" ]
+"11514/tcp" = [ "#monitoring", "#serverfarm" ]
 '''
 
 
@@ -65,11 +66,11 @@ def test_load_config():
     )
 
     assert config.routes == {
-        Route(514, "#monitoring"),
-        Route(10514, "#monitoring"),
-        Route(10514, "#network"),
-        Route(11514, "#monitoring"),
-        Route(11514, "#serverfarm"),
+        Route(Port(514, TransportProtocol.UDP), "#monitoring"),
+        Route(Port(10514, TransportProtocol.UDP), "#monitoring"),
+        Route(Port(10514, TransportProtocol.UDP), "#network"),
+        Route(Port(11514, TransportProtocol.TCP), "#monitoring"),
+        Route(Port(11514, TransportProtocol.TCP), "#serverfarm"),
     }
 
 

@@ -10,6 +10,9 @@ Unreleased
 - Switched to using Python's logging mechanism directly, with different
   log levels. Removed function ``util.log``.
 
+- Added TCP support for syslog message receiving. Adjusted routes
+  configuration format to support it.
+
 - Added support for custom IRC commands to send after connecting
   (authentication, cloaking, flood protection, etc.).
 

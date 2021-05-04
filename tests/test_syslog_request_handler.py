@@ -7,6 +7,7 @@ from datetime import datetime
 
 from syslogmp import Facility, Message, Severity
 
+from syslog2irc.network import Port, TransportProtocol
 from syslog2irc.signals import syslog_message_received
 from syslog2irc.syslog import RequestHandler
 
@@ -26,8 +27,8 @@ def test_handle():
     # Example 5 from RFC 3164.
     data = b'<0>Oct 22 10:52:12 scapegoat 1990 Oct 22 10:52:01 TZ-6 scapegoat.dmz.example.org 10.1.2.3 sched[0]: That\'s All Folks!'
 
-    port = 514
-    client_address = ('127.0.0.1', port)
+    port = Port(514, TransportProtocol.UDP)
+    client_address = ('127.0.0.1', port.number)
     request = [data]
 
     received_signal_data = []

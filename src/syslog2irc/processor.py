@@ -12,6 +12,7 @@ from typing import Any, Callable, Iterator, Optional, Set, Tuple
 
 from syslogmp import Message as SyslogMessage
 
+from .network import Port
 from .router import Router
 from .signals import (
     irc_channel_joined,
@@ -50,7 +51,7 @@ class Processor:
 
     def handle_syslog_message(
         self,
-        port: int,
+        port: Port,
         source_address: Optional[Tuple[str, int]] = None,
         message: Optional[SyslogMessage] = None,
     ) -> None:

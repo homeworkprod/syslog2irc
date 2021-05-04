@@ -5,7 +5,12 @@
 
 import pytest
 
+from syslog2irc.network import Port, TransportProtocol
 from syslog2irc.router import map_channel_names_to_ports, Router
+
+
+def create_port(number):
+    return Port(number, TransportProtocol.UDP)
 
 
 @pytest.mark.parametrize(
@@ -13,20 +18,20 @@ from syslog2irc.router import map_channel_names_to_ports, Router
     [
         (
             {
-                514: ['#example1'],
+                create_port(514): ['#example1'],
             },
             {
-                '#example1': {514},
+                '#example1': {create_port(514)},
             },
         ),
         (
             {
-                  514: ['#example1', '#example2'],
-                55514: ['#example2'],
+                create_port(514): ['#example1', '#example2'],
+                create_port(55514): ['#example2'],
             },
             {
-                '#example1': {514},
-                '#example2': {514, 55514},
+                '#example1': {create_port(514)},
+                '#example2': {create_port(514), create_port(55514)},
             },
         ),
     ],
@@ -36,7 +41,7 @@ def test_map_channel_names_to_ports(routes, expected):
 
 
 def test_do_not_enable_channel_without_routed_ports():
-    router = Router({514: {'#one'}})
+    router = Router({create_port(514): {'#one'}})
 
     router.enable_channel(None, channel_name='#one')
     router.enable_channel(None, channel_name='#two')

@@ -3,6 +3,7 @@
 :License: MIT, see LICENSE for details.
 """
 
+from syslog2irc.network import Port, TransportProtocol
 from syslog2irc.processor import Processor
 from syslog2irc.router import Router
 from syslog2irc.signals import irc_channel_joined
@@ -10,8 +11,8 @@ from syslog2irc.signals import irc_channel_joined
 
 def test_channel_enabling_on_join_signal():
     ports_to_channel_names = {
-          514: {'#example1', '#example2'},
-        55514: {'#example2'},
+        Port(514, TransportProtocol.UDP): {'#example1', '#example2'},
+        Port(55514, TransportProtocol.UDP): {'#example2'},
     }
 
     processor = create_processor(ports_to_channel_names)

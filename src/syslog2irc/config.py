@@ -16,6 +16,7 @@ from typing import Any, Dict, Iterator, Optional, Set
 import rtoml
 
 from .irc import IrcChannel, IrcConfig, IrcServer
+from .network import parse_port
 from .router import Route
 
 
@@ -104,8 +105,15 @@ def _get_routes(
     known_irc_channel_names = {c.name for c in irc_channels}
 
     def iterate() -> Iterator[Route]:
-        for syslog_port, irc_channel_names in data_routes.items():
+        for syslog_port_str, irc_channel_names in data_routes.items():
             for irc_channel_name in irc_channel_names:
+                try:
+                    syslog_port = parse_port(syslog_port_str)
+                except ValueError:
+                    raise ConfigurationError(
+                        f'Invalid syslog port "{syslog_port_str}"'
+                    )
+
                 if irc_channel_name not in known_irc_channel_names:
                     raise ConfigurationError(
                         f'Route target IRC channel "{irc_channel_name}" '
@@ -113,7 +121,7 @@ def _get_routes(
                     )
 
                 yield Route(
-                    syslog_port=int(syslog_port),
+                    syslog_port=syslog_port,
                     irc_channel_name=irc_channel_name,
                 )
 

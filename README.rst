@@ -93,12 +93,12 @@ single IRC channel looks like this:
     ]
 
     [routes]
-    514 = [ '#syslog' ]
+    "514/udp" = [ '#syslog' ]
 
 In a more complex setup, syslog messages could be received on multiple
-ports (514 and 55514 in this example), with those received on the first
-port being forwarded to two IRC channels, and those received on the
-latter port being forwarded exclusively to the second channel.
+ports (514/UDP and 55514/TCP in this example), with those received on
+the first port being forwarded to two IRC channels, and those received
+on the latter port being forwarded exclusively to the second channel.
 
 Here is a full example of an advanced configuration with all optional
 properties being specified:
@@ -128,8 +128,8 @@ properties being specified:
     [routes]
     # routing for syslog messages from the ports on which they are
     # received to the IRC channels they should be announced on
-    514 = [ '#examplechannel1', '#examplechannel2' ]
-    55514 = [ '#examplechannel2' ]
+    "514/udp" = [ '#examplechannel1', '#examplechannel2' ]
+    "55514/tcp" = [ '#examplechannel2' ]
 
 .. _TOML: https://toml.io/
 
