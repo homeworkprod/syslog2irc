@@ -15,7 +15,7 @@ from syslogmp import Message as SyslogMessage
 from .formatting import format_message
 from .irc import Bot as IrcBot, DummyBot as DummyIrcBot
 from .network import Port
-from .router import Router
+from .routing import Router
 from .signals import (
     irc_channel_joined,
     message_received,

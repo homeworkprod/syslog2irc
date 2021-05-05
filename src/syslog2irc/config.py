@@ -17,7 +17,7 @@ import rtoml
 
 from .irc import IrcChannel, IrcConfig, IrcServer
 from .network import parse_port
-from .router import Route
+from .routing import Route
 
 
 DEFAULT_IRC_SERVER_PORT = 6667

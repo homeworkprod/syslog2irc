@@ -8,7 +8,7 @@ from io import StringIO
 from syslog2irc.config import load_config
 from syslog2irc.irc import IrcChannel, IrcConfig, IrcServer
 from syslog2irc.network import Port, TransportProtocol
-from syslog2irc.router import Route
+from syslog2irc.routing import Route
 
 
 TOML_CONFIG = '''\

@@ -1,6 +1,6 @@
 """
-syslog2irc.router
-~~~~~~~~~~~~~~~~~
+syslog2irc.routing
+~~~~~~~~~~~~~~~~~~
 
 Routing of syslog messages to IRC channels by the port they arrive on.
 

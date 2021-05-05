@@ -14,7 +14,7 @@ from .cli import parse_args
 from .config import Config, load_config
 from .irc import create_bot
 from .processor import Processor
-from .router import map_ports_to_channel_names, Router
+from .routing import map_ports_to_channel_names, Router
 from .signals import message_received
 from .util import configure_logging
 

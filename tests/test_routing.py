@@ -6,7 +6,7 @@
 import pytest
 
 from syslog2irc.network import Port, TransportProtocol
-from syslog2irc.router import map_channel_names_to_ports, Router
+from syslog2irc.routing import map_channel_names_to_ports, Router
 
 
 def create_port(number):
