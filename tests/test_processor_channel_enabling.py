@@ -37,6 +37,4 @@ def create_processor(routes):
     syslog_ports = set()
     router = Router(routes)
 
-    processor = Processor(irc_bot, syslog_ports, router)
-    processor.connect_to_signals()
-    return processor
+    return Processor(irc_bot, syslog_ports, router)

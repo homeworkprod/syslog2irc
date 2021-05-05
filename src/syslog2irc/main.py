@@ -63,6 +63,10 @@ class Processor:
         else:
             self.format_message = format_message
 
+        # Up to this point, no signals must have been sent.
+        self.connect_to_signals()
+        # Signals are allowed be sent from here on.
+
     def connect_to_signals(self) -> None:
         irc_channel_joined.connect(self.router.enable_channel)
         syslog_message_received.connect(self.handle_syslog_message)
@@ -119,12 +123,6 @@ def create_processor(config: Config) -> Processor:
 def start(config: Config) -> None:
     """Start the IRC bot and the syslog listen server(s)."""
     processor = create_processor(config)
-
-    # Up to this point, no signals must have been sent.
-    processor.connect_to_signals()
-
-    # Signals are allowed be sent from here on.
-
     processor.run()
 
 
