@@ -28,6 +28,9 @@ from .util import configure_logging
 logger = logging.getLogger(__name__)
 
 
+FormatMessageCallable = Callable[[Tuple[str, int], SyslogMessage], str]
+
+
 # A note on threads (implementation detail):
 #
 # This application uses threads. Besides the main thread there is one
@@ -47,9 +50,7 @@ class Processor:
         self,
         config: Config,
         *,
-        custom_format_message: Optional[
-            Callable[[Tuple[str, int], SyslogMessage], str]
-        ] = None,
+        custom_format_message: Optional[FormatMessageCallable] = None,
     ) -> None:
         self.irc_bot = create_bot(config.irc)
         self.syslog_ports = {route.syslog_port for route in config.routes}
@@ -109,13 +110,15 @@ class Processor:
         self.irc_bot.disconnect('Bye.')  # Joins bot thread.
 
 
-def main() -> None:
+def main(
+    *, custom_format_message: Optional[FormatMessageCallable] = None
+) -> None:
     """Parse arguments, load configuration, and start the application."""
     args = parse_args()
     config = load_config(args.config_filename)
     configure_logging(config.log_level)
 
-    processor = Processor(config)
+    processor = Processor(config, custom_format_message=custom_format_message)
     processor.run()
 
 

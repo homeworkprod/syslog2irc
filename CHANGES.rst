@@ -27,6 +27,8 @@ Unreleased
 - Remove leading and trailing newlines from message text to prevent
   additional lines on IRC (patch provided by Jonas Alexandersson).
 
+- Provided and documented an easier way to customize message formatting.
+
 
 Version 0.11
 ------------

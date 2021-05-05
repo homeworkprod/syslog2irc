@@ -184,6 +184,35 @@ server. The bot should then enter the channel(s) you have configured
 (see Configuration_).
 
 
+Custom Message Format
+=====================
+
+The application's entry point is prepared to accept a custom callable to
+format messages.
+
+Arguably the easiest way to make use of this without fiddling inside of
+the installed package's sources:
+
+- Copy the Python code from ``src/syslog2irc/formatting.py`` to a new
+  file outside of the package path, e.g. ``syslog2irc-custom.py``.
+- Adjust the copy of the function ``format_message`` as desired.
+- Import the entry point function into the new file, then call it while
+  passing the adjusted formatter function to it:
+
+  .. code:: python
+
+      from syslog2irc.main import main
+
+      if __name__ == '__main__':
+          main(custom_format_message=format_message)
+
+- Run the new file in the shell:
+
+  .. code:: sh
+
+      $ python syslog2irc-custom.py config.toml
+
+
 Further Reading
 ===============
 
