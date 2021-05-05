@@ -56,7 +56,7 @@ class Processor:
         self.irc_bot = irc_bot
         self.syslog_ports = syslog_ports
         self.router = router
-        self.message_queue = SimpleQueue()
+        self.message_queue: SimpleQueue = SimpleQueue()
 
         if custom_format_message is not None:
             self.format_message = custom_format_message
