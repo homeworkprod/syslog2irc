@@ -31,9 +31,9 @@ logger = logging.getLogger(__name__)
 # A note on threads (implementation detail):
 #
 # This application uses threads. Besides the main thread there is one
-# thread for *each* syslog message receiver (which itself is a
-# `ThreadingUDPServer`!) and one thread for the (actual) IRC bot. (The
-# dummy bot does not run in a separate thread.)
+# thread for *each* syslog message receiver (which itself is a threading
+# server!) and one thread for the (actual) IRC bot. (The dummy bot does
+# not run in a separate thread.)
 
 # Those threads are configured to be daemon threads. A Python
 # application exits if no more non-daemon threads are running.
