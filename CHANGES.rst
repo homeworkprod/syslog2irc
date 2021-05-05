@@ -5,7 +5,7 @@ Changelog
 Version 0.12
 ------------
 
-Unreleased
+Released 2021-05-05
 
 - Switched to using Python's logging mechanism directly, with different
   log levels. Removed function ``util.log``.
