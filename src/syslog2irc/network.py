@@ -13,7 +13,7 @@ from enum import Enum
 TransportProtocol = Enum('TransportProtocol', ['TCP', 'UDP'])
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class Port:
     """A network port."""
 

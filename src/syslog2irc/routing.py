@@ -53,7 +53,7 @@ class Router:
         logger.info(
             'Enabled forwarding to IRC channel %s from syslog port(s) %s.',
             channel_name,
-            ', '.join(map(format_port, sorted(ports, key=lambda p: p.number))),
+            ', '.join(map(format_port, sorted(ports))),
         )
 
     def is_channel_enabled(self, channel: str) -> bool:

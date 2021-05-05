@@ -34,7 +34,7 @@ class IrcServer:
     rate_limit: Optional[float] = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class IrcChannel:
     """An IRC channel with optional password."""
 
@@ -112,7 +112,7 @@ class Bot(SingleServerIRCBot):
 
     def _join_channels(self, conn):
         """Join the configured channels."""
-        channels = _sort_channels_by_name(self.channels_to_join)
+        channels = sorted(self.channels_to_join)
         logger.info('Channels to join: %s', ', '.join(c.name for c in channels))
 
         for channel in channels:
@@ -151,7 +151,7 @@ class DummyBot:
 
     def start(self) -> None:
         # Fake channel joins.
-        for channel in _sort_channels_by_name(self.channels):
+        for channel in sorted(self.channels):
             irc_channel_joined.send(channel_name=channel.name)
 
     def say(self, channel_name: str, text: str) -> None:
@@ -160,10 +160,6 @@ class DummyBot:
     def disconnect(self, msg: str) -> None:
         # Mimics `irc.bot.SingleServerIRCBot.disconnect`.
         logger.info('Shutting down bot ...')
-
-
-def _sort_channels_by_name(channels: Set[IrcChannel]) -> List[IrcChannel]:
-    return list(sorted(channels, key=lambda c: c.name))
 
 
 def create_bot(config: IrcConfig) -> Union[Bot, DummyBot]:
