@@ -46,6 +46,7 @@ class Processor:
     def __init__(
         self,
         irc_bot: Union[IrcBot, DummyIrcBot],
+        syslog_ports: Set[Port],
         router: Router,
         *,
         custom_format_message: Optional[
@@ -53,6 +54,7 @@ class Processor:
         ] = None,
     ) -> None:
         self.irc_bot = irc_bot
+        self.syslog_ports = syslog_ports
         self.router = router
         self.message_queue = SimpleQueue()
 
@@ -89,10 +91,10 @@ class Processor:
             if self.router.is_channel_enabled(channel_name):
                 self.irc_bot.say(channel_name, text)
 
-    def run(self, syslog_ports: Set[Port]) -> None:
+    def run(self) -> None:
         """Start network-based components, run main loop."""
         self.irc_bot.start()
-        start_syslog_message_receivers(syslog_ports)
+        start_syslog_message_receivers(self.syslog_ports)
 
         try:
             while True:
@@ -108,9 +110,10 @@ class Processor:
 def create_processor(config: Config) -> Processor:
     """Create a processor."""
     irc_bot = create_bot(config.irc)
+    syslog_ports = {route.syslog_port for route in config.routes}
     router = Router(config.routes)
 
-    return Processor(irc_bot, router)
+    return Processor(irc_bot, syslog_ports, router)
 
 
 def start(config: Config) -> None:
@@ -122,8 +125,7 @@ def start(config: Config) -> None:
 
     # Signals are allowed be sent from here on.
 
-    syslog_ports = {route.syslog_port for route in config.routes}
-    processor.run(syslog_ports)
+    processor.run()
 
 
 def main() -> None:
