@@ -31,11 +31,11 @@ class Processor:
     def __init__(
         self,
         router: Router,
+        *,
         custom_format_message: Optional[
             Callable[[Tuple[str, int], SyslogMessage], str]
         ] = None,
     ) -> None:
-        super(Processor, self).__init__()
         self.router = router
 
         if custom_format_message is not None:
@@ -62,7 +62,7 @@ class Processor:
             if self.router.is_channel_enabled(channel_name):
                 message_received.send(channel_name=channel_name, text=text)
 
-    def run(self, seconds_to_sleep: float = 0.5) -> None:
+    def run(self, *, seconds_to_sleep: float = 0.5) -> None:
         """Run the main loop."""
         try:
             while True:
