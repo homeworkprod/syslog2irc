@@ -62,11 +62,7 @@ class Processor:
         formatted_message = self.syslog_message_formatter(message)
         text = f'{formatted_source} {formatted_message}'
 
-        message_received.send(
-            channel_names=channel_names,
-            text=text,
-            source_address=source_address,
-        )
+        message_received.send(channel_names=channel_names, text=text)
 
     def handle_message(
         self,
@@ -74,7 +70,6 @@ class Processor:
         *,
         channel_names: Optional[Set[str]] = None,
         text: Optional[str] = None,
-        source_address: Optional[Tuple[str, int]] = None,
     ) -> None:
         """Process an incoming message."""
         for channel_name in channel_names:
