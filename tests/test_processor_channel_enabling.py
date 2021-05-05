@@ -32,8 +32,9 @@ def test_channel_enabling_on_join_signal():
 
 
 def create_processor(ports_to_channel_names):
+    irc_bot = None
     router = Router(ports_to_channel_names)
 
-    processor = Processor(router)
+    processor = Processor(irc_bot, router)
     processor.connect_to_signals()
     return processor

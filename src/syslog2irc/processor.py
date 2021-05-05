@@ -8,10 +8,11 @@ syslog2irc.processor
 
 import logging
 from time import sleep
-from typing import Any, Callable, Iterator, Optional, Set, Tuple
+from typing import Any, Callable, Iterator, Optional, Set, Tuple, Union
 
 from syslogmp import Message as SyslogMessage
 
+from .irc import Bot as IrcBot, DummyBot as DummyIrcBot
 from .network import Port
 from .router import Router
 from .signals import (
@@ -19,6 +20,7 @@ from .signals import (
     message_received,
     syslog_message_received,
 )
+from .syslog import start_syslog_message_receivers
 
 
 MESSAGE_TEXT_ENCODING = 'utf-8'
@@ -30,12 +32,14 @@ logger = logging.getLogger(__name__)
 class Processor:
     def __init__(
         self,
+        irc_bot: Union[IrcBot, DummyIrcBot],
         router: Router,
         *,
         custom_format_message: Optional[
             Callable[[Tuple[str, int], SyslogMessage], str]
         ] = None,
     ) -> None:
+        self.irc_bot = irc_bot
         self.router = router
 
         if custom_format_message is not None:
@@ -62,8 +66,13 @@ class Processor:
             if self.router.is_channel_enabled(channel_name):
                 message_received.send(channel_name=channel_name, text=text)
 
-    def run(self, *, seconds_to_sleep: float = 0.5) -> None:
-        """Run the main loop."""
+    def run(
+        self, syslog_ports: Set[Port], *, seconds_to_sleep: float = 0.5
+    ) -> None:
+        """Start network-based components, run main loop."""
+        self.irc_bot.start()
+        start_syslog_message_receivers(syslog_ports)
+
         try:
             while True:
                 sleep(seconds_to_sleep)
@@ -71,6 +80,7 @@ class Processor:
             pass
 
         logger.info('Shutting down ...')
+        self.irc_bot.disconnect('Bye.')  # Joins bot thread.
 
 
 def format_message(

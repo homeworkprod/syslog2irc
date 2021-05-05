@@ -16,7 +16,6 @@ from .irc import create_bot
 from .processor import Processor
 from .router import map_ports_to_channel_names, Router
 from .signals import message_received
-from .syslog import start_syslog_message_receivers
 from .util import configure_logging
 
 
@@ -36,26 +35,22 @@ from .util import configure_logging
 
 def start(config: Config) -> None:
     """Start the IRC bot and the syslog listen server(s)."""
-    ports = {route.syslog_port for route in config.routes}
+    syslog_ports = {route.syslog_port for route in config.routes}
     ports_to_channel_names = map_ports_to_channel_names(config.routes)
 
     irc_bot = create_bot(config.irc)
     message_received.connect(irc_bot.say)
 
     router = Router(ports_to_channel_names)
-    processor = Processor(router)
+
+    processor = Processor(irc_bot, router)
 
     # Up to this point, no signals must have been sent.
     processor.connect_to_signals()
 
     # Signals are allowed be sent from here on.
 
-    start_syslog_message_receivers(ports)
-    irc_bot.start()
-
-    processor.run()
-
-    irc_bot.disconnect('Bye.')  # Joins bot thread.
+    processor.run(syslog_ports)
 
 
 def main() -> None:
