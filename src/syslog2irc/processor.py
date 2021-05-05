@@ -32,17 +32,17 @@ class Processor:
     def __init__(
         self,
         router: Router,
-        syslog_message_formatter: Optional[
+        custom_format_message: Optional[
             Callable[[Tuple[str, int], SyslogMessage], str]
         ] = None,
     ) -> None:
         super(Processor, self).__init__()
         self.router = router
 
-        if syslog_message_formatter is not None:
-            self.syslog_message_formatter = syslog_message_formatter
+        if custom_format_message is not None:
+            self.format_message = custom_format_message
         else:
-            self.syslog_message_formatter = format_syslog_message
+            self.format_message = format_message
 
     def connect_to_signals(self) -> None:
         irc_channel_joined.connect(self.router.enable_channel)
@@ -57,7 +57,7 @@ class Processor:
     ) -> None:
         """Process an incoming syslog message."""
         channel_names = self.router.get_channel_names_for_port(port)
-        text = self.syslog_message_formatter(source_address, message)
+        text = self.format_message(source_address, message)
 
         message_received.send(channel_names=channel_names, text=text)
 
@@ -84,11 +84,10 @@ class Processor:
         logger.info('Shutting down ...')
 
 
-def format_syslog_message(
-    source_address: Tuple[str, int],
-    message: SyslogMessage,
+def format_message(
+    source_address: Tuple[str, int], message: SyslogMessage
 ) -> str:
-    """Format a syslog message to be displayed on IRC."""
+    """Format syslog message to be displayed on IRC."""
 
     def _generate() -> Iterator[str]:
         yield f'{source_address[0]}:{source_address[1]:d} '

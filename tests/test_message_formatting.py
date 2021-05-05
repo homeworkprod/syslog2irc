@@ -8,7 +8,7 @@ from datetime import datetime
 import pytest
 from syslogmp import Facility, Message, Severity
 
-from syslog2irc.processor import format_syslog_message
+from syslog2irc.processor import format_message
 
 
 @pytest.mark.parametrize(
@@ -67,4 +67,4 @@ def test_format_message(
 ):
     """Test string representation of a syslog message."""
     message = Message(facility, severity, timestamp, hostname, message)
-    assert format_syslog_message(source_address, message) == expected
+    assert format_message(source_address, message) == expected
