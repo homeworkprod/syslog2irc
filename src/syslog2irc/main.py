@@ -120,18 +120,14 @@ def create_processor(config: Config) -> Processor:
     return Processor(irc_bot, syslog_ports, router)
 
 
-def start(config: Config) -> None:
-    """Start the IRC bot and the syslog listen server(s)."""
-    processor = create_processor(config)
-    processor.run()
-
-
 def main() -> None:
     """Parse arguments, load configuration, and start the application."""
     args = parse_args()
     config = load_config(args.config_filename)
     configure_logging(config.log_level)
-    start(config)
+
+    processor = create_processor(config)
+    processor.run()
 
 
 if __name__ == '__main__':
