@@ -17,11 +17,7 @@ from .config import Config
 from .irc import Bot as IrcBot, create_bot, DummyBot as DummyIrcBot
 from .network import Port
 from .routing import map_ports_to_channel_names, Router
-from .signals import (
-    irc_channel_joined,
-    message_received,
-    syslog_message_received,
-)
+from .signals import irc_channel_joined, syslog_message_received
 from .syslog import start_syslog_message_receivers
 
 
@@ -63,7 +59,7 @@ class Processor:
 
         for channel_name in channel_names:
             if self.router.is_channel_enabled(channel_name):
-                message_received.send(channel_name=channel_name, text=text)
+                self.irc_bot.say(channel_name, text)
 
     def run(
         self, syslog_ports: Set[Port], *, seconds_to_sleep: float = 0.5
@@ -87,8 +83,6 @@ def create_processor(config: Config) -> Processor:
     ports_to_channel_names = map_ports_to_channel_names(config.routes)
 
     irc_bot = create_bot(config.irc)
-    message_received.connect(irc_bot.say)
-
     router = Router(ports_to_channel_names)
 
     return Processor(irc_bot, router)

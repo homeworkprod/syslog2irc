@@ -11,7 +11,7 @@ Internet Relay Chat
 from dataclasses import dataclass
 import logging
 from ssl import wrap_socket as ssl_wrap_socket
-from typing import Any, List, Optional, Set, Union
+from typing import List, Optional, Set, Union
 
 from irc.bot import ServerSpec, SingleServerIRCBot
 from irc.connection import Factory
@@ -138,13 +138,7 @@ class Bot(SingleServerIRCBot):
         channel_name = event.arguments[0]
         logger.info('Cannot join channel %s (bad key).', channel_name)
 
-    def say(
-        self,
-        sender: Optional[Any],
-        *,
-        channel_name: Optional[str] = None,
-        text: Optional[str] = None,
-    ) -> None:
+    def say(self, channel_name: str, text: str) -> None:
         """Say message on channel."""
         self.connection.privmsg(channel_name, text)
 
@@ -160,13 +154,7 @@ class DummyBot:
         for channel in _sort_channels_by_name(self.channels):
             irc_channel_joined.send(channel_name=channel.name)
 
-    def say(
-        self,
-        sender: Optional[Any],
-        *,
-        channel_name: Optional[str] = None,
-        text: Optional[str] = None,
-    ) -> None:
+    def say(self, channel_name: str, text: str) -> None:
         logger.info('%s> %s', channel_name, text)
 
     def disconnect(self, msg: str) -> None:
