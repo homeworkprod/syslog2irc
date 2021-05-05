@@ -15,7 +15,7 @@ from .config import Config, load_config
 from .irc import create_bot
 from .processor import Processor
 from .router import map_ports_to_channel_names, Router
-from .signals import message_approved
+from .signals import message_received
 from .syslog import start_syslog_message_receivers
 from .util import configure_logging
 
@@ -40,7 +40,7 @@ def start(config: Config) -> None:
     ports_to_channel_names = map_ports_to_channel_names(config.routes)
 
     irc_bot = create_bot(config.irc)
-    message_approved.connect(irc_bot.say)
+    message_received.connect(irc_bot.say)
 
     router = Router(ports_to_channel_names)
     processor = Processor(router)

@@ -16,7 +16,6 @@ from .network import Port
 from .router import Router
 from .signals import (
     irc_channel_joined,
-    message_approved,
     message_received,
     syslog_message_received,
 )
@@ -47,11 +46,11 @@ class Processor:
     def connect_to_signals(self) -> None:
         irc_channel_joined.connect(self.router.enable_channel)
         syslog_message_received.connect(self.handle_syslog_message)
-        message_received.connect(self.handle_message)
 
     def handle_syslog_message(
         self,
         port: Port,
+        *,
         source_address: Optional[Tuple[str, int]] = None,
         message: Optional[SyslogMessage] = None,
     ) -> None:
@@ -59,19 +58,9 @@ class Processor:
         channel_names = self.router.get_channel_names_for_port(port)
         text = self.format_message(source_address, message)
 
-        message_received.send(channel_names=channel_names, text=text)
-
-    def handle_message(
-        self,
-        sender: Any,
-        *,
-        channel_names: Optional[Set[str]] = None,
-        text: Optional[str] = None,
-    ) -> None:
-        """Process an incoming message."""
         for channel_name in channel_names:
             if self.router.is_channel_enabled(channel_name):
-                message_approved.send(channel_name=channel_name, text=text)
+                message_received.send(channel_name=channel_name, text=text)
 
     def run(self, seconds_to_sleep: float = 0.5) -> None:
         """Run the main loop."""
