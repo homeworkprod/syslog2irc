@@ -19,7 +19,8 @@ Unreleased
   configuration format to support it.
 
 - Added support for custom IRC commands to send after connecting
-  (authentication, cloaking, flood protection, etc.).
+  (authentication, cloaking, flood protection, etc.) (idea and essential
+  patch provided by Jonas Alexandersson).
 
 - Prevent enabling of a joined IRC channel to receive messages if no
   ports are routed to it.
