@@ -8,7 +8,7 @@ from datetime import datetime
 import pytest
 from syslogmp import Facility, Message, Severity
 
-from syslog2irc.processor import format_message
+from syslog2irc.formatting import format_message
 
 
 @pytest.mark.parametrize(
