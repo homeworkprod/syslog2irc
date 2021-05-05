@@ -3,9 +3,11 @@
 :License: MIT, see LICENSE for details.
 """
 
+from syslog2irc.config import Config
+from syslog2irc.irc import IrcConfig
 from syslog2irc.main import Processor
 from syslog2irc.network import Port, TransportProtocol
-from syslog2irc.routing import Route, Router
+from syslog2irc.routing import Route
 from syslog2irc.signals import irc_channel_joined
 
 
@@ -33,8 +35,14 @@ def test_channel_enabling_on_join_signal():
 
 
 def create_processor(routes):
-    irc_bot = None
-    syslog_ports = set()
-    router = Router(routes)
+    irc_config = IrcConfig(
+        server=None,
+        nickname='nick',
+        realname='Nick',
+        commands=[],
+        channels=set(),
+    )
 
-    return Processor(irc_bot, syslog_ports, router)
+    config = Config(log_level=None, irc=irc_config, routes=routes)
+
+    return Processor(config)

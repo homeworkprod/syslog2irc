@@ -10,14 +10,14 @@ Orchestration, application entry point
 
 import logging
 from queue import SimpleQueue
-from typing import Callable, Optional, Set, Tuple, Union
+from typing import Callable, Optional, Tuple
 
 from syslogmp import Message as SyslogMessage
 
 from .cli import parse_args
 from .config import Config, load_config
 from .formatting import format_message
-from .irc import Bot as IrcBot, create_bot, DummyBot as DummyIrcBot
+from .irc import create_bot
 from .network import Port
 from .routing import Router
 from .signals import irc_channel_joined, syslog_message_received
@@ -45,17 +45,15 @@ logger = logging.getLogger(__name__)
 class Processor:
     def __init__(
         self,
-        irc_bot: Union[IrcBot, DummyIrcBot],
-        syslog_ports: Set[Port],
-        router: Router,
+        config: Config,
         *,
         custom_format_message: Optional[
             Callable[[Tuple[str, int], SyslogMessage], str]
         ] = None,
     ) -> None:
-        self.irc_bot = irc_bot
-        self.syslog_ports = syslog_ports
-        self.router = router
+        self.irc_bot = create_bot(config.irc)
+        self.syslog_ports = {route.syslog_port for route in config.routes}
+        self.router = Router(config.routes)
         self.message_queue: SimpleQueue = SimpleQueue()
 
         if custom_format_message is not None:
@@ -111,22 +109,13 @@ class Processor:
         self.irc_bot.disconnect('Bye.')  # Joins bot thread.
 
 
-def create_processor(config: Config) -> Processor:
-    """Create a processor."""
-    irc_bot = create_bot(config.irc)
-    syslog_ports = {route.syslog_port for route in config.routes}
-    router = Router(config.routes)
-
-    return Processor(irc_bot, syslog_ports, router)
-
-
 def main() -> None:
     """Parse arguments, load configuration, and start the application."""
     args = parse_args()
     config = load_config(args.config_filename)
     configure_logging(config.log_level)
 
-    processor = create_processor(config)
+    processor = Processor(config)
     processor.run()
 
 
