@@ -105,6 +105,8 @@ properties being specified:
 
 .. code:: toml
 
+    log_level = "warning"        # optional
+
     [irc.server]
     host = "irc.server.example"  # optional
     port = 6667                  # optional

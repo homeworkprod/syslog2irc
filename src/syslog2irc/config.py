@@ -33,6 +33,7 @@ class ConfigurationError(Exception):
 
 @dataclass(frozen=True)
 class Config:
+    log_level: str
     irc: IrcConfig
     routes: Set[Route]
 
@@ -41,10 +42,20 @@ def load_config(path: Path) -> Config:
     """Load configuration from file."""
     data = rtoml.load(path)
 
+    log_level = _get_log_level(data)
     irc_config = _get_irc_config(data)
     routes = _get_routes(data, irc_config.channels)
 
-    return Config(irc=irc_config, routes=routes)
+    return Config(log_level=log_level, irc=irc_config, routes=routes)
+
+
+def _get_log_level(data: Dict[str, Any]) -> str:
+    level = data.get('log_level', 'debug').upper()
+
+    if level not in {'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'}:
+        raise ConfigurationError(f'Unknown log level "{level}"')
+
+    return level
 
 
 def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:

@@ -14,7 +14,7 @@ from threading import Thread
 from typing import Callable
 
 
-def configure_logging() -> None:
+def configure_logging(level: str) -> None:
     """Configure application-specific loggers.
 
     Setting the log level does not affect dependencies' loggers.
@@ -28,7 +28,7 @@ def configure_logging() -> None:
     handler.setFormatter(Formatter('%(asctime)s %(levelname)-8s %(message)s'))
     pkg_logger.addHandler(handler)
 
-    pkg_logger.setLevel(logging.DEBUG)
+    pkg_logger.setLevel(level)
 
 
 def start_thread(target: Callable, name: str) -> None:

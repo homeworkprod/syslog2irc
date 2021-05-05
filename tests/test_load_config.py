@@ -12,6 +12,8 @@ from syslog2irc.routing import Route
 
 
 TOML_CONFIG = '''\
+log_level = "warning"
+
 [irc.server]
 host = "irc.acme.test"
 port = 6669
@@ -44,6 +46,8 @@ def test_load_config():
     toml = StringIO(TOML_CONFIG)
 
     config = load_config(toml)
+
+    assert config.log_level == 'WARNING'
 
     assert config.irc == IrcConfig(
         server=IrcServer(
@@ -87,6 +91,8 @@ def test_load_config_with_defaults():
     toml = StringIO(TOML_CONFIG_WITH_DEFAULTS)
 
     config = load_config(toml)
+
+    assert config.log_level == 'DEBUG'
 
     assert config.irc == IrcConfig(
         server=IrcServer(

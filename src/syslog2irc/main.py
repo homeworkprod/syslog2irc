@@ -131,8 +131,8 @@ def start(config: Config) -> None:
 def main() -> None:
     """Parse arguments, load configuration, and start the application."""
     args = parse_args()
-    configure_logging()
     config = load_config(args.config_filename)
+    configure_logging(config.log_level)
     start(config)
 
 

@@ -10,6 +10,8 @@ Unreleased
 - Switched to using Python's logging mechanism directly, with different
   log levels. Removed function ``util.log``.
 
+- Made the application's log level configurable.
+
 - Introduced an internal queue to decouple syslog message reception from
   message formatting and posting to IRC.
 
