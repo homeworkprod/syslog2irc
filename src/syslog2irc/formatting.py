@@ -24,13 +24,11 @@ def format_message(
     def _generate() -> Iterator[str]:
         yield f'{source_address[0]}:{source_address[1]:d} '
 
-        if message.timestamp is not None:
-            timestamp_format = '%Y-%m-%d %H:%M:%S'
-            formatted_timestamp = message.timestamp.strftime(timestamp_format)
-            yield f'[{formatted_timestamp}] '
+        timestamp_format = '%Y-%m-%d %H:%M:%S'
+        formatted_timestamp = message.timestamp.strftime(timestamp_format)
+        yield f'[{formatted_timestamp}] '
 
-        if message.hostname is not None:
-            yield f'({message.hostname}) '
+        yield f'({message.hostname}) '
 
         severity_name = message.severity.name
 
