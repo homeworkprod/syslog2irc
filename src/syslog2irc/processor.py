@@ -13,9 +13,10 @@ from typing import Callable, Optional, Set, Tuple, Union
 from syslogmp import Message as SyslogMessage
 
 from .formatting import format_message
-from .irc import Bot as IrcBot, DummyBot as DummyIrcBot
+from .config import Config
+from .irc import Bot as IrcBot, create_bot, DummyBot as DummyIrcBot
 from .network import Port
-from .routing import Router
+from .routing import map_ports_to_channel_names, Router
 from .signals import (
     irc_channel_joined,
     message_received,
@@ -79,3 +80,15 @@ class Processor:
 
         logger.info('Shutting down ...')
         self.irc_bot.disconnect('Bye.')  # Joins bot thread.
+
+
+def create_processor(config: Config) -> Processor:
+    """Create a processor."""
+    ports_to_channel_names = map_ports_to_channel_names(config.routes)
+
+    irc_bot = create_bot(config.irc)
+    message_received.connect(irc_bot.say)
+
+    router = Router(ports_to_channel_names)
+
+    return Processor(irc_bot, router)

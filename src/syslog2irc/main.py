@@ -8,14 +8,9 @@ Application entry point
 :License: MIT, see LICENSE for details.
 """
 
-import logging
-
 from .cli import parse_args
 from .config import Config, load_config
-from .irc import create_bot
-from .processor import Processor
-from .routing import map_ports_to_channel_names, Router
-from .signals import message_received
+from .processor import create_processor
 from .util import configure_logging
 
 
@@ -35,21 +30,14 @@ from .util import configure_logging
 
 def start(config: Config) -> None:
     """Start the IRC bot and the syslog listen server(s)."""
-    syslog_ports = {route.syslog_port for route in config.routes}
-    ports_to_channel_names = map_ports_to_channel_names(config.routes)
-
-    irc_bot = create_bot(config.irc)
-    message_received.connect(irc_bot.say)
-
-    router = Router(ports_to_channel_names)
-
-    processor = Processor(irc_bot, router)
+    processor = create_processor(config)
 
     # Up to this point, no signals must have been sent.
     processor.connect_to_signals()
 
     # Signals are allowed be sent from here on.
 
+    syslog_ports = {route.syslog_port for route in config.routes}
     processor.run(syslog_ports)
 
 
