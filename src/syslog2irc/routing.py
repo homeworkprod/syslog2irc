@@ -30,10 +30,10 @@ class Route:
 class Router:
     """Map syslog port numbers to IRC channel names."""
 
-    def __init__(self, ports_to_channel_names: Dict[Port, Set[str]]) -> None:
-        self.ports_to_channel_names = ports_to_channel_names
+    def __init__(self, routes: Set[Route]) -> None:
+        self.ports_to_channel_names = map_ports_to_channel_names(routes)
         self.channel_names_to_ports = map_channel_names_to_ports(
-            ports_to_channel_names
+            self.ports_to_channel_names
         )
         self.enabled_channels: Set[str] = set()
 

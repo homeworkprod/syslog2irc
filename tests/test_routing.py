@@ -6,7 +6,7 @@
 import pytest
 
 from syslog2irc.network import Port, TransportProtocol
-from syslog2irc.routing import map_channel_names_to_ports, Router
+from syslog2irc.routing import map_channel_names_to_ports, Route, Router
 
 
 def create_port(number):
@@ -41,7 +41,10 @@ def test_map_channel_names_to_ports(routes, expected):
 
 
 def test_do_not_enable_channel_without_routed_ports():
-    router = Router({create_port(514): {'#one'}})
+    routes = {
+        Route(create_port(514), '#one'),
+    }
+    router = Router(routes)
 
     router.enable_channel(None, channel_name='#one')
     router.enable_channel(None, channel_name='#two')

@@ -5,17 +5,18 @@
 
 from syslog2irc.main import Processor
 from syslog2irc.network import Port, TransportProtocol
-from syslog2irc.routing import Router
+from syslog2irc.routing import Route, Router
 from syslog2irc.signals import irc_channel_joined
 
 
 def test_channel_enabling_on_join_signal():
-    ports_to_channel_names = {
-        Port(514, TransportProtocol.UDP): {'#example1', '#example2'},
-        Port(55514, TransportProtocol.UDP): {'#example2'},
+    routes = {
+        Route(Port(514, TransportProtocol.UDP), '#example1'),
+        Route(Port(514, TransportProtocol.UDP), '#example2'),
+        Route(Port(55514, TransportProtocol.UDP), '#example2'),
     }
 
-    processor = create_processor(ports_to_channel_names)
+    processor = create_processor(routes)
 
     assert not processor.router.is_channel_enabled('#example1')
     assert not processor.router.is_channel_enabled('#example2')
@@ -31,9 +32,9 @@ def test_channel_enabling_on_join_signal():
     assert processor.router.is_channel_enabled('#example2')
 
 
-def create_processor(ports_to_channel_names):
+def create_processor(routes):
     irc_bot = None
-    router = Router(ports_to_channel_names)
+    router = Router(routes)
 
     processor = Processor(irc_bot, router)
     processor.connect_to_signals()

@@ -19,7 +19,7 @@ from .config import Config, load_config
 from .formatting import format_message
 from .irc import Bot as IrcBot, create_bot, DummyBot as DummyIrcBot
 from .network import Port
-from .routing import map_ports_to_channel_names, Router
+from .routing import Router
 from .signals import irc_channel_joined, syslog_message_received
 from .syslog import start_syslog_message_receivers
 from .util import configure_logging
@@ -107,10 +107,8 @@ class Processor:
 
 def create_processor(config: Config) -> Processor:
     """Create a processor."""
-    ports_to_channel_names = map_ports_to_channel_names(config.routes)
-
     irc_bot = create_bot(config.irc)
-    router = Router(ports_to_channel_names)
+    router = Router(config.routes)
 
     return Processor(irc_bot, router)
 
