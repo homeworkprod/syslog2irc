@@ -3,8 +3,8 @@
 :License: MIT, see LICENSE for details.
 """
 
+from syslog2irc.main import Processor
 from syslog2irc.network import Port, TransportProtocol
-from syslog2irc.processor import Processor
 from syslog2irc.routing import Router
 from syslog2irc.signals import irc_channel_joined
 
