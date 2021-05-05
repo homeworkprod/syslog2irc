@@ -33,7 +33,7 @@ class Processor:
         self,
         router: Router,
         syslog_message_formatter: Optional[
-            Callable[[SyslogMessage], str]
+            Callable[[Tuple[str, int], SyslogMessage], str]
         ] = None,
     ) -> None:
         super(Processor, self).__init__()
@@ -57,10 +57,7 @@ class Processor:
     ) -> None:
         """Process an incoming syslog message."""
         channel_names = self.router.get_channel_names_for_port(port)
-
-        formatted_source = f'{source_address[0]}:{source_address[1]:d}'
-        formatted_message = self.syslog_message_formatter(message)
-        text = f'{formatted_source} {formatted_message}'
+        text = self.syslog_message_formatter(source_address, message)
 
         message_received.send(channel_names=channel_names, text=text)
 
@@ -87,10 +84,15 @@ class Processor:
         logger.info('Shutting down ...')
 
 
-def format_syslog_message(message: SyslogMessage) -> str:
+def format_syslog_message(
+    source_address: Tuple[str, int],
+    message: SyslogMessage,
+) -> str:
     """Format a syslog message to be displayed on IRC."""
 
     def _generate() -> Iterator[str]:
+        yield f'{source_address[0]}:{source_address[1]:d} '
+
         if message.timestamp is not None:
             timestamp_format = '%Y-%m-%d %H:%M:%S'
             formatted_timestamp = message.timestamp.strftime(timestamp_format)
