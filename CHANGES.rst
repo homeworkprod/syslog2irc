@@ -10,6 +10,9 @@ Unreleased
 - Switched to using Python's logging mechanism directly, with different
   log levels. Removed function ``util.log``.
 
+- Introduced an internal queue to decouple syslog message reception from
+  message formatting and posting to IRC.
+
 - Added TCP support for syslog message receiving. Adjusted routes
   configuration format to support it.
 

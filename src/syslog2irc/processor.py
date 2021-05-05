@@ -7,7 +7,7 @@ syslog2irc.processor
 """
 
 import logging
-from time import sleep
+from queue import SimpleQueue
 from typing import Callable, Optional, Set, Tuple, Union
 
 from syslogmp import Message as SyslogMessage
@@ -36,6 +36,7 @@ class Processor:
     ) -> None:
         self.irc_bot = irc_bot
         self.router = router
+        self.message_queue = SimpleQueue()
 
         if custom_format_message is not None:
             self.format_message = custom_format_message
@@ -54,6 +55,15 @@ class Processor:
         message: Optional[SyslogMessage] = None,
     ) -> None:
         """Process an incoming syslog message."""
+        self.message_queue.put((port, source_address, message))
+
+    def announce_message(
+        self,
+        port: Port,
+        source_address: Tuple[str, int],
+        message: SyslogMessage,
+    ) -> None:
+        """Announce message on IRC."""
         channel_names = self.router.get_channel_names_for_port(port)
         text = self.format_message(source_address, message)
 
@@ -61,16 +71,15 @@ class Processor:
             if self.router.is_channel_enabled(channel_name):
                 self.irc_bot.say(channel_name, text)
 
-    def run(
-        self, syslog_ports: Set[Port], *, seconds_to_sleep: float = 0.5
-    ) -> None:
+    def run(self, syslog_ports: Set[Port]) -> None:
         """Start network-based components, run main loop."""
         self.irc_bot.start()
         start_syslog_message_receivers(syslog_ports)
 
         try:
             while True:
-                sleep(seconds_to_sleep)
+                port, source_address, message = self.message_queue.get()
+                self.announce_message(port, source_address, message)
         except KeyboardInterrupt:
             pass
 
