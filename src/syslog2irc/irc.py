@@ -155,7 +155,7 @@ class DummyBot:
             irc_channel_joined.send(channel_name=channel.name)
 
     def say(self, channel_name: str, text: str) -> None:
-        logger.info('%s> %s', channel_name, text)
+        logger.debug('%s> %s', channel_name, text)
 
     def disconnect(self, msg: str) -> None:
         # Mimics `irc.bot.SingleServerIRCBot.disconnect`.
