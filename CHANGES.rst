@@ -7,6 +7,10 @@ Version 0.13
 
 Unreleased
 
+- Changed log level of message for failed IRC channel join due to bad
+  key to "warning". This keeps it visible if one decides logging on
+  level "info" is too noisy in production.
+
 
 Version 0.12
 ------------

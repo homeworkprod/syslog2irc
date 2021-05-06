@@ -136,7 +136,7 @@ class Bot(SingleServerIRCBot):
     def on_badchannelkey(self, conn, event) -> None:
         """Channel could not be joined due to wrong password."""
         channel_name = event.arguments[0]
-        logger.info('Cannot join channel %s (bad key).', channel_name)
+        logger.warning('Cannot join channel %s (bad key).', channel_name)
 
     def say(self, channel_name: str, text: str) -> None:
         """Say message on channel."""
