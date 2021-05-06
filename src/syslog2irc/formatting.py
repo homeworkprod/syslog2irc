@@ -22,7 +22,9 @@ def format_message(
     """Format syslog message to be displayed on IRC."""
 
     def _generate() -> Iterator[str]:
-        yield f'{source_address[0]}:{source_address[1]:d} '
+        source_host = source_address[0]
+        source_port = source_address[1]
+        yield f'{source_host}:{source_port:d} '
 
         timestamp_format = '%Y-%m-%d %H:%M:%S'
         formatted_timestamp = message.timestamp.strftime(timestamp_format)
