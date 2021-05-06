@@ -8,7 +8,7 @@ Message formatting
 :License: MIT, see LICENSE for details.
 """
 
-from typing import Iterator, Tuple
+from typing import Tuple
 
 from syslogmp import Message as SyslogMessage
 
@@ -20,28 +20,25 @@ def format_message(
     source_address: Tuple[str, int], message: SyslogMessage
 ) -> str:
     """Format syslog message to be displayed on IRC."""
+    source_host = source_address[0]
+    source_port = source_address[1]
 
-    def _generate() -> Iterator[str]:
-        source_host = source_address[0]
-        source_port = source_address[1]
-        yield f'{source_host}:{source_port:d} '
+    timestamp_format = '%Y-%m-%d %H:%M:%S'
+    formatted_timestamp = message.timestamp.strftime(timestamp_format)
 
-        timestamp_format = '%Y-%m-%d %H:%M:%S'
-        formatted_timestamp = message.timestamp.strftime(timestamp_format)
-        yield f'[{formatted_timestamp}] '
+    severity_name = message.severity.name
 
-        yield f'({message.hostname}) '
+    # Important: The message text is a byte string.
+    text = message.message.decode(MESSAGE_TEXT_ENCODING)
 
-        severity_name = message.severity.name
+    # Remove leading and trailing newlines. Those would result in
+    # additional lines on IRC with the usual metadata but with an
+    # empty message text.
+    text = text.strip('\n')
 
-        # Important: The message text is a byte string.
-        text = message.message.decode(MESSAGE_TEXT_ENCODING)
-
-        # Remove leading and trailing newlines. Those would result in
-        # additional lines on IRC with the usual metadata but with an
-        # empty message text.
-        text = text.strip('\n')
-
-        yield f'[{severity_name}]: {text}'
-
-    return ''.join(_generate())
+    return (
+        f'{source_host}:{source_port:d} '
+        f'[{formatted_timestamp}] '
+        f'({message.hostname}) '
+        f'[{severity_name}]: {text}'
+    )

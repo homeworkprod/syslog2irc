@@ -11,6 +11,9 @@ Unreleased
   key to "warning". This keeps it visible if one decides logging on
   level "info" is too noisy in production.
 
+- Simplified implementation of ``format_message``. As it is suggested to
+  be copied and adjusted by users, this change should make that easier.
+
 
 Version 0.12
 ------------
