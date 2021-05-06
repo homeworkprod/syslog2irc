@@ -10,7 +10,7 @@ Internet Relay Chat
 
 from dataclasses import dataclass
 import logging
-from ssl import wrap_socket as ssl_wrap_socket
+import ssl
 from typing import List, Optional, Set, Union
 
 from irc.bot import ServerSpec, SingleServerIRCBot
@@ -69,7 +69,7 @@ class Bot(SingleServerIRCBot):
         )
 
         server_spec = ServerSpec(server.host, server.port, server.password)
-        factory = Factory(wrapper=ssl_wrap_socket) if server.ssl else Factory()
+        factory = Factory(wrapper=ssl.wrap_socket) if server.ssl else Factory()
         SingleServerIRCBot.__init__(
             self, [server_spec], nickname, realname, connect_factory=factory
         )
