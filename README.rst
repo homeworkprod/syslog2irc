@@ -42,6 +42,11 @@ Requirements
 - Python 3.7+
 - Dependencies: blinker_, irc_, rtoml_, syslogmp_
 
+.. _blinker:  https://pythonhosted.org/blinker/
+.. _irc:      https://bitbucket.org/jaraco/irc
+.. _rtoml:    https://github.com/samuelcolvin/rtoml
+.. _syslogmp: https://homework.nwsnet.de/releases/76d6/#syslogmp
+
 
 Installation
 ============
@@ -51,6 +56,8 @@ syslog2IRC and its dependencies can be installed via pip_:
 .. code:: sh
 
     $ pip install syslog2irc
+
+.. _pip:      http://www.pip-installer.org/
 
 
 Configuration
@@ -69,6 +76,8 @@ port (514, UDP, as assigned by IANA_)::
 Or, when syslog2IRC listens on a non-default port (here: 11514)::
 
     *.*     @host-to-send-log-messages-to-and-this-script-runs-on:11514
+
+.. _IANA:     https://www.iana.org/
 
 
 syslog2IRC
@@ -221,13 +230,6 @@ For more information, see `RFC 3164`_, "The BSD syslog Protocol".
 Please note that there is `RFC 5424`_, "The Syslog Protocol", which
 obsoletes `RFC 3164`_. syslog2IRC, however, only implements the latter.
 
-
-.. _blinker:  https://pythonhosted.org/blinker/
-.. _irc:      https://bitbucket.org/jaraco/irc
-.. _rtoml:    https://github.com/samuelcolvin/rtoml
-.. _syslogmp: https://homework.nwsnet.de/releases/76d6/#syslogmp
-.. _pip:      http://www.pip-installer.org/
-.. _IANA:     https://www.iana.org/
 .. _RFC 3164: https://tools.ietf.org/html/rfc3164
 .. _RFC 5424: https://tools.ietf.org/html/rfc5424
 
