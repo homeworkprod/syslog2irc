@@ -33,13 +33,13 @@ def format_message(
         severity_name = message.severity.name
 
         # Important: The message text is a byte string.
-        message_text = message.message.decode(MESSAGE_TEXT_ENCODING)
+        text = message.message.decode(MESSAGE_TEXT_ENCODING)
 
         # Remove leading and trailing newlines. Those would result in
         # additional lines on IRC with the usual metadata but with an
         # empty message text.
-        message_text = message_text.strip('\n')
+        text = text.strip('\n')
 
-        yield f'[{severity_name}]: {message_text}'
+        yield f'[{severity_name}]: {text}'
 
     return ''.join(_generate())
