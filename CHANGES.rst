@@ -5,7 +5,7 @@ Changelog
 Version 0.13
 ------------
 
-Unreleased
+Released 2021-05-07
 
 - Changed log level of message for failed IRC channel join due to bad
   key to "warning". This keeps it visible if one decides logging on
