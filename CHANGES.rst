@@ -14,6 +14,8 @@ Unreleased
 - Simplified implementation of ``format_message``. As it is suggested to
   be copied and adjusted by users, this change should make that easier.
 
+- Corrected Weitersager version in ``Dockerfile``.
+
 
 Version 0.12
 ------------

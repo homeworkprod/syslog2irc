@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-RUN pip install syslog2irc==0.11
+RUN pip install syslog2irc==0.13
 
 COPY ./config.toml .
 
