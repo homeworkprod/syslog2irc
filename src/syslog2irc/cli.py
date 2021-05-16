@@ -8,14 +8,15 @@ Command line argument parsing
 :License: MIT, see LICENSE for details.
 """
 
+from __future__ import annotations
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from . import VERSION
 
 
-def parse_args(args: Optional[List[str]] = None) -> Namespace:
+def parse_args(args: Optional[list[str]] = None) -> Namespace:
     """Parse command line arguments."""
     parser = _create_arg_parser()
     return parser.parse_args(args)

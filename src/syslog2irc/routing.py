@@ -8,10 +8,11 @@ Routing of syslog messages to IRC channels by the port they arrive on.
 :License: MIT, see LICENSE for details.
 """
 
+from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 import logging
-from typing import Any, Dict, Optional, Set
+from typing import Any, Optional
 
 from .network import format_port, Port
 
@@ -30,12 +31,12 @@ class Route:
 class Router:
     """Map syslog port numbers to IRC channel names."""
 
-    def __init__(self, routes: Set[Route]) -> None:
+    def __init__(self, routes: set[Route]) -> None:
         self.ports_to_channel_names = map_ports_to_channel_names(routes)
         self.channel_names_to_ports = map_channel_names_to_ports(
             self.ports_to_channel_names
         )
-        self.enabled_channels: Set[str] = set()
+        self.enabled_channels: set[str] = set()
 
     def enable_channel(
         self, sender: Any, *, channel_name: Optional[str] = None
@@ -59,11 +60,11 @@ class Router:
     def is_channel_enabled(self, channel: str) -> bool:
         return channel in self.enabled_channels
 
-    def get_channel_names_for_port(self, port: Port) -> Set[str]:
+    def get_channel_names_for_port(self, port: Port) -> set[str]:
         return self.ports_to_channel_names[port]
 
 
-def map_ports_to_channel_names(routes: Set[Route]) -> Dict[Port, Set[str]]:
+def map_ports_to_channel_names(routes: set[Route]) -> dict[Port, set[str]]:
     ports_to_channel_names = defaultdict(set)
     for route in routes:
         ports_to_channel_names[route.syslog_port].add(route.irc_channel_name)
@@ -71,8 +72,8 @@ def map_ports_to_channel_names(routes: Set[Route]) -> Dict[Port, Set[str]]:
 
 
 def map_channel_names_to_ports(
-    ports_to_channel_names: Dict[Port, Set[str]]
-) -> Dict[str, Set[Port]]:
+    ports_to_channel_names: dict[Port, set[str]]
+) -> dict[str, set[Port]]:
     channel_names_to_ports = defaultdict(set)
     for port, channel_names in ports_to_channel_names.items():
         for channel_name in channel_names:

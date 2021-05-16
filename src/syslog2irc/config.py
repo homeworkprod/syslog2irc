@@ -8,10 +8,11 @@ Configuration loading
 :License: MIT, see LICENSE for details.
 """
 
+from __future__ import annotations
 from dataclasses import dataclass
 import logging
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Set
+from typing import Any, Iterator, Optional
 
 import rtoml
 
@@ -35,7 +36,7 @@ class ConfigurationError(Exception):
 class Config:
     log_level: str
     irc: IrcConfig
-    routes: Set[Route]
+    routes: set[Route]
 
 
 def load_config(path: Path) -> Config:
@@ -49,7 +50,7 @@ def load_config(path: Path) -> Config:
     return Config(log_level=log_level, irc=irc_config, routes=routes)
 
 
-def _get_log_level(data: Dict[str, Any]) -> str:
+def _get_log_level(data: dict[str, Any]) -> str:
     level = data.get('log_level', 'debug').upper()
 
     if level not in {'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'}:
@@ -58,7 +59,7 @@ def _get_log_level(data: Dict[str, Any]) -> str:
     return level
 
 
-def _get_irc_config(data: Dict[str, Any]) -> IrcConfig:
+def _get_irc_config(data: dict[str, Any]) -> IrcConfig:
     data_irc = data['irc']
 
     server = _get_irc_server(data_irc)
@@ -107,8 +108,8 @@ def _get_irc_channels(data_irc: Any) -> Iterator[IrcChannel]:
 
 
 def _get_routes(
-    data: Dict[str, Any], irc_channels: Set[IrcChannel]
-) -> Set[Route]:
+    data: dict[str, Any], irc_channels: set[IrcChannel]
+) -> set[Route]:
     data_routes = data.get('routes', {})
     if not data_routes:
         logger.warning('No routes have been configured.')

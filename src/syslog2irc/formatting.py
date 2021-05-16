@@ -8,7 +8,7 @@ Message formatting
 :License: MIT, see LICENSE for details.
 """
 
-from typing import Tuple
+from __future__ import annotations
 
 from syslogmp import Message as SyslogMessage
 
@@ -17,7 +17,7 @@ MESSAGE_TEXT_ENCODING = 'utf-8'
 
 
 def format_message(
-    source_address: Tuple[str, int], message: SyslogMessage
+    source_address: tuple[str, int], message: SyslogMessage
 ) -> str:
     """Format syslog message to be displayed on IRC."""
     source_host = source_address[0]

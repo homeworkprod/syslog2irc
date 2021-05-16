@@ -8,6 +8,7 @@ Orchestration, application entry point
 :License: MIT, see LICENSE for details.
 """
 
+from __future__ import annotations
 import logging
 from queue import SimpleQueue
 from typing import Callable, Optional, Tuple
@@ -74,7 +75,7 @@ class Processor:
         self,
         port: Port,
         *,
-        source_address: Optional[Tuple[str, int]] = None,
+        source_address: Optional[tuple[str, int]] = None,
         message: Optional[SyslogMessage] = None,
     ) -> None:
         """Process an incoming syslog message."""
@@ -83,7 +84,7 @@ class Processor:
     def announce_message(
         self,
         port: Port,
-        source_address: Tuple[str, int],
+        source_address: tuple[str, int],
         message: SyslogMessage,
     ) -> None:
         """Announce message on IRC."""

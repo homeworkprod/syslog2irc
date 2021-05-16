@@ -8,6 +8,7 @@ BSD syslog message reception and handling
 :License: MIT, see LICENSE for details.
 """
 
+from __future__ import annotations
 from functools import partial
 import logging
 from socketserver import (
@@ -17,7 +18,7 @@ from socketserver import (
     ThreadingUDPServer,
 )
 import sys
-from typing import Iterable, Tuple, Union
+from typing import Iterable, Union
 
 import syslogmp
 from syslogmp import Message as SyslogMessage
@@ -71,7 +72,7 @@ class UDPHandler(BaseRequestHandler):
 
 
 def _handle_received_message(
-    client_address: Tuple[str, int], port: Port, message: SyslogMessage
+    client_address: tuple[str, int], port: Port, message: SyslogMessage
 ) -> None:
     logger.debug(
         'Received message from %s:%d on port %s -> %s',
