@@ -9,6 +9,8 @@ syslog2IRC
 
 Forward syslog messages to IRC
 
+For a more generic forwarder to IRC, check out `Weitersager <https://homework.nwsnet.de/releases/1cda/#weitersager>`_.
+
 
 Code Status
 ===========
