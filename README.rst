@@ -59,6 +59,12 @@ syslog2IRC and its dependencies can be installed via pip_:
 
     $ pip install syslog2irc
 
+To update an installed copy of syslog2IRC to the most recent release:
+
+.. code:: sh
+
+    $ pip install -U syslog2irc
+
 .. _pip:      http://www.pip-installer.org/
 
 
