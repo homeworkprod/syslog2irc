@@ -7,6 +7,8 @@ Version 0.14
 
 Unreleased
 
+- Updated rtoml to 0.7.1 (from 0.6.1).
+
 
 Version 0.13
 ------------

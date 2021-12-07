@@ -1,4 +1,4 @@
 blinker==1.4
 irc==19.0.1
-rtoml==0.6.1
+rtoml==0.7.1
 syslogmp==0.4
